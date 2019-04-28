@@ -4,9 +4,11 @@ import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.gofficer.codenames.components.Card
 import com.gofficer.codenames.redux.Dispatch
 import com.gofficer.codenames.redux.Unsubscribe
 import gofficer.codenames.game.GameState
@@ -18,6 +20,7 @@ class CodenamesGame : ApplicationAdapter() {
     internal var red: Float = 0f
     internal var green: Float = 0f
     internal var blue: Float = 0f
+    lateinit var card: Card
 
 
     internal lateinit var store: Gamestore
@@ -27,6 +30,7 @@ class CodenamesGame : ApplicationAdapter() {
         batch = SpriteBatch()
         img = Texture("badlogic.jpg")
 
+        card = Card(0f, 0f, 100f, 100f, Color.RED)
 
         val initState = GameState(0f, 0f, 0f, 1, false)
         store = Gamestore(initState)
@@ -39,6 +43,7 @@ class CodenamesGame : ApplicationAdapter() {
             green = state.green
         })
 
+        card.setX(200f)
 
         Gdx.input.inputProcessor = object : InputAdapter() {
             override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
@@ -60,6 +65,9 @@ class CodenamesGame : ApplicationAdapter() {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         batch.begin()
         batch.draw(img, 0f, 0f)
+
+
+        card.draw(batch, 1f)
         batch.end()
 
 
