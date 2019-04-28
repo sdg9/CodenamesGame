@@ -1,6 +1,6 @@
 package com.gofficer.codenames;
 
-import com.gofficer.codenames.game.CodenamesGame;
+import com.gofficer.codenames.game.Application;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 
@@ -11,7 +11,7 @@ public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new CodenamesGame(), config);
+        return new IOSApplication(new Application(), config);
     }
 
     public static void main(String[] argv) {
