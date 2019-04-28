@@ -1,4 +1,4 @@
-package com.gofficer.codenames.components
+package com.gofficer.codenames.actors
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
