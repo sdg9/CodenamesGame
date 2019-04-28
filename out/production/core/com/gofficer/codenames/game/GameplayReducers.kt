@@ -1,0 +1,60 @@
+package com.gofficer.codenames
+import com.badlogic.gdx.Gdx
+import com.gofficer.codenames.game.ChangeColor
+import com.gofficer.codenames.redux.Action
+import com.gofficer.codenames.redux.Reducer
+import gofficer.codenames.game.GameState
+
+fun GameState.reduceSetup(action: Action): GameState {
+    return when(action) {
+//        is AddShip -> reduceChildState(this, boardById(action.offense), action, Board::reduceSetup, { state, board -> state.updateBoard(board) })
+        else -> this
+    }
+}
+
+fun GameState.reduceGameplay(action: Action): GameState {
+    return when(action) {
+        is ChangeColor -> copy(red = action.red, blue = action.blue, green = action.green)
+//        is ChangeColor -> {
+//            Gdx.app.log("GamePlay Reducer", action.toString());
+//            copy(red = action.red)
+//            copy(green = action.green)
+//            copy(blue = action.blue)
+//        }
+//        is GeneratedAction -> {
+//            val offense = boardById(action.offense).reduceOffense(action)
+//            val defense = boardById(action.defense).reduceDefense(action)
+//            copy(board1 = whichBoard(board1, offense, defense),
+//                    board2 = whichBoard(board2, offense, defense),
+//                    gameOver = action is GeneratedAction.DefinitiveAction.LostGame)
+//
+//        }
+//        is SwitchAction -> {
+//            reduceGameplay(action.last).copy(lastPlayed = action.offense)
+//        }
+        else -> this
+    }
+}
+
+fun<State, Child> reduceChildState(
+        state: State,
+        child: Child,
+        action: Action,
+        reducer: Reducer<Child>,
+        onReduced: (State, Child) -> State): State {
+
+    val reduced = reducer.invoke(child, action)
+    if (reduced === child) {
+        return state
+    }
+
+    return onReduced(state, reduced)
+}
+//
+//private fun whichBoard(board: Board, offense: Board, defense: Board): Board {
+//    return when(board.id) {
+//        offense.id -> offense
+//        defense.id -> defense
+//        else -> board
+//    }
+//}
