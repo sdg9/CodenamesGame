@@ -91,10 +91,10 @@ class MainMenuScreen(private val app: Application) : Screen {
         })
 
         buttonExit = TextButton("Exit", skin!!, "default")
-        buttonExit!!.setPosition(110f, 190f)
-        buttonExit!!.setSize(280f, 60f)
-        buttonExit!!.addAction(sequence(alpha(0f), parallel(fadeIn(.5f), moveBy(0f, -20f, .5f, Interpolation.pow5Out))))
-        buttonExit!!.addListener(object : ClickListener() {
+        buttonExit?.setPosition(110f, 190f)
+        buttonExit?.setSize(280f, 60f)
+        buttonExit?.addAction(sequence(alpha(0f), parallel(fadeIn(.5f), moveBy(0f, -20f, .5f, Interpolation.pow5Out))))
+        buttonExit?.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 Gdx.app.exit()
             }
