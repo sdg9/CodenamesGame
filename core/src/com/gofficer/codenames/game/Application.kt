@@ -16,9 +16,25 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.gofficer.codenames.screens.MainMenuScreen
 import com.gofficer.codenames.screens.LoadingScreen
 import com.gofficer.codenames.screens.PlayScreen
+import com.gofficer.codenames.utils.logger
 
 
 class Application : Game() {
+
+
+    companion object {
+        @kotlin.jvm.JvmField
+        val VERSION = 0.1f
+        @kotlin.jvm.JvmField
+        val V_WIDTH  = 480f
+        @kotlin.jvm.JvmField
+        val V_HEIGHT = 420f
+        @kotlin.jvm.JvmField
+        val TITLE = "My Game"
+        @JvmStatic
+        private val log = logger<Application>()
+    }
+
     internal lateinit var batch: SpriteBatch
     internal lateinit var img: Texture
     internal var red: Float = 0f
@@ -128,14 +144,4 @@ class Application : Game() {
         font24 = generator.generateFont(params)
     }
 
-    companion object {
-        @kotlin.jvm.JvmField
-        val VERSION = 0.1f
-        @kotlin.jvm.JvmField
-        val V_WIDTH  = 480f
-        @kotlin.jvm.JvmField
-        val V_HEIGHT = 420f
-        @kotlin.jvm.JvmField
-        val TITLE = "My Game"
-    }
 }

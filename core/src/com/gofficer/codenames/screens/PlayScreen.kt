@@ -3,6 +3,7 @@ package com.gofficer.codenames.screens
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Interpolation;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -18,12 +20,20 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.Align
+import com.gofficer.codenames.actions.FlipAction
+import com.gofficer.codenames.actors.Card
 import com.gofficer.codenames.game.Application
 import com.gofficer.codenames.actors.SlideButton
+import com.gofficer.codenames.utils.logger
 
 
 class PlayScreen(// App reference
         private val app: Application) : Screen {
+
+    companion object {
+        @JvmStatic
+        private val log = logger<PlayScreen>()
+    }
 
     // Stage vars
     private val stage: Stage
@@ -148,8 +158,20 @@ class PlayScreen(// App reference
         val button = skin?.let {
             SlideButton(id.toString() + "", it, "default", id)
         }
+
+        val card = Card(0f, 0f, 20f, 20f, Color.RED)
 //        button?.setOrigin(button.width / 2, button.height / 2)
         stage.addActor(button)
+        stage.addActor(card)
+
+        card.addAction(
+                SequenceAction(
+                        FlipAction.flipOut(0f, 10f, 1f),
+                        FlipAction.flipIn(0f, 10f, 1f)
+                )
+        )
+
+
 
 //        val id2 = 5
 //        stage.addActor(skin?.let { SlideButton(id2.toString() + "", it, "default", id2) })
