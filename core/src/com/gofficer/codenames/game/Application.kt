@@ -56,7 +56,9 @@ class Application : Game() {
     private var unsubscribe: Unsubscribe? = null
     private var dispatch: Dispatch? = null
     override fun create() {
+        Gdx.app.logLevel = com.badlogic.gdx.Application.LOG_DEBUG
 
+        log.debug("create()")
 
         assets = AssetManager()
         camera = OrthographicCamera()

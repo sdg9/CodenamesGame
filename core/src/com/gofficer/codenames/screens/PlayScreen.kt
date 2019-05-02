@@ -24,6 +24,7 @@ import com.gofficer.codenames.actions.FlipAction
 import com.gofficer.codenames.actors.Card
 import com.gofficer.codenames.game.Application
 import com.gofficer.codenames.actors.SlideButton
+import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
 
 
@@ -95,8 +96,7 @@ class PlayScreen(// App reference
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        clearScreen()
 
         update(delta)
 
@@ -170,7 +170,6 @@ class PlayScreen(// App reference
                         FlipAction.flipIn(0f, 10f, 1f)
                 )
         )
-
 
 
 //        val id2 = 5
