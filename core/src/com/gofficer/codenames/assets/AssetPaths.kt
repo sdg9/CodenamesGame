@@ -9,4 +9,5 @@ object AssetPaths {
     const val GAMEPLAY = "gameplay/gameplay.atlas"
     const val SPLASH = "splash/splash.atlas"
     const val UI_SKIN = "ui/uiskin.atlas"
+    const val UI_SKIN_JSON = "ui/uiskin.json"
 }

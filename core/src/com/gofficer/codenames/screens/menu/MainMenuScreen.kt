@@ -17,12 +17,11 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
 import com.badlogic.gdx.utils.Align
 import com.gofficer.codenames.assets.AssetDescriptors
-import com.gofficer.codenames.assets.RegionNames
+import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.game.CodenamesGame
 import com.gofficer.codenames.screens.game.PlayScreen
 import com.gofficer.codenames.utils.clearScreen
-import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.utils.logger
 import com.gofficer.codenames.utils.toInternalFile
 
@@ -35,20 +34,15 @@ class MainMenuScreen(private val game: CodenamesGame) : ScreenAdapter() {
 
     private var skin: Skin = Skin()
 
-    lateinit private var buttonPlay: TextButton
-    lateinit private var buttonExit: TextButton
+    private lateinit var buttonPlay: TextButton
+    private lateinit var buttonExit: TextButton
 
     private val renderer: ShapeRenderer = ShapeRenderer()
 
     private val camera = OrthographicCamera()
     private val stage: Stage = Stage(FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera))
-    private val gameplayAtlas = game.assetManager[AssetDescriptors.GAMEPLAY]
     private val uiSkinAtlas = game.assetManager[AssetDescriptors.UI_SKIN]
-    private val backgroundTexture = gameplayAtlas[RegionNames.BACKGROUND]
 
-    private val font = game.assetManager[AssetDescriptors.FONT]
-
-//    private var splashImg: Image = Image(splashIconTexture)
 
     override fun show() {
         log.debug("show")
@@ -91,7 +85,7 @@ class MainMenuScreen(private val game: CodenamesGame) : ScreenAdapter() {
     private fun initSkin() {
         skin.addRegions(uiSkinAtlas)
         skin.add("default-font", game.font24)
-        skin.load("ui/uiskin.json".toInternalFile())
+        skin.load(AssetPaths.UI_SKIN_JSON.toInternalFile())
     }
 
     private fun initButtons() {
