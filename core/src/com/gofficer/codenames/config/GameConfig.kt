@@ -23,6 +23,7 @@ object GameConfig {
     const val MEDIUM_OBSTACLE_SPEED = 0.15f
     const val HARD_OBSTACLE_SPEED = 0.18f
 
+    const val USE_SPLASH = false
 
     const val VERSION = 0.1f
     const val TITLE = "Codenames Game"

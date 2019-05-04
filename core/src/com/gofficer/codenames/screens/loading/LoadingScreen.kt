@@ -74,10 +74,9 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
     private fun update(delta: Float) {
         progress = MathUtils.lerp(progress, assetManager.progress, .1f)
         if (assetManager.update() && progress >= assetManager.progress - .001f) {
-//            changedScreen = true
-//            game.screen = SplashScreen(game)
 
-            game.screen = MainMenuScreen(game)
+            @Suppress("ConstantConditionIf")
+            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
         }
     }
 
