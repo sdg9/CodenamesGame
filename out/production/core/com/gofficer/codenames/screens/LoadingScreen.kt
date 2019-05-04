@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
-import com.gofficer.codenames.game.Application
+import com.gofficer.codenames.game.CodenamesGame
 
 
-class LoadingScreen(private val app: Application) : Screen {
+class LoadingScreen(private val app: CodenamesGame) : Screen {
 
     private val shapeRenderer: ShapeRenderer
     private var progress: Float = 0.toFloat()

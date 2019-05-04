@@ -2,15 +2,18 @@ package com.gofficer.codenames.desktop
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.gofficer.codenames.game.Application
+import com.gofficer.codenames.config.GameConfig
+import com.gofficer.codenames.game.CodenamesGame
 
 fun main(args: Array<String>) {
     val config = LwjglApplicationConfiguration()
-    config.title = Application.TITLE + " v" + Application.VERSION
-    config.width = Application.V_WIDTH.toInt()
-    config.height = Application.V_HEIGHT.toInt()
+    config.title = GameConfig.TITLE + " v" + GameConfig.VERSION
+    config.width = GameConfig.WIDTH
+    config.height = GameConfig.HEIGHT
     config.backgroundFPS = 60
     config.foregroundFPS = 60
-    config.resizable = false
-    LwjglApplication(Application(), config)
+//    config.resizable = false
+    config.x = (1920 - GameConfig.WIDTH) / 2
+    config.y = (1080 - GameConfig.HEIGHT) / 2
+    LwjglApplication(CodenamesGame(), config)
 }

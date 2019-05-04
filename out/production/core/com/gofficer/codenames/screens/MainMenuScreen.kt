@@ -15,9 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
-import com.gofficer.codenames.game.Application
+import com.gofficer.codenames.game.CodenamesGame
 
-class MainMenuScreen(private val app: Application) : Screen {
+class MainMenuScreen(private val app: CodenamesGame) : Screen {
 
     private val stage: Stage
     private var skin: Skin? = null
@@ -28,7 +28,7 @@ class MainMenuScreen(private val app: Application) : Screen {
     private val shapeRenderer: ShapeRenderer
 
     init {
-        this.stage = Stage(FitViewport(Application.V_WIDTH, Application.V_HEIGHT, app.camera))
+        this.stage = Stage(FitViewport(CodenamesGame.V_WIDTH, CodenamesGame.V_HEIGHT, app.camera))
         this.shapeRenderer = ShapeRenderer()
     }
 
@@ -91,10 +91,10 @@ class MainMenuScreen(private val app: Application) : Screen {
         })
 
         buttonExit = TextButton("Exit", skin!!, "default")
-        buttonExit!!.setPosition(110f, 190f)
-        buttonExit!!.setSize(280f, 60f)
-        buttonExit!!.addAction(sequence(alpha(0f), parallel(fadeIn(.5f), moveBy(0f, -20f, .5f, Interpolation.pow5Out))))
-        buttonExit!!.addListener(object : ClickListener() {
+        buttonExit?.setPosition(110f, 190f)
+        buttonExit?.setSize(280f, 60f)
+        buttonExit?.addAction(sequence(alpha(0f), parallel(fadeIn(.5f), moveBy(0f, -20f, .5f, Interpolation.pow5Out))))
+        buttonExit?.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 Gdx.app.exit()
             }

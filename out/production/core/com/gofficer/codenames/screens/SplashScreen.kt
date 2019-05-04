@@ -10,15 +10,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
-import com.gofficer.codenames.game.Application
+import com.gofficer.codenames.game.CodenamesGame
 
-class SplashScreen(private val app: Application) : Screen {
+class SplashScreen(private val app: CodenamesGame) : Screen {
     private val stage: Stage
 
     private var splashImg: Image? = null
 
     init {
-        this.stage = Stage(FitViewport(Application.V_WIDTH, Application.V_HEIGHT, app.camera))
+        this.stage = Stage(FitViewport(CodenamesGame.V_WIDTH, CodenamesGame.V_HEIGHT, app.camera))
     }
 
     override fun show() {
@@ -31,9 +31,9 @@ class SplashScreen(private val app: Application) : Screen {
 //        app.assets.load()
         val splashTex = app.assets.get("img/splash.png", Texture::class.java)
         splashImg = Image(splashTex)
-        splashImg!!.setOrigin(splashImg!!.width / 2, splashImg!!.height / 2)
-        splashImg!!.setPosition(stage.width / 2 - 32, stage.height + 32)
-        splashImg!!.addAction(sequence(alpha(0f), scaleTo(.1f, .1f),
+        splashImg?.setOrigin(splashImg!!.width / 2, splashImg!!.height / 2)
+        splashImg?.setPosition(stage.width / 2 - 32, stage.height + 32)
+        splashImg?.addAction(sequence(alpha(0f), scaleTo(.1f, .1f),
                 parallel(fadeIn(2f, Interpolation.pow2),
                         scaleTo(2f, 2f, 2.5f, Interpolation.pow5),
                         moveTo(stage.width / 2 - 32, stage.height / 2 - 32, 2f, Interpolation.swing)),

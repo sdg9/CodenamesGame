@@ -1,35 +1,32 @@
-package com.gofficer.codenames.screens
+package com.gofficer.codenames.screens.game
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.Align
 import com.gofficer.codenames.actions.FlipAction
 import com.gofficer.codenames.actors.Card
-import com.gofficer.codenames.game.Application
+import com.gofficer.codenames.game.CodenamesGame
 import com.gofficer.codenames.actors.SlideButton
+import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
 
 
 class PlayScreen(// App reference
-        private val app: Application) : Screen {
+        private val app: CodenamesGame) : Screen {
 
     companion object {
         @JvmStatic
@@ -37,7 +34,6 @@ class PlayScreen(// App reference
     }
 
     // Stage vars
-    private val stage: Stage
     private var skin: Skin? = null
 
     // Game Grid
@@ -53,19 +49,19 @@ class PlayScreen(// App reference
     // Info label
     private var labelInfo: Label? = null
 
-    init {
-        this.stage = Stage(FitViewport(Application.V_WIDTH, Application.V_HEIGHT, app.camera))
-    }
+    private val camera = OrthographicCamera()
+    private val stage: Stage = Stage(FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera))
+
 
     override fun show() {
         println("PLAY")
         Gdx.input.inputProcessor = stage
         stage.clear()
 
-        this.skin = Skin()
-        this.skin?.addRegions(app.assets.get("ui/uiskin.atlas", TextureAtlas::class.java))
-        this.skin?.add("default-font", app.font24)
-        this.skin?.load(Gdx.files.internal("ui/uiskin.json"))
+//        this.skin = Skin()
+//        this.skin?.addRegions(app.assets.get("ui/uiskin.atlas", TextureAtlas::class.java))
+//        this.skin?.add("default-font", app.font24)
+//        this.skin?.load(Gdx.files.internal("ui/uiskin.json"))
 
         initNavigationButtons()
         initInfoLabel()
@@ -130,16 +126,16 @@ class PlayScreen(// App reference
 
     // Initialize the back button
     private fun initNavigationButtons() {
-        buttonBack = TextButton("Back", skin!!, "default")
-        buttonBack?.setPosition(20f, app.camera.viewportHeight - 70)
-        buttonBack?.setSize(100f, 50f)
-        buttonBack?.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                app.setScreen(app.mainMenuScreen)
-            }
-        })
+//        buttonBack = TextButton("Back", skin!!, "default")
+//        buttonBack?.setPosition(20f, app.camera.viewportHeight - 70)
+//        buttonBack?.setSize(100f, 50f)
+//        buttonBack?.addListener(object : ClickListener() {
+//            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+//                app.setScreen(app.mainMenuScreen)
+//            }
+//        })
 
-        stage.addActor(buttonBack)
+//        stage.addActor(buttonBack)
     }
 
     // Initialize the info label

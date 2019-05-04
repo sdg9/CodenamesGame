@@ -3,26 +3,33 @@ package com.gofficer.codenames.screens
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.Align
-import com.gofficer.codenames.game.Application
+import com.gofficer.codenames.actions.FlipAction
+import com.gofficer.codenames.actors.Card
+import com.gofficer.codenames.game.CodenamesGame
 import com.gofficer.codenames.actors.SlideButton
+import com.gofficer.codenames.utils.clearScreen
+import com.gofficer.codenames.utils.logger
 
 
 class PlayScreen(// App reference
-        private val app: Application) : Screen {
+        private val app: CodenamesGame) : Screen {
+
+    companion object {
+        @JvmStatic
+        private val log = logger<PlayScreen>()
+    }
 
     // Stage vars
     private val stage: Stage
@@ -42,7 +49,7 @@ class PlayScreen(// App reference
     private var labelInfo: Label? = null
 
     init {
-        this.stage = Stage(FitViewport(Application.V_WIDTH, Application.V_HEIGHT, app.camera))
+        this.stage = Stage(FitViewport(CodenamesGame.V_WIDTH, CodenamesGame.V_HEIGHT, app.camera))
     }
 
     override fun show() {
@@ -51,9 +58,9 @@ class PlayScreen(// App reference
         stage.clear()
 
         this.skin = Skin()
-        this.skin!!.addRegions(app.assets.get("ui/uiskin.atlas", TextureAtlas::class.java))
-        this.skin!!.add("default-font", app.font24)
-        this.skin!!.load(Gdx.files.internal("ui/uiskin.json"))
+        this.skin?.addRegions(app.assets.get("ui/uiskin.atlas", TextureAtlas::class.java))
+        this.skin?.add("default-font", app.font24)
+        this.skin?.load(Gdx.files.internal("ui/uiskin.json"))
 
         initNavigationButtons()
         initInfoLabel()
@@ -84,8 +91,7 @@ class PlayScreen(// App reference
     }
 
     override fun render(delta: Float) {
-        Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        clearScreen()
 
         update(delta)
 
@@ -120,9 +126,9 @@ class PlayScreen(// App reference
     // Initialize the back button
     private fun initNavigationButtons() {
         buttonBack = TextButton("Back", skin!!, "default")
-        buttonBack!!.setPosition(20f, app.camera.viewportHeight - 70)
-        buttonBack!!.setSize(100f, 50f)
-        buttonBack!!.addListener(object : ClickListener() {
+        buttonBack?.setPosition(20f, app.camera.viewportHeight - 70)
+        buttonBack?.setSize(100f, 50f)
+        buttonBack?.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 app.setScreen(app.mainMenuScreen)
             }
@@ -134,20 +140,39 @@ class PlayScreen(// App reference
     // Initialize the info label
     private fun initInfoLabel() {
         labelInfo = Label("Welcome! Click any number tile to begin!", skin!!, "default")
-        labelInfo!!.setPosition(25f, 310f)
-        labelInfo!!.setAlignment(Align.center)
-        labelInfo!!.addAction(sequence(alpha(0f), delay(.5f), fadeIn(.5f)))
+        labelInfo?.setPosition(25f, 310f)
+        labelInfo?.setAlignment(Align.center)
+        labelInfo?.addAction(sequence(alpha(0f), delay(.5f), fadeIn(.5f)))
         stage.addActor(labelInfo)
     }
 
     // Initialize the game grid
     private fun initGrid() {
         val id = 4
-        stage.addActor(skin?.let { SlideButton(id.toString() + "", it, "default", id) })
 
-        val id2 = 5
-        stage.addActor(skin?.let { SlideButton(id2.toString() + "", it, "default", id2) })
-        stage.actors[1].x = 100f
+        val button = skin?.let {
+            SlideButton(id.toString() + "", it, "default", id)
+        }
+
+        val card = Card(0f, 0f, 20f, 20f, Color.RED)
+//        button?.setOrigin(button.width / 2, button.height / 2)
+        stage.addActor(button)
+        stage.addActor(card)
+
+        card.addAction(
+                SequenceAction(
+                        FlipAction.flipOut(0f, 10f, 1f),
+                        FlipAction.flipIn(0f, 10f, 1f)
+                )
+        )
+
+
+//        val id2 = 5
+//        stage.addActor(skin?.let { SlideButton(id2.toString() + "", it, "default", id2) })
+//        stage.actors[1].x = 100f
+//        stage.actors[1].moveBy(50f, 10f)
+        button?.addAction(moveTo(100f, 0f, 1f))
+//        button?.addAction(rotateBy(320f, 1f))
 
 //        stage.actors[1].x = 40f
 
