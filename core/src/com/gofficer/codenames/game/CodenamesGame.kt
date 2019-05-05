@@ -9,10 +9,10 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
+import com.gofficer.codenames.screens.game.PlayScreen
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
-
 
 class CodenamesGame : Game() {
 
@@ -37,7 +37,7 @@ class CodenamesGame : Game() {
 //    var splashScreen: SplashScreen? = null
 //    var loadingScreen: LoadingScreen? = null
 //    var mainMenuScreen: MainMenuScreen? = null
-//    var playScreen: PlayScreen? = null
+//    var playScreen: PlayScreenOld? = null
 //
 //    lateinit var assets: AssetManager
 
@@ -66,7 +66,7 @@ class CodenamesGame : Game() {
 //        loadingScreen = LoadingScreen(this)
 //        splashScreen = SplashScreen(this)
 //        mainMenuScreen = MainMenuScreen(this)
-//        playScreen = PlayScreen(this)
+//        playScreen = PlayScreenOld(this)
 
 
 //        this.setScreen(loadingScreen);

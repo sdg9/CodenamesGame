@@ -10,8 +10,8 @@ fun main(args: Array<String>) {
     config.title = GameConfig.TITLE + " v" + GameConfig.VERSION
     config.width = GameConfig.WIDTH
     config.height = GameConfig.HEIGHT
-    config.backgroundFPS = 60
-    config.foregroundFPS = 60
+    config.backgroundFPS = GameConfig.DEFAULT_FPS_LIMIT
+    config.foregroundFPS = GameConfig.DEFAULT_FPS_LIMIT
 //    config.resizable = false
     config.x = (1920 - GameConfig.WIDTH) / 2
     config.y = (1080 - GameConfig.HEIGHT) / 2

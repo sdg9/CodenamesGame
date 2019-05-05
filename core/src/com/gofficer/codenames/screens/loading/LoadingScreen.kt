@@ -9,9 +9,13 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.game.CodenamesGame
+import com.gofficer.codenames.screens.game.PlayScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle
+import com.gofficer.codenames.utils.drawGrid
 
 
 class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
@@ -20,8 +24,10 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
         @JvmStatic
         private val log = logger<LoadingScreen>()
 
-        private const val PROGRESS_BAR_WIDTH = GameConfig.HUD_WIDTH / 2f // world units
-        private const val PROGRESS_BAR_HEIGHT = 60f // world units
+        private const val PROGRESS_BAR_WIDTH = GameConfig.HUD_WIDTH // world units
+
+//        private const val PROGRESS_BAR_WIDTH = GameConfig.HUD_WIDTH / 2f // world units
+        private const val PROGRESS_BAR_HEIGHT = 10f // world units
 
     }
 
@@ -36,6 +42,9 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
         camera = OrthographicCamera()
         viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
         renderer = ShapeRenderer()
+//        viewport.apply()
+
+//        renderer.projectionMatrix = camera.combined
 
         progress = 0f
 
@@ -46,13 +55,18 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
 
         clearScreen()
 
-        // TODO I don't fully understand this
-//        viewport.apply()
-//        renderer.projectionMatrix = camera.combined
+        // TODO I don't fully understand this, required when changing between viewports
+        viewport.apply()
+        renderer.projectionMatrix = camera.combined
+
+
+
+//        viewport.drawGrid(renderer)
 
         renderer.begin(ShapeRenderer.ShapeType.Filled)
         draw()
         renderer.end()
+
 
         update(delta)
     }
@@ -77,6 +91,7 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
 
             @Suppress("ConstantConditionIf")
             game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
+//            game.screen = PlayScreen(game)
         }
     }
 
@@ -84,6 +99,10 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
 
         val progressBarX = (GameConfig.HUD_WIDTH - PROGRESS_BAR_WIDTH) / 2f
         val progressBarY = (GameConfig.HUD_HEIGHT - PROGRESS_BAR_HEIGHT) / 2f
+
+
+//        val progressBarX = 0f
+//        val progressBarY = (GameConfig.HUD_HEIGHT) / 2f
 
         renderer.rect(progressBarX, progressBarY,
                 progress * PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT)

@@ -2,14 +2,14 @@ package com.gofficer.codenames.config
 
 object GameConfig {
 
-    const val WIDTH = 480 // pixels - desktop only
-    const val HEIGHT = 800 // pixels - desktop only
+    const val WIDTH = 1280 // pixels - desktop only
+    const val HEIGHT = 720 // pixels - desktop only
 
-    const val WORLD_WIDTH = 600.0f // world units
-    const val WORLD_HEIGHT = 1000.0f // world units
+    const val WORLD_WIDTH = 1280f // world units
+    const val WORLD_HEIGHT = 720f // world units
 
-    const val HUD_WIDTH = 480f // world units, 1 : 1 ppu
-    const val HUD_HEIGHT = 800f // world units, 1 : 1 ppu
+    const val HUD_WIDTH = 1280 / 2f // world units, 1 : 1 ppu
+    const val HUD_HEIGHT = 720 / 2f // world units, 1 : 1 ppu
 
     const val WORLD_CENTER_X = WORLD_WIDTH / 2f
     const val WORLD_CENTER_Y = WORLD_HEIGHT / 2f
@@ -27,4 +27,6 @@ object GameConfig {
 
     const val VERSION = 0.1f
     const val TITLE = "Codenames Game"
+
+    const val DEFAULT_FPS_LIMIT = 60
 }
