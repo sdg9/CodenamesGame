@@ -1,5 +1,7 @@
 package com.gofficer.codenames.screens.game
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.ScreenAdapter
 import com.gofficer.codenames.game.CodenamesGame
@@ -20,12 +22,19 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
     override fun show() {
         log.debug("show")
         controller = PlayController()
-        renderer = PlayRenderer(assetManager, controller)
+        renderer = PlayRenderer(game.font24, assetManager, controller)
+        renderer.show()
     }
 
     override fun render(delta: Float) {
         controller.update(delta)
-        renderer.render()
+        renderer.render(delta)
+
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
+            hide()
+            show()
+        }
     }
 
     override fun resize(width: Int, height: Int) {

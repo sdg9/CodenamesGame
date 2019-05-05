@@ -6,21 +6,28 @@ filter: Nearest,Nearest
 repeat: none
 background
   rotate: false
-  xy: 2, 96
+  xy: 2, 220
   size: 480, 800
   orig: 480, 800
   offset: 0, 0
   index: -1
+card
+  rotate: false
+  xy: 2, 52
+  size: 260, 166
+  orig: 260, 166
+  offset: 0, 0
+  index: -1
 obstacle
   rotate: false
-  xy: 2, 46
+  xy: 2, 2
   size: 48, 48
   orig: 48, 48
   offset: 0, 0
   index: -1
 player
   rotate: false
-  xy: 2, 2
+  xy: 264, 176
   size: 48, 42
   orig: 48, 42
   offset: 0, 0

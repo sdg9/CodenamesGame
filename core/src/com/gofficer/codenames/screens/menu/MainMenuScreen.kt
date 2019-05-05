@@ -6,23 +6,18 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 
-import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
 import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.utils.Align
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.game.CodenamesGame
 import com.gofficer.codenames.screens.game.PlayScreen
-import com.gofficer.codenames.screens.game.PlayScreenOld
 import com.gofficer.codenames.utils.clearScreen
-import com.gofficer.codenames.utils.drawGrid
 import com.gofficer.codenames.utils.logger
 import com.gofficer.codenames.utils.toInternalFile
 

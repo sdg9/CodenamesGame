@@ -14,8 +14,11 @@ fun clearScreen(red: Float, green: Float, blue: Float, alpha: Float) {
     // clear screen
     // DRY - Don't repeat yourself
     // WET - Waste everyone's time
-    Gdx.gl.glClearColor(red, green, blue, alpha)
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+//    Gdx.gl.glClearColor(red, green, blue, alpha)
+//    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
+    Gdx.gl.glClearColor(.135f, .206f, .235f, 1f);
+    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 }
 
 inline fun Batch.use(action: () -> Unit) {

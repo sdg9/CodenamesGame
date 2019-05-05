@@ -90,8 +90,8 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
         if (assetManager.update() && progress >= assetManager.progress - .001f) {
 
             @Suppress("ConstantConditionIf")
-            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
-//            game.screen = PlayScreen(game)
+//            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
+            game.screen = PlayScreen(game)
         }
     }
 

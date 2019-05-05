@@ -8,6 +8,7 @@ object RegionNames {
     const val BACKGROUND = "background"
     const val OBSTACLE = "obstacle"
     const val PLAYER = "player"
+    const val CARD = "card"
 
     const val SPLASH_ICON = "splash"
 }
