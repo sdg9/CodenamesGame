@@ -81,6 +81,10 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
                     override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                         log.debug("Touched $j-$k")
 
+                        // TODO: If possible...
+                        // TODO: dispatch action saying pressed
+                        // TODO: have action update state tree saying item is pressed
+                        // TODO: Update stage accordingly
                         myCard.setCardText("Pushed")
 //                        doSomething(x, y, pointer)pointer
                         event.handle()//the Stage will stop trying to handle this event
@@ -141,7 +145,7 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         viewport.apply()
         batch.projectionMatrix = camera.combined
 
-        viewport.drawGrid(renderer, (GameConfig.WORLD_WIDTH / 10).toInt())
+//        viewport.drawGrid(renderer, (GameConfig.WORLD_WIDTH / 10).toInt())
     }
 
     private fun renderUi(delta: Float) {
