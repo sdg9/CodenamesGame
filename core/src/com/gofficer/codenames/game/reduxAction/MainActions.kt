@@ -1,5 +1,5 @@
-package com.gofficer.codenames.game
+package com.gofficer.codenames.game.reduxAction
 
-import com.gofficer.codenames.redux.Action
+import com.gofficer.redux.Action
 
 data class ChangeColor(val red: Float, val green: Float, val blue: Float): Action

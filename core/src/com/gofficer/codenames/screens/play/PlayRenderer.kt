@@ -1,4 +1,4 @@
-package com.gofficer.codenames.screens.game
+package com.gofficer.codenames.screens.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
@@ -6,17 +6,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.ImageTextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gofficer.codenames.actors.Card
@@ -24,12 +17,14 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.gofficer.codenames.game.reduxAction.CardPressed
+import com.gofficer.codenames.game.Gamestore
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
-                   private val controller: PlayController) : Disposable {
+                   private val controller: PlayController,
+                   private val store: Gamestore) : Disposable {
 
     companion object {
         @JvmStatic
@@ -67,7 +62,7 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         for (j in 1..4) {
             table.row().pad(10f) // padding on all sides between cards
             for (k in 1..5) {
-//                val cardDrawable = TextureRegionDrawable(TextureRegion(cardTexture))
+//                val cardDrawable = TextureRegionDrawable(TextureRegion(cardTextcure))
 //                val playButton = ImageButton(cardDrawable)
 //                table.add(ImageTextButton("test", playButton))
 
@@ -75,17 +70,19 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 //                    scaleX = 0.5f
 //                    scaleY = 0.5f
 //                }
-                val myCard = Card("test-$j-$k", assetManager, myFont)
+                val cardName = "test-$j-$k"
+                val myCard = Card(cardName, assetManager, myFont, store)
 //                myCard.touchable = Touchable.enabled
                 myCard.addListener(object : ClickListener() {
                     override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                        log.debug("Touched $j-$k")
+                        log.debug("Touched $cardName")
 
+                        store.dispatch(CardPressed(cardName))
                         // TODO: If possible...
                         // TODO: dispatch action saying pressed
                         // TODO: have action update state tree saying item is pressed
                         // TODO: Update stage accordingly
-                        myCard.setCardText("Pushed")
+//                        myCard.setCardText("Pushed")
 //                        doSomething(x, y, pointer)pointer
                         event.handle()//the Stage will stop trying to handle this event
                         return true //the inputmultiplexer will stop trying to handle this touch

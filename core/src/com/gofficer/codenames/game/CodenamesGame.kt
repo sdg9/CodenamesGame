@@ -2,17 +2,17 @@ package com.gofficer.codenames.game
 
 import com.badlogic.gdx.*
 import com.badlogic.gdx.assets.AssetManager
-import com.gofficer.codenames.redux.Dispatch
-import com.gofficer.codenames.redux.Unsubscribe
+import com.gofficer.redux.Dispatch
+import com.gofficer.redux.Unsubscribe
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
-import com.gofficer.codenames.screens.game.PlayScreen
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
+import gofficer.codenames.game.GameState
 
 class CodenamesGame : Game() {
 
@@ -41,6 +41,7 @@ class CodenamesGame : Game() {
 //
 //    lateinit var assets: AssetManager
 
+    private val initState : GameState = GameState()
 
     internal lateinit var store: Gamestore
     private var unsubscribe: Unsubscribe? = null
@@ -53,6 +54,8 @@ class CodenamesGame : Game() {
         initFonts()
 
         setScreen(LoadingScreen(this))
+
+        store = Gamestore(initState)
 //
 //        log.debug("create()")
 //

@@ -1,4 +1,4 @@
-package com.gofficer.codenames.screens.game
+package com.gofficer.codenames.screens.play
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input

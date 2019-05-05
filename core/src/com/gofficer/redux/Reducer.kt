@@ -1,4 +1,4 @@
-package com.gofficer.codenames.redux
+package com.gofficer.redux
 
 typealias Reducer<State> = (State, Action) -> State
 

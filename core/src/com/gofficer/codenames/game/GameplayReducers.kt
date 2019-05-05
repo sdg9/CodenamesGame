@@ -1,8 +1,8 @@
 package com.gofficer.codenames
-import com.badlogic.gdx.Gdx
-import com.gofficer.codenames.game.ChangeColor
-import com.gofficer.codenames.redux.Action
-import com.gofficer.codenames.redux.Reducer
+import com.gofficer.codenames.game.reduxAction.CardPressed
+import com.gofficer.codenames.game.reduxAction.ChangeColor
+import com.gofficer.redux.Action
+import com.gofficer.redux.Reducer
 import gofficer.codenames.game.GameState
 
 fun GameState.reduceSetup(action: Action): GameState {
@@ -15,7 +15,8 @@ fun GameState.reduceSetup(action: Action): GameState {
 fun GameState.reduceGameplay(action: Action): GameState {
     return when(action) {
         is ChangeColor -> copy(red = action.red, blue = action.blue, green = action.green)
-//        is ChangeColor -> {
+        is CardPressed -> copy(guessed = action.word)
+//        is Chang eColor -> {
 //            Gdx.app.log("GamePlay Reducer", action.toString());
 //            copy(red = action.red)
 //            copy(green = action.green)

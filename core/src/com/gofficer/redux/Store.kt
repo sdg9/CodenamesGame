@@ -1,9 +1,6 @@
-package com.gofficer.codenames.redux
+package com.gofficer.redux
 
-
-//import android.os.Looper
-//import android.util.Log
-//import com.fenchtose.battleship.BuildConfig
+import com.badlogic.gdx.utils.Logger
 
 interface Action
 
@@ -27,6 +24,11 @@ abstract class SimpleStore<State>(initialState: State,
                                   private val reducers: List<Reducer<State>>,
                                   private val middlewares: List<Middleware<State>>): Store<State> {
 
+//    companion object {
+//        @JvmStatic
+//        private val log = Logger(SimpleStore::class.java.simpleName, Logger.DEBUG)
+//    }
+
     private val subscriptions = arrayListOf<Subscription<State>>()
     private var _state: State = initialState
 
@@ -34,6 +36,8 @@ abstract class SimpleStore<State>(initialState: State,
 //        if (Looper.myLooper() != Looper.getMainLooper()) {
 //            throw RuntimeException("dispatch() should be called only on main thread!")
 //        }
+
+//        log.debug("Dispatching $action")
 
         val new = reduce(_state, dispatchToMiddleWare(action))
         if (_state == new) {
@@ -76,7 +80,7 @@ abstract class SimpleStore<State>(initialState: State,
         return newState
     }
 
-    override fun subscribe(subscription: Subscription<State>): Unsubscribe  {
+    override fun subscribe(subscription: Subscription<State>): Unsubscribe {
         subscriptions.add(subscription)
         subscription(_state, ::dispatch)
         return { subscriptions.remove(subscription) }

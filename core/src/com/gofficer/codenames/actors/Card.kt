@@ -16,25 +16,51 @@ import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.scenes.scene2d.ui.Button
 import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.gofficer.codenames.game.Gamestore
+import com.gofficer.redux.Unsubscribe
 import com.gofficer.codenames.utils.logger
+import gofficer.codenames.game.GameState
 
 
-class Card(private var cardText: String, assetManager: AssetManager, private val font: BitmapFont) : Widget() {
+class Card(private var cardText: String, assetManager: AssetManager, private val font: BitmapFont, store: Gamestore) : Actor() {
 
     companion object {
         @JvmStatic
         private val log = logger<Card>()
     }
+
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
+    private var isPressed = false
+    private var textToUse: String = cardText
 
-     fun setCardText(text: String) {
+
+    private var unsubscribe: Unsubscribe? = null
+
+    fun setCardText(text: String) {
         cardText = text
+        textToUse = cardText
     }
 
     init {
         width = 260f / 1.5f
         height = 166f / 1.5f
+
+//        setBounds(x, y, width, height)
+//        unsubscribe = store.subscribe()
+        unsubscribe = store.subscribe { state, dispatch ->
+            log.debug("Responding to state")
+            if (state.guessed == cardText) {
+                isPressed = true
+                textToUse = "Pressed"
+            }
+            //            this.dispatch = dispatch
+//
+//            Gdx.app.log("Subscribe", "State updated " + state.toString());
+//            red = state.red
+//            blue = state.blue
+//            green = state.green
+        }
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
@@ -47,9 +73,8 @@ class Card(private var cardText: String, assetManager: AssetManager, private val
         batch!!.draw(cardTexture, x, y, originX, originY,
                 width, height, 1f, 1f, rotation)
         // draw text below image
-        font.draw(batch, cardText, x + width / 7 , y + height / 2.5f)
 
-
+        font.draw(batch, textToUse, x + width / 7, y + height / 2.5f)
 
 
 //        var oldTransformMatrix = batch.transformMatrix.cpy();
@@ -74,12 +99,12 @@ class Card(private var cardText: String, assetManager: AssetManager, private val
 
     }
 
-    override fun getPrefWidth(): Float {
-        return width
-    }
-
-    override fun getPrefHeight(): Float {
-        return height
-    }
+//    override fun getPrefWidth(): Float {
+//        return width
+//    }
+//
+//    override fun getPrefHeight(): Float {
+//        return height
+//    }
 
 }

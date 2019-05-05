@@ -1,4 +1,4 @@
-package com.gofficer.codenames.screens.game
+package com.gofficer.codenames.screens.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
@@ -22,7 +22,7 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
     override fun show() {
         log.debug("show")
         controller = PlayController()
-        renderer = PlayRenderer(game.font24, assetManager, controller)
+        renderer = PlayRenderer(game.font24, assetManager, controller, game.store)
         renderer.show()
     }
 
