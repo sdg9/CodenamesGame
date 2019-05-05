@@ -1,5 +1,8 @@
 package gofficer.codenames.game
 
+import com.gofficer.codenames.screens.play.Board
+import com.gofficer.codenames.screens.play.PlayState
+
 
 data class GameState(
 //        val board1: Board,
@@ -9,7 +12,14 @@ data class GameState(
         val blue: Float = 0f,
         val lastPlayed: Int = 0,
         val gameOver: Boolean = false,
-        val guessed: String? = null) {
+        val guessed: String? = null,
+//        val playState: PlayState = PlayState()
+        val board: Board
+        ) {
+
+        fun updateBoard(board: Board) {
+                // test
+        }swa
 //
 //    fun hasBoardById(id: Int): Boolean {
 //        return when(id) {

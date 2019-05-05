@@ -2,6 +2,7 @@ package com.gofficer.codenames.game
 
 import com.gofficer.codenames.reduceGameplay
 import com.gofficer.codenames.reduceSetup
+import com.gofficer.codenames.screens.play.PlayState
 import com.gofficer.codenames.screens.play.reducePlay
 import com.gofficer.codenames.utils.logger
 import com.gofficer.redux.Action
@@ -25,8 +26,9 @@ class Gamestore(initialSate: GameState): SimpleStore<GameState>(
         ),
         reducers = listOf(
 //                GameState::reduceSetup,
-//                GameState::reduceGameplay,
-                GameState::reducePlay
+                GameState::reduceGameplay
+//                GameState::reducePlay
+//        PlayState::reducePlay
         )
 ) {
 

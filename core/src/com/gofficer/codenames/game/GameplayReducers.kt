@@ -1,8 +1,13 @@
 package com.gofficer.codenames
 import com.gofficer.codenames.game.reduxAction.CardPressed
 import com.gofficer.codenames.game.reduxAction.ChangeColor
+import com.gofficer.codenames.screens.play.Board
+import com.gofficer.codenames.screens.play.PlayState
+import com.gofficer.codenames.screens.play.reducePlay
+//import com.gofficer.codenames.screens.play.reducePlay
 import com.gofficer.redux.Action
 import com.gofficer.redux.Reducer
+import com.gofficer.redux.reduceChildState
 import gofficer.codenames.game.GameState
 
 fun GameState.reduceSetup(action: Action): GameState {
@@ -16,6 +21,8 @@ fun GameState.reduceGameplay(action: Action): GameState {
     return when(action) {
         is ChangeColor -> copy(red = action.red, blue = action.blue, green = action.green)
         is CardPressed -> copy(guessed = action.word)
+//        is CardPressed -> reduceChildState(this, board, action, PlayState::reducePlay, {state, board -> state.updateBoard(board)})
+        is CardPressed -> reduceChildState(this, board, action, Board.reduceSetup)
 //        is Chang eColor -> {
 //            Gdx.app.log("GamePlay Reducer", action.toString());
 //            copy(red = action.red)

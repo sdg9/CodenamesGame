@@ -6,6 +6,20 @@ fun<State, Child> reduceChildState(
         state: State,
         child: Child,
         action: Action,
+        reducer: Reducer<Child>): State {
+
+    val reduced = reducer.invoke(child, action)
+//    if (reduced === child) {
+//        return state
+//    }
+//
+    return state
+}
+
+fun<State, Child> reduceChildState(
+        state: State,
+        child: Child,
+        action: Action,
         reducer: Reducer<Child>,
         onReduced: (State, Child) -> State): State {
 
@@ -14,5 +28,5 @@ fun<State, Child> reduceChildState(
         return state
     }
 
-    return onReduced(state, reduced)
+    return f(state, reduced)
 }
