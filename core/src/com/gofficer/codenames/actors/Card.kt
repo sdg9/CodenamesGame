@@ -39,13 +39,10 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         height = 166f / 1.5f
 
 //        setBounds(x, y, width, height)
-//        unsubscribe = store.subscribe()
         unsubscribe = store.subscribe { state, dispatch ->
             log.debug("Responding to state")
             val me = state.board.cards.getById(id)
             if (me != null && me.isRevealed) {
-//                textToUse = "" + me.type
-
                 tint = when (me.type) {
                     CardType.RED -> Color.RED
                     CardType.BLUE -> Color.BLUE
@@ -53,12 +50,6 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
                     CardType.DOUBLE_AGENT -> Color(0f, 0f, 0f, 0.1f)
                 }
             }
-            //            this.dispatch = dispatch
-//
-//            Gdx.app.log("Subscribe", "State updated " + state.toString());
-//            red = state.red
-//            blue = state.blue
-//            green = state.green
         }
     }
 
@@ -66,14 +57,9 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         if (batch == null) {
             return
         }
-//        super.draw(batch, parentAlpha)
-        // draw image in center of actor
 
         font.color = Color.WHITE
-//        font.setColor(0.2f, 0.5f, 0.2f, 1.0f);
 
-//        val oldColor = batch.color
-//        log.debug("Color: $color")
         if (tint != null) {
             batch.color = tint
         }
@@ -87,35 +73,18 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
 
 
         batch.color = Color.WHITE
-//        batch.color = oldColor
-//        var oldTransformMatrix = batch.transformMatrix.cpy();
-//        val mx4Font = Matrix4()
-//        val posX = 90f
-//        val posY = -30f
-//        mx4Font.translate(-posX, -posY, 0f);
-//        mx4Font.rotate(0f, 0f, 1f, 25f);
-//        mx4Font.translate(posX, posY, 0f);
-
-//        mx4Font.rotate(Vector3(0f, 0f, 1f), 4f)
-//        mx4Font.trn(5f, -19f, 0f)
-//        batch.end()
-
-//        mx4Font.setToRotation(Vector3(0f, 0f, 1f), 5f).translate(Vector3(x, y, 0f))
-//        batch.transformMatrix = mx4Font
-//        batch.begin()
-//        font.draw(batch, cardText, x + 30 , y + 85)
-//        batch.end()
-//        batch.transformMatrix = oldTransformMatrix
-//        batch.begin()
-
     }
 
-//    override fun getPrefWidth(): Float {
-//        return width
-//    }
-//
-//    override fun getPrefHeight(): Float {
-//        return height
-//    }
+    // TODO: Determine which lifecycle method is ideal (if any) for cleaning up of redux subscription
+    override fun clear() {
+        log.debug("clear")
+        unsubscribe?.invoke()
+        super.clear()
+    }
 
+    override fun remove(): Boolean {
+        log.debug("remove")
+        unsubscribe?.invoke()
+        return super.remove()
+    }
 }
