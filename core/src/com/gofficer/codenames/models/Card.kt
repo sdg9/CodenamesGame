@@ -1,6 +1,5 @@
 package com.gofficer.codenames.models
 
-import com.gofficer.codenames.reduxAction.CardPressed
 import com.gofficer.redux.Action
 
 enum class CardType {
@@ -49,3 +48,5 @@ fun Card.reduce(action: Action): Card {
         else -> this
     }
 }
+
+data class CardPressed(val id: Int, val word: String): Action

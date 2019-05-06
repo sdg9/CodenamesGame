@@ -1,6 +1,5 @@
 package com.gofficer.codenames.models
 
-import com.gofficer.codenames.reduxAction.CardPressed
 import com.gofficer.codenames.utils.add
 import com.gofficer.redux.Action
 
@@ -12,7 +11,6 @@ data class Board(
 }
 
 data class AddCard(val card: Card) : Action
-data class AddCardInvalid(val card: Card) : Action
 
 fun Board.reduceSetup(action: Action): Board {
     return when (action) {

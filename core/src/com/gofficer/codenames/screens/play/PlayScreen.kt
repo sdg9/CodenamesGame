@@ -10,6 +10,7 @@ import com.gofficer.codenames.models.CardType
 import com.gofficer.codenames.utils.add
 import com.gofficer.codenames.utils.logger
 import gofficer.codenames.game.ResetGame
+import gofficer.codenames.game.SetupGame
 import java.util.*
 
 class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
@@ -58,9 +59,9 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
 
     private fun setupGame() {
         // Reset game back to vanilla
-        game.store.dispatch(ResetGame())
+        game.store.dispatch(SetupGame())
 
-        // Determine who goes first, red or blue
+//        // Determine who goes first, red or blue
         val isBlueFirst = Random().nextBoolean()
         val types: MutableList<CardType> = mutableListOf()
         val totalBlue = if (isBlueFirst) 9 else 8

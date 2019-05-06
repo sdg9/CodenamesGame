@@ -90,4 +90,7 @@ abstract class SimpleStore<State>(initialState: State,
         _dispatch(action)
     }
 
+    fun getState(): State {
+        return _state
+    }
 }

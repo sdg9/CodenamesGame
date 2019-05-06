@@ -1,7 +1,6 @@
 package gofficer.codenames.game
 
 import com.gofficer.codenames.models.*
-import com.gofficer.codenames.reduxAction.CardPressed
 import com.gofficer.codenames.utils.add
 import com.gofficer.redux.Action
 import com.gofficer.redux.reduceChildState
@@ -14,7 +13,6 @@ data class GameState(
         val cards: List<Card> = listOf()
         )
 
-class ResetGame : Action
 
 fun GameState.reduceGameplay(action: Action): GameState {
     return when(action) {
@@ -36,3 +34,6 @@ fun GameState.reduceSetup(action: Action): GameState {
         else -> this
     }
 }
+
+class ResetGame : Action
+class SetupGame : Action

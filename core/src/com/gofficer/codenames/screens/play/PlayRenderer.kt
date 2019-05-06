@@ -18,8 +18,8 @@ import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.gofficer.codenames.reduxAction.CardPressed
 import com.gofficer.codenames.Gamestore
+import com.gofficer.codenames.models.CardPressed
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
@@ -59,9 +59,12 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         stage.clear()
 
         val table = Table()
-        for (j in 0..4) {
-            table.row().pad(10f) // padding on all sides between cards
-            for (k in 1..5) {
+        val currentState = store.getState()
+        if (currentState.board.cards.size >= 25) {
+
+            for (j in 0..4) {
+                table.row().pad(10f) // padding on all sides between cards
+                for (k in 1..5) {
 //                val cardDrawable = TextureRegionDrawable(TextureRegion(cardTextcure))
 //                val playButton = ImageButton(cardDrawable)
 //                table.add(ImageTextButton("test", playButton))
@@ -70,27 +73,29 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 //                    scaleX = 0.5f
 //                    scaleY = 0.5f
 //                }
-                val cardName = "test-$j-$k"
-                val id = j * 5 + k
-                val myCard = Card(id, cardName, assetManager, myFont, store)
+                    val cardName = "test-$j-$k"
+                    val id = j * 5 + k
+                    val myCard = Card(id, currentState.board.cards[id - 1].text, assetManager, myFont, store)
 //                myCard.touchable = Touchable.enabled
-                myCard.addListener(object : ClickListener() {
-                    override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
-                        log.debug("Touched $cardName")
+                    myCard.addListener(object : ClickListener() {
+                        override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
+                            log.debug("Touched $cardName")
 
-                        store.dispatch(CardPressed(id, cardName))
-                        // TODO: If possible...
-                        // TODO: dispatch action saying pressed
-                        // TODO: have action update state tree saying item is pressed
-                        // TODO: Update stage accordingly
+                            store.dispatch(CardPressed(id, cardName))
+                            // TODO: If possible...
+                            // TODO: dispatch action saying pressed
+                            // TODO: have action update state tree saying item is pressed
+                            // TODO: Update stage accordingly
 //                        myCard.setCardText("Pushed")
 //                        doSomething(x, y, pointer)pointer
-                        event.handle()//the Stage will stop trying to handle this event
-                        return true //the inputmultiplexer will stop trying to handle this touch
-                    }
-                })
-                table.add(myCard)
+                            event.handle()//the Stage will stop trying to handle this event
+                            return true //the inputmultiplexer will stop trying to handle this touch
+                        }
+                    })
+                    table.add(myCard)
+                }
             }
+
         }
         table.setFillParent(true)
 
