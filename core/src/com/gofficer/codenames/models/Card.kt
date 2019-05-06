@@ -43,11 +43,9 @@ fun List<Card>.getById(id: Int): Card? {
 }
 
 fun Card.reduce(action: Action): Card {
-    return when(action) {
-        is CardPressed -> {
-//            println("Revealing $action")
-            copy(isRevealed = true)
-        }
+    return when (action) {
+        is CardPressed -> copy(isRevealed = true)
+
         else -> this
     }
 }

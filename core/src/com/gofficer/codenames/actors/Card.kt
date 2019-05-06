@@ -9,6 +9,7 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.Gamestore
+import com.gofficer.codenames.models.CardType
 import com.gofficer.codenames.models.getById
 import com.gofficer.redux.Unsubscribe
 import com.gofficer.codenames.utils.logger
@@ -24,7 +25,7 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
     private var textToUse: String = cardText
-
+    private var tint: Color? = null
 
     private var unsubscribe: Unsubscribe? = null
 
@@ -43,7 +44,14 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
             log.debug("Responding to state")
             val me = state.board.cards.getById(id)
             if (me != null && me.isRevealed) {
-                textToUse = "" + me.type
+//                textToUse = "" + me.type
+
+                tint = when (me.type) {
+                    CardType.RED -> Color.RED
+                    CardType.BLUE -> Color.BLUE
+                    CardType.BYSTANDER -> Color.YELLOW
+                    CardType.DOUBLE_AGENT -> Color(0f, 0f, 0f, 0.1f)
+                }
             }
             //            this.dispatch = dispatch
 //
@@ -55,19 +63,31 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
+        if (batch == null) {
+            return
+        }
 //        super.draw(batch, parentAlpha)
         // draw image in center of actor
 
         font.color = Color.WHITE
 //        font.setColor(0.2f, 0.5f, 0.2f, 1.0f);
 
-        batch!!.draw(cardTexture, x, y, originX, originY,
+//        val oldColor = batch.color
+//        log.debug("Color: $color")
+        if (tint != null) {
+            batch.color = tint
+        }
+
+
+        batch.draw(cardTexture, x, y, originX, originY,
                 width, height, 1f, 1f, rotation)
         // draw text below image
 
         font.draw(batch, textToUse, x + width / 7, y + height / 2.5f)
 
 
+        batch.color = Color.WHITE
+//        batch.color = oldColor
 //        var oldTransformMatrix = batch.transformMatrix.cpy();
 //        val mx4Font = Matrix4()
 //        val posX = 90f

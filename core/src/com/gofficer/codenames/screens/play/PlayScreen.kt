@@ -7,7 +7,10 @@ import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.models.AddCard
 import com.gofficer.codenames.models.Card
 import com.gofficer.codenames.models.CardType
+import com.gofficer.codenames.utils.add
 import com.gofficer.codenames.utils.logger
+import gofficer.codenames.game.ResetGame
+import java.util.*
 
 class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
 
@@ -17,13 +20,10 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
     }
 
     private val assetManager = game.assetManager
-//    private lateinit var controller: PlayController
     private lateinit var renderer: PlayRenderer
-
 
     override fun show() {
         log.debug("show")
-//        controller = PlayController()
         renderer = PlayRenderer(game.font24, assetManager, game.store)
 
         setupGame()
@@ -57,8 +57,32 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
     }
 
     private fun setupGame() {
+        // Reset game back to vanilla
+        game.store.dispatch(ResetGame())
+
+        // Determine who goes first, red or blue
+        val isBlueFirst = Random().nextBoolean()
+        val types: MutableList<CardType> = mutableListOf()
+        val totalBlue = if (isBlueFirst) 9 else 8
+        val totalRed = if (!isBlueFirst) 9 else 8
+        // Add appropriate number of color types
+        for (i in 1..totalBlue) {
+            types.add(CardType.BLUE)
+        }
+        for (i in 1..totalRed) {
+            types.add(CardType.RED)
+        }
+        types.add(CardType.DOUBLE_AGENT)
+        for (i in 1..(25 - types.size)) {
+            types.add(CardType.BYSTANDER)
+        }
+        // Shuffle colors
+        val shuffledList = types.shuffled()
+
+        //Apply colors as cards are added
+        // TODO: Implement dynamic card text, not allowing for duplicates
         for (i in 1..25) {
-            game.store.dispatch(AddCard(Card(i, "test$i", CardType.RED)))
+            game.store.dispatch(AddCard(Card(i, "test$i", shuffledList[i-1])))
         }
     }
 }

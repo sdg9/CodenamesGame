@@ -59,7 +59,7 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         stage.clear()
 
         val table = Table()
-        for (j in 0..3) {
+        for (j in 0..4) {
             table.row().pad(10f) // padding on all sides between cards
             for (k in 1..5) {
 //                val cardDrawable = TextureRegionDrawable(TextureRegion(cardTextcure))

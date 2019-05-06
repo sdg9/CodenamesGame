@@ -16,16 +16,7 @@ data class AddCardInvalid(val card: Card) : Action
 
 fun Board.reduceSetup(action: Action): Board {
     return when (action) {
-        is AddCard -> {
-            val retVal = copy(cards = cards.add(action.card))
-            println("RV: $retVal")
-            retVal
-//            cards.add(action.card)
-////            this
-////
-//            println("Called add cards ${cards.size}")
-//            this
-        }
+        is AddCard -> copy(cards = cards.add(action.card))
         else -> this
     }
 }
