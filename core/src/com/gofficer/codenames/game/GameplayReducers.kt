@@ -22,7 +22,7 @@ fun GameState.reduceGameplay(action: Action): GameState {
         is ChangeColor -> copy(red = action.red, blue = action.blue, green = action.green)
         is CardPressed -> copy(guessed = action.word)
 //        is CardPressed -> reduceChildState(this, board, action, PlayState::reducePlay, {state, board -> state.updateBoard(board)})
-        is CardPressed -> reduceChildState(this, board, action, Board.reduceSetup)
+//        is CardPressed -> reduceChildState(this, board, action, Board.reduceSetup)
 //        is Chang eColor -> {
 //            Gdx.app.log("GamePlay Reducer", action.toString());
 //            copy(red = action.red)

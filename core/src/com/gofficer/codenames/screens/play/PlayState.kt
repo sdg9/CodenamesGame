@@ -12,8 +12,8 @@ data class PlayState(val cards: List<Card> = listOf()) {
 }
 
 data class Board(
-        val width: Int,
-        val height: Int,
+//        val width: Int,
+//        val height: Int,
         val cards: List<Card> = listOf())
 
 

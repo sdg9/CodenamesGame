@@ -28,5 +28,5 @@ fun<State, Child> reduceChildState(
         return state
     }
 
-    return f(state, reduced)
+    return onReduced(state, reduced)
 }

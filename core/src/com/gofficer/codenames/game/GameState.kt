@@ -14,12 +14,12 @@ data class GameState(
         val gameOver: Boolean = false,
         val guessed: String? = null,
 //        val playState: PlayState = PlayState()
-        val board: Board
+        val board: Board = Board()
         ) {
 
         fun updateBoard(board: Board) {
                 // test
-        }swa
+        }
 //
 //    fun hasBoardById(id: Int): Boolean {
 //        return when(id) {
