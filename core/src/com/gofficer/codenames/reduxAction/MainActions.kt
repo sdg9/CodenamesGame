@@ -1,4 +1,4 @@
-package com.gofficer.codenames.game.reduxAction
+package com.gofficer.codenames.reduxAction
 
 import com.gofficer.redux.Action
 

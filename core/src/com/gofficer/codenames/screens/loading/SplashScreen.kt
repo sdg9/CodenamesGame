@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -14,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions.*
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.game.CodenamesGame
+import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.utils.logger

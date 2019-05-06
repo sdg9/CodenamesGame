@@ -1,4 +1,4 @@
-package com.gofficer.codenames.game
+package com.gofficer.codenames
 
 import com.badlogic.gdx.*
 import com.badlogic.gdx.assets.AssetManager

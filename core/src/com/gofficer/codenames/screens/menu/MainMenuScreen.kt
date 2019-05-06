@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.game.CodenamesGame
+import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger

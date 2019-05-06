@@ -3,7 +3,7 @@ package com.gofficer.codenames.desktop
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.game.CodenamesGame
+import com.gofficer.codenames.CodenamesGame
 
 fun main(args: Array<String>) {
     val config = LwjglApplicationConfiguration()

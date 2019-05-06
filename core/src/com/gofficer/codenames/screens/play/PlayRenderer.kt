@@ -18,12 +18,12 @@ import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.gofficer.codenames.game.reduxAction.CardPressed
-import com.gofficer.codenames.game.Gamestore
+import com.gofficer.codenames.reduxAction.CardPressed
+import com.gofficer.codenames.Gamestore
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
-                   private val controller: PlayController,
+//                   private val controller: PlayController,
                    private val store: Gamestore) : Disposable {
 
     companion object {
@@ -59,7 +59,7 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         stage.clear()
 
         val table = Table()
-        for (j in 1..4) {
+        for (j in 0..3) {
             table.row().pad(10f) // padding on all sides between cards
             for (k in 1..5) {
 //                val cardDrawable = TextureRegionDrawable(TextureRegion(cardTextcure))
@@ -71,13 +71,14 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 //                    scaleY = 0.5f
 //                }
                 val cardName = "test-$j-$k"
-                val myCard = Card(cardName, assetManager, myFont, store)
+                val id = j * 5 + k
+                val myCard = Card(id, cardName, assetManager, myFont, store)
 //                myCard.touchable = Touchable.enabled
                 myCard.addListener(object : ClickListener() {
                     override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                         log.debug("Touched $cardName")
 
-                        store.dispatch(CardPressed(cardName))
+                        store.dispatch(CardPressed(id, cardName))
                         // TODO: If possible...
                         // TODO: dispatch action saying pressed
                         // TODO: have action update state tree saying item is pressed

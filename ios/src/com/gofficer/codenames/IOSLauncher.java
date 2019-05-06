@@ -1,6 +1,5 @@
 package com.gofficer.codenames;
 
-import com.gofficer.codenames.game.CodenamesGame;
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 

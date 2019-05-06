@@ -8,14 +8,10 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.game.CodenamesGame
+import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.screens.play.PlayScreen
-import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar.ProgressBarStyle
-import com.gofficer.codenames.utils.drawGrid
 
 
 class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {

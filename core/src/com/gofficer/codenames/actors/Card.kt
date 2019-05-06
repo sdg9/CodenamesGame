@@ -3,26 +3,18 @@ package com.gofficer.codenames.actors
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.utils.get
-import java.awt.SystemColor.text
-import com.badlogic.gdx.math.Matrix4
-import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.scenes.scene2d.ui.Button
-import com.badlogic.gdx.scenes.scene2d.ui.Widget
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.gofficer.codenames.game.Gamestore
+import com.gofficer.codenames.Gamestore
+import com.gofficer.codenames.models.getById
 import com.gofficer.redux.Unsubscribe
 import com.gofficer.codenames.utils.logger
-import gofficer.codenames.game.GameState
 
 
-class Card(private var cardText: String, assetManager: AssetManager, private val font: BitmapFont, store: Gamestore) : Actor() {
+class Card(private var id: Int, private var cardText: String, assetManager: AssetManager, private val font: BitmapFont, store: Gamestore) : Actor() {
 
     companion object {
         @JvmStatic
@@ -31,7 +23,6 @@ class Card(private var cardText: String, assetManager: AssetManager, private val
 
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
-    private var isPressed = false
     private var textToUse: String = cardText
 
 
@@ -50,9 +41,9 @@ class Card(private var cardText: String, assetManager: AssetManager, private val
 //        unsubscribe = store.subscribe()
         unsubscribe = store.subscribe { state, dispatch ->
             log.debug("Responding to state")
-            if (state.guessed == cardText) {
-                isPressed = true
-                textToUse = "Pressed"
+            val me = state.board.cards.getById(id)
+            if (me != null && me.isRevealed) {
+                textToUse = "" + me.type
             }
             //            this.dispatch = dispatch
 //
