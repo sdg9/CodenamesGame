@@ -15,12 +15,16 @@ import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.game.GameState
 import gofficer.codenames.game.reduceGameSetup
+import io.colyseus.Client
 import redux.api.Dispatcher
 import redux.api.Store
 import redux.api.enhancer.Middleware
 import redux.applyMiddleware
 import redux.combineReducers
 import redux.createStore
+import io.colyseus.Room
+
+
 
 class CodenamesGame : Game() {
 
@@ -29,6 +33,8 @@ class CodenamesGame : Game() {
         private val log = logger<CodenamesGame>()
     }
 
+    private var room: Room? = null
+    private lateinit var client: Client
     val assetManager = AssetManager()
     lateinit var font24: BitmapFont
     private val initState: GameState = GameState()
@@ -56,8 +62,41 @@ class CodenamesGame : Game() {
                         networkActionMiddleware,
                         setupGameMiddleware
                 ))
+
+        client = Client("ws://localhost:2567", object : Client.Listener {
+            override fun onOpen(id: String) {
+                println("Client.onOpen();")
+                println("colyseus id: $id")
+            }
+
+            override fun onMessage(message: Any) {
+                println("Client.onMessage()")
+                println(message)
+            }
+
+            override fun onClose(code: Int, reason: String, remote: Boolean) {
+                println("Client.onClose();")
+            }
+
+            override fun onError(e: Exception) {
+                println("Client.onError()")
+                e.printStackTrace()
+            }
+        })
+
+        room = client.join("my_room")
     }
 
+    val networkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+        if (action is NetworkAction) {
+            println("Dispatching remotely: $action")
+        }
+        if (room != null) {
+            log.debug("Sending $action")
+        }
+        room?.send(action.toString())
+        next.dispatch(action)
+    }
 
     override fun dispose() {
         super.dispose()
@@ -94,13 +133,6 @@ val validActionMiddleware = Middleware { store: Store<GameState>, next: Dispatch
     }
 }
 
-
-val networkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-    if (action is NetworkAction) {
-        println("Dispatching remotely: $action")
-    }
-    next.dispatch(action)
-}
 
 interface Action
 

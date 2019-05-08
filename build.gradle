@@ -113,11 +113,12 @@ project(":core") {
 
 
     dependencies {
-        compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-        compile "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
+        implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
+        implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
+        implementation 'ir.doorbash:colyseus-java:1.2.3'
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"
 
