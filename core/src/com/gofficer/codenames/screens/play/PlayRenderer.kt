@@ -166,6 +166,9 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 
     override fun dispose() {
         log.debug("dispose")
+        stage.actors.forEach {
+            it.remove()
+        }
         renderer.dispose()
         batch.dispose()
     }

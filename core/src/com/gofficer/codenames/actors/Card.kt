@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.utils.get
@@ -22,27 +23,17 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         private val log = logger<Card>()
     }
 
-    private var subscription: Store.Subscription?
+    private var subscription: Store.Subscription? = null
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
     private var textToUse: String = cardText
     private var tint: Color? = null
+    private var store: Store<GameState>
 
-//    private var unsubscribe: Unsubscribe? = null
-
-    fun setCardText(text: String) {
-        cardText = text
-        textToUse = cardText
-    }
-
-    init {
-        width = 260f / 1.5f
-        height = 166f / 1.5f
-
-//        setBounds(x, y, width, height)
+    private fun subscribeStore() {
+        subscription?.unsubscribe()
         subscription = store.subscribe {
-//            println("${store.getState()}")
-
+            //            println("${store.getState()}")
             log.debug("Responding to state")
             val me = store.state.cards.getById(id)
             if (me != null && me.isRevealed) {
@@ -54,6 +45,18 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
                 }
             }
         }
+    }
+
+    fun setCardText(text: String) {
+        cardText = text
+        textToUse = cardText
+    }
+
+    init {
+        width = 260f / 1.5f
+        height = 166f / 1.5f
+
+        this.store = store
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
@@ -78,16 +81,26 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         batch.color = Color.WHITE
     }
 
-    // TODO: Determine which lifecycle method is ideal (if any) for cleaning up of redux subscription
-    override fun clear() {
-        log.debug("clear")
-//        unsubscribe?.invoke()
-        super.clear()
-    }
+//    override fun clear() {
+//        log.debug("clear")
+//        super.clear()
+//    }
+//
+//    override fun remove(): Boolean {
+//        log.debug("remove")
+//        subscription?.unsubscribe()
+//        return super.remove()
+//    }
 
-    override fun remove(): Boolean {
-        log.debug("remove")
-        subscription?.unsubscribe()
-        return super.remove()
+    override fun setStage(stage: Stage?) {
+        super.setStage(stage)
+
+        if (stage != null) {
+            log.debug("Actor added to stage")
+            subscribeStore()
+        } else {
+            log.debug("Actor removed from stage")
+            subscription?.unsubscribe()
+        }
     }
 }
