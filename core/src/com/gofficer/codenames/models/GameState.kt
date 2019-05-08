@@ -1,6 +1,7 @@
 package gofficer.codenames.game
 
 import com.gofficer.codenames.Action
+import com.gofficer.codenames.NetworkAction
 import com.gofficer.codenames.models.*
 import redux.api.Reducer
 
@@ -92,6 +93,6 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
 //}
 
 
-class ResetGame : Action
+class ResetGame : NetworkAction
 
 class SetupGame : Action

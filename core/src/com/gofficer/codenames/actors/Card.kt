@@ -34,8 +34,9 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         subscription?.unsubscribe()
         subscription = store.subscribe {
             //            println("${store.getState()}")
-            log.debug("Responding to state")
             val me = store.state.cards.getById(id)
+
+            log.debug("Responding to state $me")
             if (me != null && me.isRevealed) {
                 tint = when (me.type) {
                     CardType.RED -> Color.RED
@@ -43,6 +44,8 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
                     CardType.BYSTANDER -> Color.YELLOW
                     CardType.DOUBLE_AGENT -> Color(0f, 0f, 0f, 0.1f)
                 }
+            } else {
+                tint = null
             }
         }
     }

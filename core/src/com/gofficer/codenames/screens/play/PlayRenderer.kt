@@ -4,27 +4,29 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gofficer.codenames.actors.Card
 import com.gofficer.codenames.assets.AssetDescriptors
-import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.models.CardPressed
+import com.gofficer.codenames.screens.menu.MainMenuScreen
 import gofficer.codenames.game.GameState
+import gofficer.codenames.game.SetupGame
 import redux.api.Store
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
-//                   private val controller: PlayController,
                    private val store: Store<GameState>) : Disposable {
 
     companion object {
@@ -39,31 +41,29 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
     private val uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
     private val renderer = ShapeRenderer()
     private val batch = SpriteBatch()
-    private val padding = 20f
-    private val layout = GlyphLayout()
-
-    private val font = assetManager[AssetDescriptors.FONT]
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
 
-    private val playerTexture = gameplayAtlas[RegionNames.PLAYER]
-    private val obstacleTexture = gameplayAtlas[RegionNames.OBSTACLE]
-    private val backgroundTexture = gameplayAtlas[RegionNames.BACKGROUND]
+    private val uiSkinAtlas = assetManager[AssetDescriptors.UI_SKIN]
 
+    private var skin: Skin = Skin()
 
     private val stage: Stage = Stage(viewport)
-
-    private val cardTexture = gameplayAtlas[RegionNames.CARD]
 
     // == public functions ==
 
     fun show() {
         stage.clear()
 
+
+        initSkin()
         val table = Table()
         val currentState = store.state
-//        println("Play renderer current state: ${store.state.cards}")
         if (currentState.cards.size >= 25) {
 
+            table.add(makeButton("New Game"){
+                log.debug("Pressed new game")
+                store.dispatch(SetupGame())
+            })
             for (j in 0..4) {
                 table.row().pad(10f) // padding on all sides between cards
                 for (k in 1..5) {
@@ -171,5 +171,26 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         }
         renderer.dispose()
         batch.dispose()
+    }
+
+    private fun initSkin() {
+        skin.addRegions(uiSkinAtlas)
+        skin.add("default-font", myFont)
+        skin.load(AssetPaths.UI_SKIN_JSON.toInternalFile())
+    }
+
+    private fun makeButton(name: String, onClick: () -> Unit): TextButton {
+        return TextButton(name, skin, "default").apply {
+            // TODO: figure out how to better deal with font, as-is this distorts bitmap
+//            label.setFontScale(1f)
+//            setSize(GameConfig.WORLD_WIDTH / 2, GameConfig.WORLD_HEIGHT / 5)
+//            setPosition(GameConfig.WORLD_CENTER_X, positionY, Align.center)
+//            addAction(sequence(alpha(0f), parallel(fadeIn(.5f), moveBy(0f, -20f, .5f, Interpolation.pow5Out))))
+            addListener(object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    onClick()
+                }
+            })
+        }
     }
 }

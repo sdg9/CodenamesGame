@@ -1,6 +1,7 @@
 package com.gofficer.codenames.models
 
 import com.gofficer.codenames.Action
+import com.gofficer.codenames.NetworkAction
 import gofficer.codenames.game.GameState
 import redux.api.Reducer
 
@@ -68,4 +69,4 @@ val cardReduce = Reducer { state: GameState, action: Any ->
 }
 
 
-data class CardPressed(val id: Int, val word: String): Action
+data class CardPressed(val id: Int, val word: String): NetworkAction

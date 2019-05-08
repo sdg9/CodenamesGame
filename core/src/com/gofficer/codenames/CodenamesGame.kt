@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
-import com.gofficer.codenames.models.Board
 import com.gofficer.codenames.models.boardReduceSetup
 import com.gofficer.codenames.models.cardReduce
 import com.gofficer.codenames.screens.loading.LoadingScreen
@@ -17,7 +16,6 @@ import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.game.GameState
 import gofficer.codenames.game.reduceGameSetup
 import redux.api.Dispatcher
-import redux.api.Reducer
 import redux.api.Store
 import redux.api.enhancer.Middleware
 import redux.applyMiddleware
@@ -55,6 +53,7 @@ class CodenamesGame : Game() {
                 applyMiddleware(
                         loggingMiddleware,
                         validActionMiddleware,
+                        networkActionMiddleware,
                         setupGameMiddleware
                 ))
     }
@@ -94,19 +93,15 @@ val validActionMiddleware = Middleware { store: Store<GameState>, next: Dispatch
         action
     }
 }
-//
-//val reducer = Reducer { state: GameState, action: Any ->
-//    when (action) {
-////        is Action1 -> state.copy(todos = state.todos + 1)
-////        is Action2 -> state.copy(todos = state.todos - 1)
-////        is Action3 -> state.copy(todos = state.todos - 1)
-//        else -> state
-//    }
-////    when (action) {
-////        "Inc" -> state.copy(todos = state.todos + 1)
-////        "Dec" -> state.copy(todos = state.todos - 1)
-////        else -> state
-////    }
-//}
+
+
+val networkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+    if (action is NetworkAction) {
+        println("Dispatching remotely: $action")
+    }
+    next.dispatch(action)
+}
 
 interface Action
+
+interface NetworkAction: Action
