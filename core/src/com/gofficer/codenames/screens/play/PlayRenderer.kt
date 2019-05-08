@@ -18,13 +18,14 @@ import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.gofficer.codenames.Gamestore
 import com.gofficer.codenames.models.CardPressed
+import gofficer.codenames.game.GameState
+import redux.api.Store
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
 //                   private val controller: PlayController,
-                   private val store: Gamestore) : Disposable {
+                   private val store: Store<GameState>) : Disposable {
 
     companion object {
         @JvmStatic
@@ -59,8 +60,9 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         stage.clear()
 
         val table = Table()
-        val currentState = store.getState()
-        if (currentState.board.cards.size >= 25) {
+        val currentState = store.state
+//        println("Play renderer current state: ${store.state.cards}")
+        if (currentState.cards.size >= 25) {
 
             for (j in 0..4) {
                 table.row().pad(10f) // padding on all sides between cards
@@ -75,7 +77,7 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 //                }
                     val cardName = "test-$j-$k"
                     val id = j * 5 + k
-                    val myCard = Card(id, currentState.board.cards[id - 1].text, assetManager, myFont, store)
+                    val myCard = Card(id, currentState.cards[id - 1].text, assetManager, myFont, store)
 //                myCard.touchable = Touchable.enabled
                     myCard.addListener(object : ClickListener() {
                         override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {

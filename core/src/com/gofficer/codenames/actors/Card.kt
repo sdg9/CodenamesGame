@@ -8,26 +8,27 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.utils.get
-import com.gofficer.codenames.Gamestore
 import com.gofficer.codenames.models.CardType
 import com.gofficer.codenames.models.getById
-import com.gofficer.redux.Unsubscribe
 import com.gofficer.codenames.utils.logger
+import gofficer.codenames.game.GameState
+import redux.api.Store
 
 
-class Card(private var id: Int, private var cardText: String, assetManager: AssetManager, private val font: BitmapFont, store: Gamestore) : Actor() {
+class Card(private var id: Int, private var cardText: String, assetManager: AssetManager, private val font: BitmapFont, store: Store<GameState>) : Actor() {
 
     companion object {
         @JvmStatic
         private val log = logger<Card>()
     }
 
+    private var subscription: Store.Subscription?
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
     private var textToUse: String = cardText
     private var tint: Color? = null
 
-    private var unsubscribe: Unsubscribe? = null
+//    private var unsubscribe: Unsubscribe? = null
 
     fun setCardText(text: String) {
         cardText = text
@@ -39,9 +40,11 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         height = 166f / 1.5f
 
 //        setBounds(x, y, width, height)
-        unsubscribe = store.subscribe { state, dispatch ->
+        subscription = store.subscribe {
+//            println("${store.getState()}")
+
             log.debug("Responding to state")
-            val me = state.board.cards.getById(id)
+            val me = store.state.cards.getById(id)
             if (me != null && me.isRevealed) {
                 tint = when (me.type) {
                     CardType.RED -> Color.RED
@@ -78,13 +81,13 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
     // TODO: Determine which lifecycle method is ideal (if any) for cleaning up of redux subscription
     override fun clear() {
         log.debug("clear")
-        unsubscribe?.invoke()
+//        unsubscribe?.invoke()
         super.clear()
     }
 
     override fun remove(): Boolean {
         log.debug("remove")
-        unsubscribe?.invoke()
+        subscription?.unsubscribe()
         return super.remove()
     }
 }
