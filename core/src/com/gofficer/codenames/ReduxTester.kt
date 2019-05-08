@@ -9,6 +9,16 @@ interface Action
 
 object NoAction: Action
 
+class Action1: Action
+
+class Action2: Action
+
+class AddOne: Action
+
+class SubtractOne: Action
+
+data class Action3(val type: String, val payload: Object?): Action
+
 val middleware = Middleware { store: Store<State>, next: Dispatcher, action: Any ->
     println("Mid 1 $action")
 //    val result = next.dispatch(action)
@@ -26,6 +36,15 @@ val middleware2 = Middleware { store: Store<State>, next: Dispatcher, action: An
     action
 }
 
+val actionInterfaceOnly = Middleware { store: Store<State>, next: Dispatcher, action: Any ->
+    if (action !is Action) {
+        println("Only allow action objects")
+    } else {
+        next.dispatch(action)
+        action
+    }
+}
+
 //val middlewares = arrayOf(middleware, middleware2)
 
 
@@ -34,7 +53,7 @@ fun main(args: Array<String>) {
 //    val store = createStore(reducer, 0, applyMiddleware(middleware))
 
 //    val store = createStore(reducer, State())
-    val store = createStore(reducer, State(), applyMiddleware(middleware, middleware2))
+    val store = createStore(reducer, State(), applyMiddleware(actionInterfaceOnly, middleware, middleware2))
 
     store.subscribe {
         println("Update: ${store.getState()}")
@@ -47,6 +66,12 @@ fun main(args: Array<String>) {
 // 2
     store.dispatch("Dec")
 // 1
+
+    store.dispatch(Action1())
+
+    store.dispatch(AddOne())
+
+    store.dispatch(Action3("Inc", null))
 }
 
 data class State(val todos: Int = 1)
@@ -54,10 +79,15 @@ data class State(val todos: Int = 1)
 
 val reducer = Reducer { state: State, action: Any ->
     when (action) {
-        "Inc" -> state.copy(todos = state.todos + 1)
-        "Dec" -> state.copy(todos = state.todos - 1)
+        is Action1 -> state.copy(todos = state.todos + 1)
+        is Action2 -> state.copy(todos = state.todos - 1)
         else -> state
     }
+//    when (action) {
+//        "Inc" -> state.copy(todos = state.todos + 1)
+//        "Dec" -> state.copy(todos = state.todos - 1)
+//        else -> state
+//    }
 }
 
 
