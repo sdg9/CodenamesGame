@@ -1,11 +1,11 @@
 package com.gofficer.codenames.desktop
 
-sealed class CalculatorAction {
-    data class Add(val value: Int) : CalculatorAction()
-    data class Deduct(val value: Int) : CalculatorAction()
-    data class Multiply(val value: Int) : CalculatorAction()
-    data class Divide(val value: Int) : CalculatorAction()
-}
+//sealed class CalculatorAction {
+//    data class Add(val value: Int) : CalculatorAction()
+//    data class Deduct(val value: Int) : CalculatorAction()
+//    data class Multiply(val value: Int) : CalculatorAction()
+//    data class Divide(val value: Int) : CalculatorAction()
+//}
 //
 //
 //fun create(coroutineScope: CoroutineScope): Store<State, Action> = coroutineScope
@@ -33,6 +33,7 @@ sealed class CalculatorAction {
 //            }
 //        }
 //)
+
 
 fun main(args: Array<String>) {
     println("Test")

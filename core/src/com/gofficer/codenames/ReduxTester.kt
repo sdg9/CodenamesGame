@@ -1,88 +1,114 @@
 package com.gofficer.codenames
 
+import redux.api.*
+import redux.*
+import redux.api.enhancer.Middleware
 
-import com.freeletics.coredux.*
-import kotlinx.coroutines.*
 
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
-import java.util.Collections.copy
+interface Action
 
-data class SomeState(val counter: Int = 0, val otherCounter: Int = 0)
+object NoAction: Action
 
-suspend fun main(args: Array<String>) {
+val middleware = Middleware { store: Store<State>, next: Dispatcher, action: Any ->
+    println("Mid 1 $action")
+//    val result = next.dispatch(action)
+
+    // triple action
+    next.dispatch(action)
+    next.dispatch(action)
+    next.dispatch(action)
+    action
+}
+
+val middleware2 = Middleware { store: Store<State>, next: Dispatcher, action: Any ->
+    println("Mid 2 $action")
+    next.dispatch(action)
+    action
+}
+
+//val middlewares = arrayOf(middleware, middleware2)
+
+
+fun main(args: Array<String>) {
     println("Test a")
-//    val testLogger by memoized { TestLogger() }
+//    val store = createStore(reducer, 0, applyMiddleware(middleware))
 
-    val store = GlobalScope.createStore<SomeState, CalculatorAction>(
-            name = "Calculator",
-            initialState = 0,
-            launchMode = CoroutineStart.DEFAULT,
-            sideEffects = listOf(sideEffect),
-            reducer = { currentState, newAction ->
-                when (newAction) {
-                    is CalculatorAction.Add -> currentState
-//                    is CalculatorAction.Add -> currentState + newAction.value
-                    is CalculatorAction.Deduct -> copy(counter = counter - newAction.value)
-                    is CalculatorAction.Multiply -> currentState * newAction.value
-                    is CalculatorAction.Divide -> currentState / newAction.value
-                }
-            }
+//    val store = createStore(reducer, State())
+    val store = createStore(reducer, State(), applyMiddleware(middleware, middleware2))
 
-    )
-
-    store.subscribe { state -> println("Updated state: $state") }
-
-    store.dispatch(CalculatorAction.Add(1))
-
-//    store.dispatch(CalculatorAction.Add(1))
-
-    store.dispatch(CalculatorAction.Add(1))
+    store.subscribe {
+        println("Update: ${store.getState()}")
+    }
 
 
-    delay(1000)
-}
-sealed class CalculatorAction {
-    data class Add(val value: Int) : CalculatorAction()
-    data class Deduct(val value: Int) : CalculatorAction()
-    data class Multiply(val value: Int) : CalculatorAction()
-    data class Divide(val value: Int) : CalculatorAction()
+    store.dispatch("Inc")
+// 1
+    store.dispatch("Inc")
+// 2
+    store.dispatch("Dec")
+// 1
 }
 
-val logSink1 = "hi"
+data class State(val todos: Int = 1)
 
-val sideEffect = object : SideEffect<SomeState, CalculatorAction> {
-    override val name: String = "network logger"
 
-    override fun CoroutineScope.start(
-            input: ReceiveChannel<CalculatorAction>,
-            stateAccessor: StateAccessor<Int>,
-            output: SendChannel<CalculatorAction>,
-//            logSinks = listOf(logSink1),
-            logger: SideEffectLogger
-    ): Job = launch(context = CoroutineName(name)) {
-        for (inputAction in input) {
-            logger.logSideEffectEvent {
-                LogEvent.SideEffectEvent.InputAction(name, inputAction)
-            }
-            println("State Accesor ${stateAccessor()}")
-//            println("Side effect")
-            if (inputAction is CalculatorAction.Add &&
-                    stateAccessor() >= 0) {
-                launch {
-//                    val response = makeNetworkCall()
-                    val response = 200
-                    logger.logSideEffectEvent {
-                        LogEvent.SideEffectEvent.Custom(name, "Received network response: $response")
-                    }
-                    if (response == 200) {
-                        val outputAction = CalculatorAction.Deduct(1)
-                        logger.logSideEffectEvent { LogEvent.SideEffectEvent.DispatchingToReducer(name, outputAction) }
-                        println("Sending output action $outputAction")
-                        output.send(outputAction)
-                    }
-                }
-            }
-        }
+val reducer = Reducer { state: State, action: Any ->
+    when (action) {
+        "Inc" -> state.copy(todos = state.todos + 1)
+        "Dec" -> state.copy(todos = state.todos - 1)
+        else -> state
     }
 }
+
+
+//
+//fun applyMiddleware(vararg middlewares: Middleware<S>): Store.Enhancer<S> {
+//    return Store.Enhancer { next ->
+//        Store.Creator { reducer, initialState ->
+//            object : Store<S> {
+//                private val store = next.create(reducer, initialState)
+//                private val rootDispatcher = middlewares.foldRight(store as Dispatcher) { middleware, next ->
+//                    Dispatcher { action ->
+//                        middleware.dispatch(this, next, action)
+//                    }
+//                }
+//
+//                override fun dispatch(action: Any) = rootDispatcher.dispatch(action)
+//
+//                override fun getState() = store.state
+//
+//                override fun replaceReducer(reducer: Reducer<S>) = store.replaceReducer(reducer)
+//
+//                override fun subscribe(subscriber: Subscriber) = store.subscribe(subscriber)
+//            }
+//        }
+//    }
+//}
+
+//data class ApplicationState(
+//        var activePageName: String
+//)
+//
+//fun myReducer(state: ApplicationState, action: RAction) = when (action) {
+//    is MyAction -> {
+//        state.activePageName = "Changed State"
+//        state
+//    }
+//    else -> state
+//}
+
+//
+//abstract class StoreModel<S : Any> : Store<S> {
+//
+//    private val store by lazy { createStore() }
+//
+//    abstract fun createStore(): Store<S>
+//
+//    override fun getState() = store.getState()
+//
+//    override fun replaceReducer(reducer: Reducer<S>) = store.replaceReducer(reducer)
+//
+//    override fun subscribe(subscriber: Subscriber) = store.subscribe(subscriber)
+//
+//    override fun dispatch(action: Any) = store.dispatch(action)
+//}
