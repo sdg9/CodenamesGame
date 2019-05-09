@@ -11,10 +11,11 @@ import com.gofficer.codenames.models.CardPressed
 import com.gofficer.codenames.models.boardReduceSetup
 import com.gofficer.codenames.models.cardReduce
 import com.gofficer.codenames.screens.loading.LoadingScreen
+import com.gofficer.codenames.screens.menu.MainMenuScreen
+import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.screens.play.setupGameMiddleware
 import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
-import com.google.gson.*
 import gofficer.codenames.game.GameState
 import gofficer.codenames.game.reduceGameSetup
 import io.colyseus.Client
@@ -40,8 +41,8 @@ class CodenamesGame : Game() {
         private val log = logger<CodenamesGame>()
     }
 
-    private var room: Room? = null
-    private lateinit var client: Client
+    var room: Room? = null
+    var client: Client? = null
     val assetManager = AssetManager()
     lateinit var font24: BitmapFont
     private val initState: GameState = GameState()
@@ -61,6 +62,7 @@ class CodenamesGame : Game() {
     private val LERP_MIN = 0.1f
     private val LERP_MAX = 0.5f
     private var lerp = LERP_MAX
+    private lateinit var game: CodenamesGame
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
@@ -69,10 +71,12 @@ class CodenamesGame : Game() {
 
         initFonts()
 
-        createReduxStore()
-        connectToServer()
+//        connectToServer()
 
-        setScreen(LoadingScreen(this))
+        game = this
+
+        createReduxStore()
+        setScreen(LoadingScreen(game))
     }
 
     private fun createReduxStore() {
@@ -87,16 +91,17 @@ class CodenamesGame : Game() {
                         loggingMiddleware,
                         validActionMiddleware,
                         networkActionMiddleware,
+                        navigationMiddleware(game),
                         setupGameMiddleware
                 ))
     }
 
-    private fun connectToServer() {
+    fun connectToServer(onOpenCallback: (() -> Unit)? = null) {
         log.debug("Attempting connection to server")
         client = Client(endpoint, object : Client.Listener {
             override fun onOpen(id: String) {
                 log.debug("onOpen called")
-                room = client.join("public")
+                room = client?.join("public")
                 log.debug("Joined room: $room")
 
                 println("Client.onOpen();")
@@ -194,6 +199,8 @@ class CodenamesGame : Game() {
                         }
                     }
                 })
+
+                onOpenCallback?.invoke()
             }
 
             override fun onMessage(message: Any) {
@@ -204,14 +211,14 @@ class CodenamesGame : Game() {
 
             override fun onClose(code: Int, reason: String, remote: Boolean) {
                 println("Client.onClose();")
-                try {
-                    Thread.sleep(2000)
-//                    players.clear()
-//                    fruits.clear()
-                    connectToServer()
-                } catch (e: InterruptedException) {
-                    e.printStackTrace()
-                }
+//                try {
+//                    Thread.sleep(2000)
+////                    players.clear()
+////                    fruits.clear()
+////                    connectToServer()
+//                } catch (e: InterruptedException) {
+//                    e.printStackTrace()
+//                }
 
             }
 
@@ -224,6 +231,7 @@ class CodenamesGame : Game() {
 
 
     }
+
 
     val networkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
         if (action is NetworkAction && room != null) {
@@ -321,6 +329,44 @@ interface NetworkAction : Action {
 
 data class NetworkMessage(val type: String?, val payload: NetworkAction)
 
+data class ChangeScene(val screenName: String) : Action
+
+
+val navigationMiddleware = { game: CodenamesGame ->
+    Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+
+        println("Changing Screen $action")
+        if (action is ChangeScene) {
+            when (action.screenName) {
+                "MainMenu" -> {
+//                    Gdx.app.postRunnable {
+                    println("Calling close on client")
+                    game.room?.leave()
+                    game.client?.close()
+//                    game.client?.close()
+//                    game.client = null
+                    game.screen = MainMenuScreen(game)
+//                    }
+                }
+                "PlayOnline" -> {
+                    game.connectToServer {
+                        Gdx.app.postRunnable {
+                            game.screen = PlayScreen(game)
+                        }
+                    }
+                }
+                "Play" -> {
+//                    Gdx.app.postRunnable {
+                    game.screen = PlayScreen(game)
+//                    }
+                }
+                else -> null
+            }
+        } else {
+            next.dispatch(action)
+        }
+    }
+}
 //class MenuContentInterfaceAdapter : JsonDeserializer<Any>, JsonSerializer<Any> {
 //
 //    companion object {

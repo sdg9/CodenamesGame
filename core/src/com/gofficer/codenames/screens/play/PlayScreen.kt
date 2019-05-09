@@ -25,7 +25,7 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
 
     override fun show() {
         log.debug("show")
-        renderer = PlayRenderer(game.font24, assetManager, game.store)
+        renderer = PlayRenderer(game.font24, assetManager, game.store, game)
 
         setupGame()
         renderer.show()
@@ -34,7 +34,6 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
     override fun render(delta: Float) {
 //        controller.update(delta)
         renderer.render(delta)
-
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
             hide()

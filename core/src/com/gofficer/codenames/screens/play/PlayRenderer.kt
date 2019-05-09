@@ -18,6 +18,8 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.gofficer.codenames.ChangeScene
+import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.models.CardPressed
 import com.gofficer.codenames.screens.menu.MainMenuScreen
@@ -27,7 +29,7 @@ import redux.api.Store
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
-                   private val store: Store<GameState>) : Disposable {
+                   private val store: Store<GameState>, private val game: CodenamesGame) : Disposable {
 
     companion object {
         @JvmStatic
@@ -60,9 +62,15 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         val currentState = store.state
         if (currentState.cards.size >= 25) {
 
-            table.add(makeButton("New Game"){
+            table.add(makeButton("Rematch"){
                 log.debug("Pressed new game")
                 store.dispatch(SetupGame())
+            })
+            table.add(makeButton("Quit Game"){
+                log.debug("Pressed quit game")
+                // TODO dispatch instead
+                store.dispatch(ChangeScene("MainMenu"))
+//                game.screen = MainMenuScreen(game)
             })
             for (j in 0..4) {
                 table.row().pad(10f) // padding on all sides between cards
