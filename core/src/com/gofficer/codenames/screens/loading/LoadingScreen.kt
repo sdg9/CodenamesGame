@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
+import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
@@ -86,8 +87,8 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
         if (assetManager.update() && progress >= assetManager.progress - .001f) {
 
             @Suppress("ConstantConditionIf")
-//            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
-            game.screen = PlayScreen(game)
+            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
+//            game.screen = PlayScreen(game)
         }
     }
 

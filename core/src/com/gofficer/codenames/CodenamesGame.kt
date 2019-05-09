@@ -7,12 +7,14 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
+import com.gofficer.codenames.models.CardPressed
 import com.gofficer.codenames.models.boardReduceSetup
 import com.gofficer.codenames.models.cardReduce
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.play.setupGameMiddleware
 import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
+import com.google.gson.*
 import gofficer.codenames.game.GameState
 import gofficer.codenames.game.reduceGameSetup
 import io.colyseus.Client
@@ -23,7 +25,12 @@ import redux.applyMiddleware
 import redux.combineReducers
 import redux.createStore
 import io.colyseus.Room
+import io.colyseus.state_listener.PatchListenerCallback
+import io.colyseus.state_listener.DataChange
+import io.colyseus.state_listener.PatchObject
+import io.colyseus.state_listener.FallbackPatchListenerCallback
 
+import java.util.LinkedHashMap
 
 
 class CodenamesGame : Game() {
@@ -39,6 +46,21 @@ class CodenamesGame : Game() {
     lateinit var font24: BitmapFont
     private val initState: GameState = GameState()
     internal lateinit var store: Store<GameState>
+    private val endpoint = "ws://127.0.0.1:2567" //ws://localhost:2567
+//    private val endpoint = "ws://localhost:2567" //ws://localhost:2567
+
+    private val checkLatencyInterval = 10000
+
+    private var lastLatencyCheckTime: Long = 0
+
+    private val lastNetworkUpdateTime: Long = 0
+
+    private val LATENCY_MIN = 100f // ms
+    private val LATENCY_MAX = 500f // ms
+
+    private val LERP_MIN = 0.1f
+    private val LERP_MAX = 0.5f
+    private var lerp = LERP_MAX
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
@@ -47,8 +69,13 @@ class CodenamesGame : Game() {
 
         initFonts()
 
-        setScreen(LoadingScreen(this))
+        createReduxStore()
+        connectToServer()
 
+        setScreen(LoadingScreen(this))
+    }
+
+    private fun createReduxStore() {
         store = createStore(
                 combineReducers(
                         reduceGameSetup,
@@ -62,20 +89,130 @@ class CodenamesGame : Game() {
                         networkActionMiddleware,
                         setupGameMiddleware
                 ))
+    }
 
-        client = Client("ws://localhost:2567", object : Client.Listener {
+    private fun connectToServer() {
+        log.debug("Attempting connection to server")
+        client = Client(endpoint, object : Client.Listener {
             override fun onOpen(id: String) {
+                log.debug("onOpen called")
+                room = client.join("public")
+                log.debug("Joined room: $room")
+
                 println("Client.onOpen();")
                 println("colyseus id: $id")
+
+                room?.addPatchListener("players/:id", object : PatchListenerCallback() {
+                    override fun callback(change: DataChange) {
+                        log.debug("patchListener: $change")
+                        //                        System.out.println(">>> players/:id");
+                        //                        System.out.println(change.path);
+                        //                        System.out.println(change.operation);
+                        //                        System.out.println(change.value);
+//                        if (change.operation == "add") {
+//                            val player = Player()
+//                            val data = change.value as LinkedHashMap<String, Any>
+//
+//                            if (data["x"] is Float)
+//                                player.position.x = data["x"] as Float
+//                            else if (data["x"] is Double)
+//                                player.position.x = (data["x"] as Double).toFloat()
+//                            else if (data["x"] is Int)
+//                                player.position.x = (data["x"] as Int).toFloat()
+//
+//                            if (data["y"] is Float)
+//                                player.position.y = data["y"] as Float
+//                            else if (data["y"] is Double)
+//                                player.position.y = (data["y"] as Double).toFloat()
+//                            else if (data["y"] is Int)
+//                                player.position.y = (data["y"] as Int).toFloat()
+//
+//                            if (data["radius"] is Float)
+//                                player.radius = data["radius"] as Float
+//                            else if (data["radius"] is Double)
+//                                player.radius = (data["radius"] as Double).toFloat()
+//                            else if (data["radius"] is Int)
+//                                player.radius = (data["radius"] as Int).toFloat()
+//
+//                            val color: Int
+//                            if (data["color"] is Long)
+//                                color = (data["color"] as Long).toInt()
+//                            else
+//                                color = data["color"] as Int
+//                            player.color = Color(color)
+//                            player.strokeColor = Color(player.color)
+//                            player.strokeColor.mul(0.9f)
+//
+//                            players.put(change.path["id"], player)
+//                        } else if (change.operation == "remove") {
+//                            players.remove(change.path["id"])
+//                        }
+                    }
+                })
+                room?.setDefaultPatchListener(object : FallbackPatchListenerCallback() {
+                    override fun callback(patch: PatchObject) {
+                        log.debug("Default listener: $patch")
+                        //                        System.out.println(" >>> default listener");
+                        //                        System.out.println(patch.path);
+                        //                        System.out.println(patch.operation);
+                        //                        System.out.println(patch.value);
+                    }
+                })
+                room?.addListener(object : Room.Listener() {
+                    override fun onMessage(message: Any?) {
+                        log.debug("onMessage: $message")
+                        if (message == "pong") {
+                            calculateLerp((System.currentTimeMillis() - lastLatencyCheckTime).toFloat())
+                        }
+
+                        if (message is LinkedHashMap<*, *>) {
+                            val type = message["type"]
+
+                            if (type == CardPressed::class.java.simpleName) {
+
+                                val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
+                                val id = payload["id"] as Int
+                                val word = payload["word"] as String
+
+                                log.debug("Type is $type")
+                                log.debug("Payload is $payload")
+                                log.debug("id is $id")
+                                log.debug("word is $word")
+
+
+                                store.dispatch(CardPressed(id, word))
+                            }
+
+//                            val action = Gson().fromJson(payload, CardPressed::class.java)
+//                            val action = Gson().fromJson(message, NetworkMessage::class.java)
+//                            log.debug("Message is ${action.payload}")
+                        } else {
+                            log.debug("Message is not string $message")
+
+
+                            log.debug("Message type is ${message?.javaClass?.kotlin}")
+                        }
+                    }
+                })
             }
 
             override fun onMessage(message: Any) {
-                println("Client.onMessage()")
-                println(message)
+                log.debug("Client.onMessage(): $message")
+
+
             }
 
             override fun onClose(code: Int, reason: String, remote: Boolean) {
                 println("Client.onClose();")
+                try {
+                    Thread.sleep(2000)
+//                    players.clear()
+//                    fruits.clear()
+                    connectToServer()
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+
             }
 
             override fun onError(e: Exception) {
@@ -83,20 +220,39 @@ class CodenamesGame : Game() {
                 e.printStackTrace()
             }
         })
+        log.debug("Client: $client")
 
-        room = client.join("my_room")
+
     }
 
     val networkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-        if (action is NetworkAction) {
+        if (action is NetworkAction && room != null) {
             println("Dispatching remotely: $action")
+
+//            val gsonBuilder = GsonBuilder()
+//            gsonBuilder.registerTypeAdapter(action::class.java, MenuContentInterfaceAdapter())
+//            var gson = gsonBuilder.create()
+
+//            var gson = Gson()
+//            var jsonString = gson.toJson(NetworkMessage(action::class.java.simpleName, action))
+
+//            log.debug("Sending $jsonString")
+//            room?.send(action.toJson())
+            room?.send(NetworkMessage(action::class.java.simpleName, action))
         }
-        if (room != null) {
-            log.debug("Sending $action")
-        }
-        room?.send(action.toString())
         next.dispatch(action)
     }
+
+//    override fun render() {
+////        super.render()
+//        val now = System.currentTimeMillis()
+//        if (now - lastLatencyCheckTime >= checkLatencyInterval) {
+//            log.debug("Calling ping")
+//            lastLatencyCheckTime = now
+//            checkLatency()
+////            log.debug("R: ${client.rooms}")
+//        }
+//    }
 
     override fun dispose() {
         super.dispose()
@@ -113,6 +269,29 @@ class CodenamesGame : Game() {
         params.size = 24
         params.color = Color.BLACK
         font24 = generator.generateFont(params)
+    }
+
+    private fun checkLatency() {
+        log.debug("Room: $room")
+        if (room == null) return
+        val data = LinkedHashMap<String, String>()
+        data["op"] = "ping"
+        log.debug("Sending message to server")
+        room?.send(data)
+    }
+
+
+    private fun calculateLerp(currentLatency: Float) {
+        val latency: Float
+        if (currentLatency < LATENCY_MIN)
+            latency = LATENCY_MIN
+        else if (currentLatency > LATENCY_MAX)
+            latency = LATENCY_MAX
+        else
+            latency = currentLatency
+        lerp = LERP_MAX + (latency - LATENCY_MIN) / (LATENCY_MAX - LATENCY_MIN) * (LERP_MIN - LERP_MAX)
+        println("current latency: $currentLatency ms")
+        System.out.println("lerp : ${lerp}")
     }
 
 }
@@ -136,4 +315,43 @@ val validActionMiddleware = Middleware { store: Store<GameState>, next: Dispatch
 
 interface Action
 
-interface NetworkAction: Action
+interface NetworkAction : Action {
+//    fun toJson(): String
+}
+
+data class NetworkMessage(val type: String?, val payload: NetworkAction)
+
+//class MenuContentInterfaceAdapter : JsonDeserializer<Any>, JsonSerializer<Any> {
+//
+//    companion object {
+//        const val CLASSNAME = "CLASSNAME"
+//        const val DATA  = "DATA"
+//    }
+//
+//    @Throws(JsonParseException::class)
+//    override fun deserialize(jsonElement: JsonElement, type: Type,
+//                             jsonDeserializationContext: JsonDeserializationContext): Any {
+//
+//        val jsonObject = jsonElement.asJsonObject
+//        val prim = jsonObject.get(CLASSNAME) as JsonPrimitive
+//        val className = prim.asString
+//        val objectClass = getObjectClass(className)
+//        return jsonDeserializationContext.deserialize(jsonObject.get(DATA), objectClass)
+//    }
+//
+//    override fun serialize(jsonElement: Any, type: Type, jsonSerializationContext: JsonSerializationContext): JsonElement {
+//        val jsonObject = JsonObject()
+//        jsonObject.addProperty(CLASSNAME, jsonElement.javaClass.name)
+//        jsonObject.add(DATA, jsonSerializationContext.serialize(jsonElement))
+//        return jsonObject
+//    }
+//
+//    private fun getObjectClass(className: String): Class<*> {
+//        try {
+//            return Class.forName(className)
+//        } catch (e: ClassNotFoundException) {
+//            throw JsonParseException(e.message)
+//        }
+//
+//    }
+//}

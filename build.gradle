@@ -119,6 +119,8 @@ project(":core") {
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
         implementation 'ir.doorbash:colyseus-java:1.2.3'
+        implementation 'com.google.code.gson:gson:2.8.5'
+
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"
 

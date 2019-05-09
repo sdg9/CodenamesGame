@@ -95,4 +95,4 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
 
 class ResetGame : NetworkAction
 
-class SetupGame : Action
+class SetupGame : NetworkAction
