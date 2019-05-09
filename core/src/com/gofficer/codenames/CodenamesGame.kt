@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
+import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.models.CardPressed
 import com.gofficer.codenames.models.boardReduceSetup
 import com.gofficer.codenames.models.cardReduce
@@ -47,7 +48,9 @@ class CodenamesGame : Game() {
     lateinit var font24: BitmapFont
     private val initState: GameState = GameState()
     internal lateinit var store: Store<GameState>
-    private val endpoint = "ws://127.0.0.1:2567" //ws://localhost:2567
+
+//    private val endpoint = "ws://10.0.2.2:2567" //ws://localhost:2567
+//    private val endpoint = "ws://127.0.0.1:2567" //ws://localhost:2567
 //    private val endpoint = "ws://localhost:2567" //ws://localhost:2567
 
     private val checkLatencyInterval = 10000
@@ -98,6 +101,7 @@ class CodenamesGame : Game() {
 
     fun connectToServer(onOpenCallback: (() -> Unit)? = null) {
         log.debug("Attempting connection to server")
+        val endpoint = if (Gdx.app.type == Application.ApplicationType.Android) GameConfig.LOCAL_WEBSOCKET_ANDROID else GameConfig.LOCAL_WEBSOCKET_DESKTOP
         client = Client(endpoint, object : Client.Listener {
             override fun onOpen(id: String) {
                 log.debug("onOpen called")
