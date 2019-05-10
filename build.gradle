@@ -29,6 +29,7 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
+        ktor_version = '1.1.4'
 
         reduxKotlinVersion = '1.2.0'
 //        reduxObservableKotlinVersion = '1.0.0'
@@ -121,6 +122,16 @@ project(":core") {
         implementation 'ir.doorbash:colyseus-java:1.2.3'
         implementation 'com.google.code.gson:gson:2.8.5'
 
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+        // https://mvnrepository.com/artifact/org.java-websocket/Java-WebSocket
+        compile "org.java-websocket:Java-WebSocket:1.4.0"
+        compile "org.slf4j:slf4j-simple:1.6.1"
+        implementation("com.squareup.moshi:moshi:1.8.0")
+        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
+//        implementation "io.ktor:ktor-client-websocket:$ktor_version"
+//        implementation "io.ktor:ktor-client-cio:$ktor_version"
+//        implementation "io.ktor:ktor-client-core:$ktor_version"
+//        implementation "io.ktor:ktor-client-android:1.0.1"
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"
 
