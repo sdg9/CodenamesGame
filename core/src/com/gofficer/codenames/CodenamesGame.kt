@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
-import com.gofficer.client.EmptyClient
+import com.gofficer.client.Room
 import com.gofficer.client.WSClient
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.models.*
@@ -15,29 +15,21 @@ import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.PlayScreen
 //import com.gofficer.codenames.screens.play.setupGameMiddleware
-import com.gofficer.codenames.utils.add
 import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.game.GameState
 import gofficer.codenames.game.ResetGame
 import gofficer.codenames.game.SetupGame
 import gofficer.codenames.game.reduceGameSetup
-import io.colyseus.Client
 import redux.api.Dispatcher
 import redux.api.Store
 import redux.api.enhancer.Middleware
 import redux.applyMiddleware
 import redux.combineReducers
 import redux.createStore
-import io.colyseus.Room
-import io.colyseus.state_listener.PatchListenerCallback
-import io.colyseus.state_listener.DataChange
-import io.colyseus.state_listener.PatchObject
-import io.colyseus.state_listener.FallbackPatchListenerCallback
+//import io.colyseus.Room
 //import io.ktor.client.engine.cio.CIO
 import java.util.*
-import org.java_websocket.client.WebSocketClient
-import java.net.URI
 
 
 class CodenamesGame : Game() {
@@ -118,10 +110,11 @@ class CodenamesGame : Game() {
 
             override fun onOpen(id: String?) {
                 log.debug("Connected $id")
+                room = client?.join("public")
             }
 
             override fun onMessage(message: Any) {
-                log.debug("onMessage: $message")
+                log.debug("onMessage Any: $message")
 
 //                client?.getAvailableRooms()
 //                if (!hasSentSomething) {

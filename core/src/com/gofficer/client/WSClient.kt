@@ -119,9 +119,10 @@ class WSClient @JvmOverloads constructor(
      *
      * @param roomName can be either a room name or a roomId
      */
-//    fun join(roomName: String): Room {
-//        return this.createRoomRequest(roomName, null)
-//    }
+    fun join(roomName: String): Room? {
+        println("Join $roomName")
+        return this.createRoomRequest(roomName, null)
+    }
 //
 //    fun join(roomName: String, options: LinkedHashMap<String, Any>): Room {
 //        return this.createRoomRequest(roomName, options)
@@ -136,32 +137,37 @@ class WSClient @JvmOverloads constructor(
 //        return this.join(roomName, options)
 //    }
 
-//    private fun createRoomRequest(roomName: String, options: LinkedHashMap<String, Any>?): Room {
+    private fun createRoomRequest(roomName: String, options: LinkedHashMap<String, Any>?): Room? {
 //        var options = options
 //        //        System.out.println("createRoomRequest(" + roomName + "," + options + "," + reuseRoomInstance + "," + retryTimes + "," + retryCount);
 //        if (options == null) options = LinkedHashMap()
 //        options["requestId"] = ++this.requestId
-//
-//        val room = createRoom(roomName, options)
-//
-//        val finalOptions = options
-//        room.addListener(object : Room.Listener() {
-//            override fun onLeave() {
-//                rooms.remove(room.getId())
-//                connectingRooms.remove(finalOptions["requestId"])
-//            }
-//        })
-//
-//        this.connectingRooms[options["requestId"] as Int] = room
-//
-//        this.connection!!.send(Protocol.JOIN_ROOM, roomName, options)
-//
-//        return room
-//    }
-//
-//    private fun createRoom(roomName: String, options: LinkedHashMap<String, Any>): Room {
-//        return Room(roomName, options)
-//    }
+
+        /*
+        val room = createRoom(roomName, options)
+
+        val finalOptions = options
+        room.addListener(object : Room.Listener() {
+            override fun onLeave() {
+                rooms.remove(room.getId())
+                connectingRooms.remove(finalOptions["requestId"])
+            }
+        })
+
+        this.connectingRooms[options["requestId"] as Int] = room
+
+        this.connection?.send(Protocol.JOIN_ROOM, roomName, options)
+
+        return room
+        */
+        // TODO
+        this.connection?.send("TODO room join")
+        return null
+    }
+
+    private fun createRoom(roomName: String, options: LinkedHashMap<String, Any>): Room {
+        return Room(roomName, options)
+    }
 
     /*
     /**

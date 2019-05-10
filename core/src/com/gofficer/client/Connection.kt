@@ -50,6 +50,11 @@ class Connection internal constructor(uri: URI, connectTimeout: Int, httpHeaders
 //        }
 //    }
 
+    fun send(vararg data: Any?) {
+
+        //TODO implement me with message pack
+        return super.send("Dummy data")
+    }
 
     override fun onOpen(handshakedata: ServerHandshake) {
         this.listener?.onOpen()
@@ -65,6 +70,7 @@ class Connection internal constructor(uri: URI, connectTimeout: Int, httpHeaders
     }
 
     override fun onMessage(message: String) {
+        println("onMessage string: $message")
         this.listener?.onMessage(message)
 //        this@Connection.listener?.onMessage(message)
 //        println("Message received: $message")
@@ -85,6 +91,8 @@ class Connection internal constructor(uri: URI, connectTimeout: Int, httpHeaders
     override fun onMessage(buf: ByteBuffer?) {
         val bytes = ByteArray(buf!!.capacity())
         buf.get(bytes, 0, bytes.size)
+
+        println("onMessage byes: $bytes")
         this.listener?.onMessage(bytes)
 //        println("Bytes recevied $buf")
         //        System.out.println("Connection.onMessage(ByteBuffer bytes)");
