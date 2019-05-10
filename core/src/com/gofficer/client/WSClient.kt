@@ -17,7 +17,13 @@ import java.nio.charset.StandardCharsets
 import java.util.ArrayList
 import java.util.LinkedHashMap
 
-class WSClient @JvmOverloads constructor(private val hostname: String, id: String? = null, options: LinkedHashMap<String, Any>? = null, httpHeaders: LinkedHashMap<String, String>? = null, private val connectTimeout: Int = 0, private val listener: Listener? = null) {
+class WSClient @JvmOverloads constructor(
+        private val hostname: String,
+        id: String? = null,
+        options: LinkedHashMap<String, Any>? = null,
+        httpHeaders: LinkedHashMap<String, String>? = null,
+        private val connectTimeout: Int = 0,
+        private val listener: Listener? = null) {
 
     /**
      * Unique identifier for the client.
@@ -32,8 +38,8 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
 
     var connectingRooms = LinkedHashMap<Int, Object>()
     private var requestId = 0
-    private val availableRoomsRequests = LinkedHashMap<Int, AvailableRoomsRequestListener>()
-    private val msgpackMapper: ObjectMapper
+//    private val availableRoomsRequests = LinkedHashMap<Int, AvailableRoomsRequestListener>()
+//    private val msgpackMapper: ObjectMapper
     private val defaultMapper: ObjectMapper
 
     /**
@@ -71,40 +77,40 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
         fun onError(e: Exception)
     }
 
-    interface GetAvailableRoomsCallback {
-        fun onCallback(availableRooms: List<AvailableRoom>?, error: String?)
-    }
-
-    interface AvailableRoomsRequestListener {
-        fun callback(availableRooms: List<AvailableRoom>)
-    }
-
-    class AvailableRoom {
-
-        var clients: Int = 0
-        var maxClients: Int = 0
-        var roomId: String? = null
-        var metadata: Value? = null
-
-        override fun toString(): String {
-            return "{" +
-                    "clients:" + clients + ", " +
-                    "maxClients:" + maxClients + ", " +
-                    "roomId:" + roomId + ", " +
-                    "metadata:" + metadata + ", " +
-                    "}"
-        }
-    }
-
+//    interface GetAvailableRoomsCallback {
+//        fun onCallback(availableRooms: List<AvailableRoom>?, error: String?)
+//    }
+//
+//    interface AvailableRoomsRequestListener {
+//        fun callback(availableRooms: List<AvailableRoom>)
+//    }
+//
+//    class AvailableRoom {
+//
+//        var clients: Int = 0
+//        var maxClients: Int = 0
+//        var roomId: String? = null
+//        var metadata: Value? = null
+//
+//        override fun toString(): String {
+//            return "{" +
+//                    "clients:" + clients + ", " +
+//                    "maxClients:" + maxClients + ", " +
+//                    "roomId:" + roomId + ", " +
+//                    "metadata:" + metadata + ", " +
+//                    "}"
+//        }
+//    }
+//
     constructor(url: String, listener: Listener) : this(url, null, null, null, 0, listener) {}
-
-    constructor(url: String, id: String, listener: Listener) : this(url, id, null, null, 0, listener) {}
+//
+//    constructor(url: String, id: String, listener: Listener) : this(url, id, null, null, 0, listener) {}
 
     init {
         this.id = id
         this.httpHeaders = httpHeaders ?: LinkedHashMap()
         this.defaultMapper = ObjectMapper()
-        this.msgpackMapper = ObjectMapper(MessagePackFactory())
+//        this.msgpackMapper = ObjectMapper(MessagePackFactory())
         this.connect(options ?: LinkedHashMap(), connectTimeout)
     }
 
@@ -157,6 +163,7 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
 //        return Room(roomName, options)
 //    }
 
+    /*
     /**
      * List all available rooms to connect with the provided roomName. Locked rooms won't be listed.
      */
@@ -189,6 +196,7 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
             }
         }
     }
+*/
 
     /**
      * Close connection with the server.
@@ -202,16 +210,13 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
         try {
             uri = URI(buildEndpoint("", options))
         } catch (e: URISyntaxException) {
-            if (this@WSClient.listener != null)
-                this@WSClient.listener.onError(e)
+            this.listener?.onError(e)
             return
         } catch (e: UnsupportedEncodingException) {
-            if (this@WSClient.listener != null)
-                this@WSClient.listener.onError(e)
+            this.listener?.onError(e)
             return
         } catch (e: JsonProcessingException) {
-            if (this@WSClient.listener != null)
-                this@WSClient.listener.onError(e)
+            this.listener?.onError(e)
             return
         }
 
@@ -221,18 +226,16 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
             }
 
             override fun onError(e: Exception) {
-                if (this@WSClient.listener != null)
-                    this@WSClient.listener.onError(e)
+                this@WSClient.listener?.onError(e)
             }
 
             override fun onClose(code: Int, reason: String, remote: Boolean) {
-                if (this@WSClient.listener != null)
-                    this@WSClient.listener.onClose(code, reason, remote)
+                this@WSClient.listener?.onClose(code, reason, remote)
             }
 
             override fun onOpen() {
-                if (this@WSClient.id != null && this@WSClient.listener != null)
-                    this@WSClient.listener.onOpen(this@WSClient.id)
+                if (this@WSClient.id != null)
+                    this@WSClient.listener?.onOpen(this@WSClient.id)
             }
 
             override fun onMessage(bytes: ByteArray) {
@@ -271,6 +274,8 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
 
     private fun onMessageCallback(bytes: ByteArray) {
         //        System.out.println("WSClient.onMessageCallback()");
+        println("onMessageCallback bytes not implemented")
+        /*
         try {
             val unpacker = MessagePack.newDefaultUnpacker(bytes)
             val `val` = unpacker.unpackValue()
@@ -288,21 +293,21 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
                                 this@WSClient.listener.onOpen(this.id)
                             }
                         }
-//                        Protocol.JOIN_ROOM -> {
-//                            //                            System.out.println("Protocol: JOIN_ROOM");
-//                            val requestId = arrayValue.get(2).asIntegerValue().asInt()
-//                            //                            System.out.println("requestId: " + requestId);
-//                            val room = this.connectingRooms[requestId]
-//                            if (room == null) {
-//                                println("client left room before receiving session id.")
-//                                return
-//                            }
-//                            room!!.setId(arrayValue.get(1).asStringValue().asString())
-//                            //                            System.out.println("room.id: " + room.getId());
-//                            this.rooms[room!!.getId()] = room
-//                            room!!.connect(buildEndpoint(room!!.getId(), room!!.getOptions()), httpHeaders, this.connectTimeout)
-//                            connectingRooms.remove(requestId)
-//                        }
+                        Protocol.JOIN_ROOM -> {
+                            //                            System.out.println("Protocol: JOIN_ROOM");
+                            val requestId = arrayValue.get(2).asIntegerValue().asInt()
+                            //                            System.out.println("requestId: " + requestId);
+                            val room = this.connectingRooms[requestId]
+                            if (room == null) {
+                                println("client left room before receiving session id.")
+                                return
+                            }
+                            room!!.setId(arrayValue.get(1).asStringValue().asString())
+                            //                            System.out.println("room.id: " + room.getId());
+                            this.rooms[room!!.getId()] = room
+                            room!!.connect(buildEndpoint(room!!.getId(), room!!.getOptions()), httpHeaders, this.connectTimeout)
+                            connectingRooms.remove(requestId)
+                        }
                         Protocol.JOIN_ERROR -> {
                             //                            System.out.println("Protocol: JOIN_ERROR");
                             System.err.println("colyseus: server error: " + arrayValue.get(2).toString())
@@ -351,7 +356,7 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
         } catch (e: Exception) {
             if (this.listener != null) this.listener.onError(e)
         }
-
+*/
     }
 
     @Throws(IOException::class)
@@ -359,11 +364,10 @@ class WSClient @JvmOverloads constructor(private val hostname: String, id: Strin
         this@WSClient.listener?.onMessage(string)
     }
 
-    @Throws(IOException::class)
-    private fun dispatchOnMessage(bytes: ByteArray) {
-        if (this@WSClient.listener != null)
-            this@WSClient.listener.onMessage(msgpackMapper.readValue(bytes, object : TypeReference<Any>() {
-
-            }))
-    }
+//    @Throws(IOException::class)
+//    private fun dispatchOnMessage(bytes: ByteArray) {
+//        this@WSClient.listener?.onMessage(msgpackMapper.readValue(bytes, object : TypeReference<Any>() {
+//
+//        }))
+//    }
 }

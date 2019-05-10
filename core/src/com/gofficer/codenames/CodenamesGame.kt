@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
+import com.gofficer.client.EmptyClient
 import com.gofficer.client.WSClient
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.models.*
@@ -49,8 +50,9 @@ class CodenamesGame : Game() {
     var room: Room? = null
 //    var client: Client? = null
     var client: WSClient? = null
+//    var client: EmptyClient? = null
 //    var client: HttpClient? = null
-    var clinet: WebSocketClient? = null
+//    var clinet: WebSocketClient? = null
     val assetManager = AssetManager()
     lateinit var font24: BitmapFont
     private val initState: GameState = GameState()
@@ -70,14 +72,14 @@ class CodenamesGame : Game() {
     private var lerp = LERP_MAX
     private lateinit var game: CodenamesGame
 
+    private var hasSentSomething = false
+
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
         assetManager.logger.level = Logger.DEBUG
         log.debug("create")
 
         initFonts()
-
-//        connectToServer()
 
         game = this
 
@@ -106,6 +108,12 @@ class CodenamesGame : Game() {
         log.debug("Attempting connection to server")
         val endpoint = if (Gdx.app.type == Application.ApplicationType.Android) GameConfig.LOCAL_WEBSOCKET_ANDROID else GameConfig.LOCAL_WEBSOCKET_DESKTOP
 
+//        client = EmptyClient(endpoint)
+//        client?.connect()
+
+        log.debug("Client: $client")
+
+
         client = WSClient(endpoint, object : WSClient.Listener {
 
             override fun onOpen(id: String?) {
@@ -113,9 +121,17 @@ class CodenamesGame : Game() {
             }
 
             override fun onMessage(message: Any) {
-                log.debug("onMessage $message")
+                log.debug("onMessage: $message")
 
 //                client?.getAvailableRooms()
+//                if (!hasSentSomething) {
+//                    // TODO send something
+////                    client.se
+//                    log.debug("Sending a message")
+////                    Thread.sleep(1000)
+////                    client?.send("Test")
+//                    hasSentSomething = true
+//                }
             }
 
             override fun onClose(code: Int, reason: String, remote: Boolean) {
@@ -304,7 +320,6 @@ class CodenamesGame : Game() {
             }
         })
         */
-        log.debug("WSClient: $client")
 
 
     }
