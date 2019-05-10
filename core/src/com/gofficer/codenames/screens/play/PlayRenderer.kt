@@ -20,12 +20,14 @@ import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.gofficer.codenames.ChangeScene
 import com.gofficer.codenames.CodenamesGame
+import com.gofficer.codenames.actions.FlipAction
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.models.CardPressed
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import gofficer.codenames.game.GameState
 import gofficer.codenames.game.SetupGame
 import redux.api.Store
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
@@ -62,11 +64,11 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         val currentState = store.state
         if (currentState.cards.size >= 25) {
 
-            table.add(makeButton("Rematch"){
+            table.add(makeButton("Rematch") {
                 log.debug("Pressed new game")
                 store.dispatch(SetupGame())
             })
-            table.add(makeButton("Quit Game"){
+            table.add(makeButton("Quit Game") {
                 log.debug("Pressed quit game")
                 // TODO dispatch instead
                 store.dispatch(ChangeScene("MainMenu"))
@@ -91,6 +93,11 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
                         override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
                             log.debug("Touched $cardName")
 
+                            val duration = 0.5f
+//                            myCard.addAction(SequenceAction(
+//                                    FlipAction.flipOut(myCard.x, myCard.width, duration / 2),
+//                                    FlipAction.flipIn(myCard.x, myCard.width, duration / 2)
+//                            ))
                             store.dispatch(CardPressed(id, cardName))
                             // TODO: If possible...
                             // TODO: dispatch action saying pressed
@@ -136,8 +143,8 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 //        }
 
         renderGamePlay(delta)
-        renderDebug(delta)
-        renderUi(delta)
+//        renderDebug(delta)
+//        renderUi(delta)
 
 //        log.debug("totalRenderCalls= ${batch.totalRenderCalls}")
     }

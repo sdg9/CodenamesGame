@@ -6,6 +6,9 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
+import com.badlogic.gdx.utils.Align
+import com.gofficer.codenames.actions.FlipAction
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.utils.get
@@ -28,13 +31,29 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
     private var textToUse: String = cardText
     private var tint: Color? = null
+    private var isRevealed: Boolean? = null
     private var store: Store<GameState>
 
     private fun subscribeStore() {
         subscription?.unsubscribe()
         subscription = store.subscribe {
-            //            println("${store.getState()}")
+            // Before
+            // TODO: Ideally we'd have before state, we don't with this implementation.
+            //  Instead we can store what we care about locally and compare vs that
+
+            // After
             val me = store.state.cards.getById(id)
+
+            if (isRevealed != true && me?.isRevealed == true) {
+                log.debug("I'm changing for first time to be revaled! $id")
+
+                val duration = 0.5f
+                addAction(SequenceAction(
+//                        isAnimating = true,
+                        FlipAction.flipOut(x, width, duration / 2),
+                        FlipAction.flipIn(x, width, duration / 2)
+                ))
+            }
 
             log.debug("Responding to state $me")
             if (me != null && me.isRevealed) {
@@ -47,6 +66,8 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
             } else {
                 tint = null
             }
+
+            isRevealed = me?.isRevealed
         }
     }
 
@@ -78,7 +99,15 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
                 width, height, 1f, 1f, rotation)
         // draw text below image
 
-        font.draw(batch, textToUse, x + width / 7, y + height / 2.5f)
+        // TODO: Get this part of the actor so it animates as the card flips
+        log.debug("W $width")
+//        font.draw(batch, textToUse, x + width / 7, y + height / 2.5f, width, Align.center, false)
+
+        val isAnimating = actions.size > 0
+        if (!isAnimating) {
+            font.draw(batch, textToUse, x , y + height / 2.5f, width, Align.center, true)
+        }
+//        font.draw(batch, textToUse, x + width / 7, y + height / 2.5f)
 
 
         batch.color = Color.WHITE

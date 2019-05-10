@@ -7,18 +7,18 @@ class FlipAction {
     companion object {
         fun flipOut(x: Float, width: Float, duration: Float): Action {
            return object : Action() {
-               internal var left = duration
+               var left = duration
 
                override fun act(delta: Float): Boolean {
                    left -= delta
                    if (left <= 0) {
-                       actor.setX(x + width / 2)
-                       actor.setWidth(0f)
+                       actor.x = x + width / 2
+                       actor.width = 0f
                        return true
                    }
                    val tmpWidth = width * (left / duration)
-                   actor.setX(x + (width / 2 - tmpWidth / 2))
-                   actor.setWidth(tmpWidth)
+                   actor.x = x + (width / 2 - tmpWidth / 2)
+                   actor.width = tmpWidth
                    return false
                }
            }
@@ -26,18 +26,18 @@ class FlipAction {
 
         fun flipIn(x: Float, width: Float, duration: Float): Action {
         return object : Action() {
-            internal var done = 0f
+            var done = 0f
 
             override fun act(delta: Float): Boolean {
                 done += delta
                 if (done >= duration) {
-                    actor.setX(x)
-                    actor.setWidth(width)
+                    actor.x = x
+                    actor.width = width
                     return true
                 }
                 val tmpWidth = width * (done / duration)
-                actor.setX(x + (width / 2 - tmpWidth / 2))
-                actor.setWidth(tmpWidth)
+                actor.x = x + (width / 2 - tmpWidth / 2)
+                actor.width = tmpWidth
                 return false
             }
         }
