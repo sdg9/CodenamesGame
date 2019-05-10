@@ -8,16 +8,17 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.models.CardPressed
-import com.gofficer.codenames.models.boardReduceSetup
-import com.gofficer.codenames.models.cardReduce
+import com.gofficer.codenames.models.*
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.PlayScreen
-import com.gofficer.codenames.screens.play.setupGameMiddleware
+//import com.gofficer.codenames.screens.play.setupGameMiddleware
+import com.gofficer.codenames.utils.add
 import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.game.GameState
+import gofficer.codenames.game.ResetGame
+import gofficer.codenames.game.SetupGame
 import gofficer.codenames.game.reduceGameSetup
 import io.colyseus.Client
 import redux.api.Dispatcher
@@ -31,8 +32,7 @@ import io.colyseus.state_listener.PatchListenerCallback
 import io.colyseus.state_listener.DataChange
 import io.colyseus.state_listener.PatchObject
 import io.colyseus.state_listener.FallbackPatchListenerCallback
-
-import java.util.LinkedHashMap
+import java.util.*
 
 
 class CodenamesGame : Game() {
@@ -94,8 +94,8 @@ class CodenamesGame : Game() {
                         loggingMiddleware,
                         validActionMiddleware,
                         networkActionMiddleware,
-                        navigationMiddleware(game),
-                        setupGameMiddleware
+                        navigationMiddleware(game)
+//                        setupGameMiddleware
                 ))
     }
 
@@ -160,7 +160,7 @@ class CodenamesGame : Game() {
                 })
                 room?.setDefaultPatchListener(object : FallbackPatchListenerCallback() {
                     override fun callback(patch: PatchObject) {
-                        log.debug("Default listener: $patch")
+//                        log.debug("Default listener: $patch")
                         //                        System.out.println(" >>> default listener");
                         //                        System.out.println(patch.path);
                         //                        System.out.println(patch.operation);
@@ -189,7 +189,53 @@ class CodenamesGame : Game() {
                                 log.debug("word is $word")
 
 
-                                store.dispatch(CardPressed(id, word))
+                                store.dispatch(CardPressed(id, word, true))
+                            }
+                            if (type == "GameSetup") {
+                                log.debug("Game setup found")
+                                try {
+
+                                    val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
+//                                    val payload: LinkedHashMap<*, *> = message["payload"] as ArrayList<*>
+//                                    log.debug("Payload: $payload")
+//                                    log.debug("Cards: ${payload["cards"]}")
+//                                    val cards = listOf<Card>()
+//
+                                    val cardsFromServer = payload["cards"] as List<LinkedHashMap<*, *>>
+//
+                                    val cards = cardsFromServer.map {
+                                        //                                        val a = it["paylaod"] as String
+//                                        val id = it["id"] as Int
+//                                        println("ID $id")
+//                                        val text = it["text"] as String
+//                                        println("text $text")
+//                                        val type = it["type"] as String
+//                                        println("type $type")
+//                                        val isRevealed = it["isRevealed"] as Boolean
+//                                        println("isRevealed $isRevealed")
+
+                                        Card(it["id"] as Int, it["text"] as String, it["type"] as String, it["isRevealed"] as Boolean)
+
+                                    }
+
+                                    log.debug("Cards $cards")
+//                                    cardsFromServer.forEach {
+////                                        val id = it["id"] as Int
+//                                          cards.add(Card(it.["id"], it["text"], it["type"], it["isRevealed"]))
+////                                        cards.add(Card(it.id ,it.text, it.type, it.isRevealed))
+//                                    }
+
+//                                    val cards: List<Card> = payload["cards"] as List<Card>
+                                    log.debug("Payload: $cards")
+
+                                    store.dispatch(SetupCards(cards))
+                                } catch (e: Exception) {
+                                    log.error(e.toString())
+                                }
+
+
+//                                val cards = payload as Array<Card>
+//                                val word = payload["word"] as String
                             }
 
 //                            val action = Gson().fromJson(payload, CardPressed::class.java)
@@ -238,7 +284,7 @@ class CodenamesGame : Game() {
 
 
     val networkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-        if (action is NetworkAction && room != null) {
+        if (action is NetworkAction && !action.isFromServer && room != null) {
             println("Dispatching remotely: $action")
 
 //            val gsonBuilder = GsonBuilder()
@@ -265,6 +311,48 @@ class CodenamesGame : Game() {
 ////            log.debug("R: ${client.rooms}")
 //        }
 //    }
+
+    val setupGameMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+
+        if (client != null) {
+            // don't do any of this if connected to server
+            null
+        } else {
+
+            val action = next.dispatch(action)
+            if (action is SetupGame) {
+                store.dispatch(ResetGame())
+                val isBlueFirst = Random().nextBoolean()
+//        val types: MutableList<CardType> = mutableListOf()
+                val types: MutableList<String> = mutableListOf()
+                val totalBlue = if (isBlueFirst) 9 else 8
+                val totalRed = if (!isBlueFirst) 9 else 8
+                // Add appropriate number of color types
+                for (i in 1..totalBlue) {
+//            types.add(CardType.BLUE)
+                    types.add("BLUE")
+                }
+                for (i in 1..totalRed) {
+//            types.add(CardType.RED)
+                    types.add("RED")
+                }
+//        types.add(CardType.DOUBLE_AGENT)
+                types.add("DOUBLE_AGENT")
+                for (i in 1..(25 - types.size)) {
+//            types.add(CardType.BYSTANDER)
+                    types.add("BYSTANDER")
+                }
+                // Shuffle colors
+                val shuffledList = types.shuffled()
+                for (i in 1..25) {
+                    store.dispatch(AddCard(Card(i, "test$i", shuffledList[i - 1])))
+                }
+            }
+
+            action
+        }
+    }
+
 
     override fun dispose() {
         super.dispose()
@@ -308,6 +396,7 @@ class CodenamesGame : Game() {
 
 }
 
+
 val loggingMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
     println("Action => $action")
     next.dispatch(action)
@@ -328,7 +417,7 @@ val validActionMiddleware = Middleware { store: Store<GameState>, next: Dispatch
 interface Action
 
 interface NetworkAction : Action {
-//    fun toJson(): String
+    var isFromServer: Boolean
 }
 
 data class NetworkMessage(val type: String?, val payload: NetworkAction)
@@ -336,10 +425,12 @@ data class NetworkMessage(val type: String?, val payload: NetworkAction)
 data class ChangeScene(val screenName: String) : Action
 
 
+data class SetupCards(val cards: List<Card>) : Action
+
 val navigationMiddleware = { game: CodenamesGame ->
     Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
 
-        println("Changing Screen $action")
+//        println("Changing Screen $action")
         if (action is ChangeScene) {
             when (action.screenName) {
                 "MainMenu" -> {
@@ -355,6 +446,7 @@ val navigationMiddleware = { game: CodenamesGame ->
                 "PlayOnline" -> {
                     game.connectToServer {
                         Gdx.app.postRunnable {
+                            println("Online play")
                             game.screen = PlayScreen(game)
                         }
                     }

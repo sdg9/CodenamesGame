@@ -14,7 +14,8 @@ enum class CardType {
 data class Card(
         val id: Int,
         val text: String,
-        val type: CardType,
+//        val type: CardType?,
+        val type: String,
         val isRevealed: Boolean = false)
 
 fun List<Card>.update(card: Card): List<Card> {
@@ -70,7 +71,7 @@ val cardReduce = Reducer { state: GameState, action: Any ->
 }
 
 
-data class CardPressed(val id: Int, val word: String): NetworkAction {
+data class CardPressed(val id: Int, val word: String, override var isFromServer: Boolean = false): NetworkAction {
 //    override fun toJson(): String {
 //        var gson = Gson()
 //        var jsonString = gson.toJson(this)

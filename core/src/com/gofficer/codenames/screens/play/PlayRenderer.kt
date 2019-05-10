@@ -31,7 +31,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
-                   private val store: Store<GameState>, private val game: CodenamesGame) : Disposable {
+                   private val store: Store<GameState>) : Disposable {
 
     companion object {
         @JvmStatic
@@ -53,16 +53,40 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 
     private val stage: Stage = Stage(viewport)
 
+    private var totalCards = 0
+
+
+    private var subscription: Store.Subscription? = null
+
     // == public functions ==
 
     fun show() {
         stage.clear()
-
+        log.debug("Show playrenderer")
 
         initSkin()
+
+        subscription?.unsubscribe()
+        subscription = store.subscribe {
+            if (store.state.cards.size != totalCards) {
+                showCards()
+            }
+        }
+        showCards()
+
+        Gdx.input.inputProcessor = stage
+    }
+
+    private fun showCards() {
+        log.debug("Store update")
+
         val table = Table()
+
         val currentState = store.state
-        if (currentState.cards.size >= 25) {
+        totalCards = currentState.cards.size
+
+        log.debug("Card size: ${totalCards}")
+        if (totalCards >= 25) {
 
             table.add(makeButton("Rematch") {
                 log.debug("Pressed new game")
@@ -87,7 +111,8 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 //                }
                     val cardName = "test-$j-$k"
                     val id = j * 5 + k
-                    val myCard = Card(id, currentState.cards[id - 1].text, assetManager, myFont, store)
+                    val card = currentState.cards[id - 1]
+                    val myCard = Card(card.id, card.text, card.type, card.isRevealed, assetManager, myFont, store)
 //                myCard.touchable = Touchable.enabled
                     myCard.addListener(object : ClickListener() {
                         override fun touchDown(event: InputEvent, x: Float, y: Float, pointer: Int, button: Int): Boolean {
@@ -113,11 +138,10 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
                 }
             }
 
-        }
-        table.setFillParent(true)
+            table.setFillParent(true)
 
-        stage.addActor(table)
-        Gdx.input.inputProcessor = stage
+            stage.addActor(table)
+        }
     }
 
 
@@ -184,6 +208,7 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         stage.actors.forEach {
             it.remove()
         }
+        subscription?.unsubscribe()
         renderer.dispose()
         batch.dispose()
     }

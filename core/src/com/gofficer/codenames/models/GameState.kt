@@ -2,6 +2,7 @@ package gofficer.codenames.game
 
 import com.gofficer.codenames.Action
 import com.gofficer.codenames.NetworkAction
+import com.gofficer.codenames.SetupCards
 import com.gofficer.codenames.models.*
 import redux.api.Reducer
 
@@ -16,6 +17,13 @@ data class GameState(
 
 val reduceGameSetup = Reducer { state: GameState, action: Any ->
     when (action) {
+        is SetupCards -> {
+            println("Setting up cards")
+            state.copy(
+                    cards = action.cards
+            )
+
+        }
         is ResetGame -> state.copy(
                 board = Board(),
                 lastPlayed = 0,
@@ -93,6 +101,6 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
 //}
 
 
-class ResetGame : NetworkAction
+class ResetGame(override var isFromServer: Boolean = false) : NetworkAction
 
-class SetupGame : NetworkAction
+class SetupGame(override var isFromServer: Boolean = false) : NetworkAction

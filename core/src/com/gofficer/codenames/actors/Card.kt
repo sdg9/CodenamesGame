@@ -19,7 +19,7 @@ import gofficer.codenames.game.GameState
 import redux.api.Store
 
 
-class Card(private var id: Int, private var cardText: String, assetManager: AssetManager, private val font: BitmapFont, store: Store<GameState>) : Actor() {
+class Card(private var id: Int, private var cardText: String, private var cardType: String, private var isRevealed: Boolean?, assetManager: AssetManager, private val font: BitmapFont, store: Store<GameState>) : Actor() {
 
     companion object {
         @JvmStatic
@@ -29,11 +29,12 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
     private var subscription: Store.Subscription? = null
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
-    private var textToUse: String = cardText
-    private var tint: Color? = null
-    private var isRevealed: Boolean? = null
-    private var store: Store<GameState>
+//    private var textToUse: String = cardText
+    private var tint: Color? = if (isRevealed == true) getTint(cardType) else null
+//    private var isRevealed: Boolean? = null
+    private var store: Store<GameState> = store
 
+    val duration = 0.5f
     private fun subscribeStore() {
         subscription?.unsubscribe()
         subscription = store.subscribe {
@@ -47,9 +48,20 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
             if (isRevealed != true && me?.isRevealed == true) {
                 log.debug("I'm changing for first time to be revaled! $id")
 
-                val duration = 0.5f
+
                 addAction(SequenceAction(
 //                        isAnimating = true,
+                        FlipAction.flipOut(x, width, duration / 2),
+                        FlipAction.flipIn(x, width, duration / 2)
+                ))
+            }
+
+            if (cardText != me?.text.toString()) {
+                tint = null
+                cardText = me?.text.toString()
+                addAction(SequenceAction(
+//                        isAnimating = true,
+
                         FlipAction.flipOut(x, width, duration / 2),
                         FlipAction.flipIn(x, width, duration / 2)
                 ))
@@ -58,10 +70,15 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
             log.debug("Responding to state $me")
             if (me != null && me.isRevealed) {
                 tint = when (me.type) {
-                    CardType.RED -> Color.RED
-                    CardType.BLUE -> Color.BLUE
-                    CardType.BYSTANDER -> Color.YELLOW
-                    CardType.DOUBLE_AGENT -> Color(0f, 0f, 0f, 0.1f)
+                    "RED" -> Color.RED
+                    "BLUE" -> Color.BLUE
+                    "BYSTANDER" -> Color.YELLOW
+                    "DOUBLE_AGENT" -> Color(0f, 0f, 0f, 0.1f)
+//                    CardType.RED -> Color.RED
+//                    CardType.BLUE -> Color.BLUE
+//                    CardType.BYSTANDER -> Color.YELLOW
+//                    CardType.DOUBLE_AGENT -> Color(0f, 0f, 0f, 0.1f)
+                    else -> null
                 }
             } else {
                 tint = null
@@ -71,16 +88,26 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         }
     }
 
-    fun setCardText(text: String) {
-        cardText = text
-        textToUse = cardText
+    fun getTint(stringTint: String): Color? {
+        return when (stringTint) {
+            "RED" -> Color.RED
+            "BLUE" -> Color.BLUE
+            "BYSTANDER" -> Color.YELLOW
+            "DOUBLE_AGENT" -> Color(0f, 0f, 0f, 0.1f)
+            else -> null
+        }
     }
+//
+//    fun setCardText(text: String) {
+//        cardText = text
+////        textToUse = cardText
+//    }
 
     init {
         width = 260f / 1.5f
         height = 166f / 1.5f
 
-        this.store = store
+//        this.store = store
     }
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
@@ -100,12 +127,12 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         // draw text below image
 
         // TODO: Get this part of the actor so it animates as the card flips
-        log.debug("W $width")
+//        log.debug("W $width")
 //        font.draw(batch, textToUse, x + width / 7, y + height / 2.5f, width, Align.center, false)
 
         val isAnimating = actions.size > 0
         if (!isAnimating) {
-            font.draw(batch, textToUse, x , y + height / 2.5f, width, Align.center, true)
+            font.draw(batch, cardText, x , y + height / 2.5f, width, Align.center, true)
         }
 //        font.draw(batch, textToUse, x + width / 7, y + height / 2.5f)
 
@@ -128,10 +155,10 @@ class Card(private var id: Int, private var cardText: String, assetManager: Asse
         super.setStage(stage)
 
         if (stage != null) {
-            log.debug("Actor added to stage")
+//            log.debug("Actor added to stage")
             subscribeStore()
         } else {
-            log.debug("Actor removed from stage")
+//            log.debug("Actor removed from stage")
             subscription?.unsubscribe()
         }
     }
