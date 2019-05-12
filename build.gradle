@@ -108,6 +108,13 @@ project(":ios") {
     }
 }
 
+project(":redux") {
+    apply plugin: "kotlin"
+
+    dependencies {
+        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
+    }
+}
 
 project(":core") {
     apply plugin: "kotlin"
