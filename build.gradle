@@ -113,7 +113,9 @@ project(":redux") {
 
     dependencies {
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
+        testCompile "io.ktor:ktor-server-tests:$ktor_version"
     }
+
 }
 
 project(":core") {
