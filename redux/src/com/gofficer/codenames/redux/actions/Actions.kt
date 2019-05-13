@@ -13,9 +13,7 @@ data class NetworkMessage(val type: String?, val payload: NetworkAction)
 
 data class ChangeScene(val screenName: String) : Action
 
-
 data class SetupCards(val cards: List<Card>) : Action
-
 
 class ResetGame(override var isFromServer: Boolean = false) : NetworkAction
 
