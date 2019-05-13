@@ -19,7 +19,7 @@ import java.util.ArrayList
 import java.util.LinkedHashMap
 
 
-class Client @JvmOverloads constructor(
+class Client(
     private val hostname: String,
     id: String? = null,
     options: LinkedHashMap<String, Any>? = null,
@@ -208,7 +208,7 @@ class Client @JvmOverloads constructor(
     private fun connect(options: LinkedHashMap<String, Any>, connectTimeout: Int) {
         val uri: URI
         try {
-            uri = URI(buildEndpoint("", options))
+            uri = URI(buildEndpoint("", options) add -)
         } catch (e: URISyntaxException) {
             if (this@Client.listener != null)
                 this@Client.listener.onError(e)
@@ -223,6 +223,7 @@ class Client @JvmOverloads constructor(
             return
         }
 
+        println("Calling connect $uri")
         this.connection = Connection(uri, connectTimeout, httpHeaders, object : Connection.Listener {
             override fun onError(e: Exception) {
                 if (this@Client.listener != null)

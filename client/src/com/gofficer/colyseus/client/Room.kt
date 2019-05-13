@@ -38,7 +38,7 @@ class Room internal constructor(
     val state: LinkedHashMap<String, Any>
         get() = state
 
-    abstract class Listener protected constructor() {
+    abstract class Listener () {
 
         /**
          * This event is triggered when the client leave the room.
@@ -57,9 +57,7 @@ class Room internal constructor(
         /**
          * This event is triggered when the server sends a message directly to the client.
          */
-        open fun onMessage(message: Any) {
-
-        }
+        open fun onMessage(message: Any) {}
 
         /**
          * This event is triggered when the client successfuly joins the room.

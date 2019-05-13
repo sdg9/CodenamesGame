@@ -139,6 +139,7 @@ project(":core") {
 
     dependencies {
         compile project(":redux")
+        compile project(":client")
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"

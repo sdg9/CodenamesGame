@@ -25,15 +25,17 @@ import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.logger
+import com.gofficer.colyseus.client.Client
+import com.gofficer.colyseus.client.Room
 import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.redux.game.GameState
-import io.colyseus.Client
+//import io.colyseus.Client
 import redux.api.Store
-import io.colyseus.Room
-import io.colyseus.state_listener.PatchListenerCallback
-import io.colyseus.state_listener.DataChange
-import io.colyseus.state_listener.PatchObject
-import io.colyseus.state_listener.FallbackPatchListenerCallback
+//import io.colyseus.Room
+//import io.colyseus.state_listener.PatchListenerCallback
+//import io.colyseus.state_listener.DataChange
+//import io.colyseus.state_listener.PatchObject
+//import io.colyseus.state_listener.FallbackPatchListenerCallback
 import redux.api.Dispatcher
 import redux.api.enhancer.Middleware
 import java.util.*
@@ -106,7 +108,11 @@ class CodenamesGame : Game() {
         log.debug("Attempting connection to server")
         val endpoint = if (Gdx.app.type == Application.ApplicationType.Android) GameConfig.LOCAL_WEBSOCKET_ANDROID else GameConfig.LOCAL_WEBSOCKET_DESKTOP
         client = Client(endpoint, object : Client.Listener {
-            override fun onOpen(id: String) {
+//            override fun onOpen(id: String?) {
+//                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+//            }
+
+            override fun onOpen(id: String?) {
                 log.debug("onOpen called")
                 room = client?.join("public")
                 log.debug("Joined room: $room")
@@ -114,17 +120,18 @@ class CodenamesGame : Game() {
                 println("Client.onOpen();")
                 println("colyseus id: $id")
 
-                room?.addPatchListener("players/:id", object : PatchListenerCallback() {
-                    override fun callback(change: DataChange) {
-                        log.debug("patchListener: $change")
-                    }
-                })
-                room?.setDefaultPatchListener(object : FallbackPatchListenerCallback() {
-                    override fun callback(patch: PatchObject) {
-                    }
-                })
+//                room?.addPatchListener("players/:id", object : PatchListenerCallback() {
+//                    override fun callback(change: DataChange) {
+//                        log.debug("patchListener: $change")
+//                    }
+//                })
+//                room?.setDefaultPatchListener(object : FallbackPatchListenerCallback() {
+//                    override fun callback(patch: PatchObject) {
+//                    }
+//                })
                 room?.addListener(object : Room.Listener() {
-                    override fun onMessage(message: Any?) {
+
+                    override fun onMessage(message: Any) {
                         log.debug("onMessage: $message")
                         if (message == "pong") {
                             calculateLerp((System.currentTimeMillis() - lastLatencyCheckTime).toFloat())
