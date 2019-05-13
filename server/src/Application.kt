@@ -89,6 +89,7 @@ class SomeApplication {
         // This installs the websockets feature to be able to establish a bidirectional configuration
         // between the server and the client
         install(WebSockets) {
+            // TODO temp remove ping
             pingPeriod = Duration.ofMinutes(1)
         }
         // This enables the use of sessions to keep information between requests/refreshes of the browser.
@@ -111,7 +112,7 @@ class SomeApplication {
 
             // This defines a websocket `/ws` route that allows a protocol upgrade to convert a HTTP request/response request
             // into a bidirectional packetized connection.
-            webSocket("/room/{roomId}") {
+            webSocket("/{roomId}") {
 //                log.debug("Attempting to connect to room ${call.parameters["sessionId"]}")
 ////                log.debug("User: ${call.parameters["userId"]}")
 //                val roomId = call.parameters["roomId"]

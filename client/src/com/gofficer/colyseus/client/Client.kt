@@ -289,6 +289,7 @@ class Client(
                 val codeValue = arrayValue.get(0)
                 if (codeValue.valueType == ValueType.INTEGER) {
                     val code = codeValue.asIntegerValue().asInt()
+                    println("Code is int! [$code]")
                     when (code) {
                         Protocol.USER_ID -> {
                             //                            System.out.println("Protocol: USER_ID")
@@ -360,9 +361,11 @@ class Client(
                     }
                 } else {
                     // message is array but first element is not integer
+                    println("Message is array but first element isn't int")
                     dispatchOnMessage(bytes)
                 }
             } else {
+                println("Message is not array")
                 // message is not an array
                 dispatchOnMessage(bytes)
             }

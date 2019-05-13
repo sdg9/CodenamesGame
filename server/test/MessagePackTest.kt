@@ -25,9 +25,7 @@ class MessagePackTest {
         val moshiPack = MoshiPack()
         val packed: BufferedSource = moshiPack.pack(MessagePackWebsitePlug())
 
-//        println("Total bytes: ${packed.}")
         println(packed.readByteString().hex())
-
     }
 
     @Test
@@ -48,7 +46,7 @@ class MessagePackTest {
         val bytes2 = ByteString.decodeHex("82a7636f6d70616374c3a6736368656d6100").toByteArray()
         val bytes3 = MoshiPack().packToByteArray(MessagePackWebsitePlug())
 
-        assertNotEquals(bytes, bytes3)
+    assertNotEquals(bytes, bytes3)
 
         val unpacked1: MessagePackWebsitePlug = MoshiPack().unpack(bytes)
 //        println(unpacked1)

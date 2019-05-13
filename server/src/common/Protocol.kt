@@ -1,5 +1,8 @@
 package com.example.common
 
+import java.io.ByteArrayOutputStream
+import java.util.*
+
 class Protocol {
 
     companion object {
@@ -34,3 +37,18 @@ class Protocol {
 data class Message(val protocol: Int, val message: String)
 
 data class MessagePackWebsitePlug(var compact: Boolean = true, var schema: Int = 0)
+
+// TODO: Currently tehse are duplciated in clietn as well, move to shared module between client & server
+fun packProtocol(protocol: Int, bytes: ByteArray): ByteArray {
+    val outputStream = ByteArrayOutputStream()
+    outputStream.write(protocol)
+    outputStream.write(bytes)
+    return outputStream.toByteArray()
+}
+
+data class DecryptProtocol(val protocol: Int, val byteArray: ByteArray)
+fun unpackProtocol(bytes: ByteArray): DecryptProtocol {
+    val protocol = bytes[0].toInt()
+    val newByteArray = Arrays.copyOfRange(bytes, 1, bytes.size)
+    return DecryptProtocol(protocol, newByteArray)
+}

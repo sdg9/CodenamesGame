@@ -1,9 +1,21 @@
 package com.example.common
 
+import common.Sever
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import io.ktor.http.cio.websocket.send
 import java.nio.ByteBuffer
+import org.msgpack.core.MessagePack
+import org.msgpack.core.MessageBufferPacker
+import org.msgpack.core.MessagePack.PackerConfig
+import org.slf4j.LoggerFactory
+import kotlin.reflect.jvm.jvmName
+
+
+var packer = MessagePack.newDefaultBufferPacker()
+
+
+private val logger by lazy { LoggerFactory.getLogger(Client::class.jvmName) }
 
 data class Client(
     var socket: WebSocketSession,
@@ -28,6 +40,43 @@ data class Client(
         onMessageListener = mutableListOf<(message: String) -> Unit>()
         onCloseListener = mutableListOf<(code: Int) -> Unit>()
     }
+
+
+    suspend fun sendUserId(id: String) {
+        val packer = MessagePack.newDefaultBufferPacker()
+        packer.packArrayHeader(2)
+            .packInt(Protocol.USER_ID)
+            .packString(id)
+            .close()
+
+
+        logger.debug("Sending USER_ID")
+        socket.send(packer.toByteArray())
+//        val packer = PackerConfig()
+//            .withSmallStringOptimizationThreshold(256) // String
+//            .newBufferPacker()
+//        packer.packString(id)
+//        packer.close()
+//        val binaryMessage = packProtocol(Protocol.USER_ID, packer.toByteArray())
+//        val packer = PackerConfig()
+//            .withSmallStringOptimizationThreshold(256) // String
+//            .newBufferPacker()
+//        println("Sending binary message to client: $binaryMessage")
+//        socket.send(binaryMessage)
+    }
+
+    suspend fun sendJoinRoom(roomId: String, processId: String?) {
+        val packer = MessagePack.newDefaultBufferPacker()
+        packer.packArrayHeader(3)
+            .packInt(Protocol.JOIN_ROOM)
+            .packString(roomId)
+            .packInt(1) // TODO watching colyseus they send a value here, so far I only see 1 (default if local process?), this fails if a string
+//            .packString(processId ?: "1")
+            .close()
+
+        logger.debug("Sending JOIN_ROOM")
+        socket.send(packer.toByteArray())
+    }
 //
 //    suspend fun send(action: Action) {
 //        val json = toJSON(action)
@@ -48,8 +97,17 @@ data class Client(
 //        }
 //    }
 }
+//
+//suspend inline fun <reified T> Client.sendUserId(id: String) {
+//    val msgpack = MessagePack()
+//    val raw = msgpack.write(id)
+//    packProtocol(Protocol.USER_ID, id)
+//    socket.send(Frame.Binary())
+//}
 
 suspend inline fun <reified T> Client.send(input: T) {
+    println("Temporarily disabling generic send")
+    return
     if (useTextOverBinary) {
         when (input) {
             is Action -> socket.send(toJSON(input))
@@ -63,7 +121,6 @@ suspend inline fun <reified T> Client.send(input: T) {
             else -> throw Error("Unable to understand message format for $input")
         }
     }
-
 }
 
 

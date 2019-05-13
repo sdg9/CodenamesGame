@@ -1,6 +1,7 @@
 package common
 
 
+import com.daveanthonythomas.moshipack.MoshiPack
 import com.example.SomeApplication
 import com.example.common.*
 import com.example.common.matchmaker.RegisteredHandler
@@ -12,6 +13,7 @@ import io.ktor.sessions.get
 import io.ktor.sessions.sessions
 import io.ktor.websocket.DefaultWebSocketServerSession
 import org.slf4j.LoggerFactory
+import java.lang.Error
 import kotlin.reflect.jvm.jvmName
 
 
@@ -48,6 +50,8 @@ class Sever {
 
     val pingTimeout: Long
 
+    val moshiPack = MoshiPack()
+
     private val logger by lazy { LoggerFactory.getLogger(Sever::class.jvmName) }
 
 
@@ -76,7 +80,7 @@ class Sever {
     }
 
     suspend fun onConnection(socket: DefaultWebSocketServerSession, incoming: ReceiveChannel<Frame>) {
-
+        logger.debug("onConnection")
         // TODO determine if this is necessary
         // First of all we get the session.
         val session = socket.call.sessions.get<SomeApplication.GameSession>()
@@ -89,7 +93,7 @@ class Sever {
 
         // set client id
         val colyseusID = socket.call.parameters["colyseusid"]
-        val id = colyseusID ?: generateId()
+        val id = if (colyseusID.isNullOrBlank()) generateId() else colyseusID
         val auth = socket.call.parameters["auth"]
         val options = socket.call.parameters["options"]
         val useTextOverBinary = socket.call.parameters["useTextOverBinary"] == "true"
@@ -107,9 +111,13 @@ class Sever {
         )
 
         // ensure client has it's "colyseusid"
-        if (colyseusID == null) {
-            client.send(UserId(id, pingCount))
+        if (colyseusID.isNullOrBlank()) {
+//            client.send(UserId(id, pingCount))
+            logger.debug("Sending user id [$id] to client")
+            client.sendUserId(id)
 //            socket.sendAction(UserId(id, pingCount))
+        } else {
+            logger.debug("Client already has id [$id]")
         }
 
         logger.debug("onConnect $client")
@@ -145,11 +153,33 @@ class Sever {
                 if (frame is Frame.Text) {
                     val message = frame.readText()
                     logger.debug("Frame.Text: $message")
-                    receiveMessageMatchMaking(client, message)
+                    receiveMessageMatchMakingText(client, message)
 
                     // TODO look up clients in room, or room
                     client.onMessageListener.forEach { it(message) }
                     logger.debug("Client: $client")
+                }
+                if (frame is Frame.Binary) {
+                    val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
+                    logger.debug("Received binary frame ${unpacked.toString()}")
+                    val firstByte = unpacked[0] as? Double ?: throw Error("Unknown binary message format")
+                    val type = firstByte.toInt()
+                    receiveMessageMatchMakingBinary(client, type, frame)
+//                    if (type == 10) {
+//                        logger.debug("Mathes 10")
+//                    } else {
+//                        logger.debug("Doesnt match 10")
+//                    }
+
+//                    val unpacker = MessagePack.newDefaultUnpacker(frame.readBytes())
+//                    logger.debug("Unpacked")
+//                    while (unpacker.hasNext()) {
+//                        val format = unpacker.nextFormat
+//                        logger.debug("Format: $format")
+//                        val msgPackValue = unpacker.unpackValue()
+//                        logger.debug(msgPackValue.toString())
+//                    }
+//                    unpacker.close()
                 }
             }
         } finally {
@@ -161,6 +191,7 @@ class Sever {
 //            this.memberLeft(session.id, socket)
         }
     }
+
 
     private fun onMessageMatchmaking(client: Client) {
         // TODO if join request
@@ -175,20 +206,47 @@ class Sever {
     /**
      * We received a message. Let's process it.
      */
-    private suspend fun receiveMessageMatchMaking(client: Client, message: String) {
+    private suspend fun receiveMessageMatchMakingText(client: Client, message: String) {
 
         val action = parseActionJSON(message)
 //        val type = getActionTypeFromJson(message)
         // We are going to handle commands (text starting with '/') and normal messages
         when (action?.type) {
-            ActionType.JOIN_REQUEST -> onJoinRequest(client, action as JoinRequest)
+            ActionType.JOIN_REQUEST -> onJoinRequestText(client, action as JoinRequest)
             ActionType.USER_ID -> this
             ActionType.ROOM_LIST -> this
         }
     }
 
-    private suspend fun onJoinRequest(client: Client, action: JoinRequest) {
-        logger.debug("onJoinRequest: $action")
+
+    private suspend fun receiveMessageMatchMakingBinary(client: Client, type: Int, frame: Frame.Binary) {
+        when (type) {
+            Protocol.JOIN_REQUEST, Protocol.JOIN_ROOM -> {
+                val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
+                val roomName = unpacked[1] as String
+                onJoinRequest(client, roomName, null)
+            }
+//            ActionType.USER_ID -> this
+//            ActionType.ROOM_LIST -> this
+        }
+    }
+
+    private suspend fun onJoinRequest(client: Client, roomName: String, joinOptions: ClientOptions?) {
+        logger.debug("onJoinRequest (Binary): $roomName")
+        if (!this.matchMaker.hasHandler(roomName) && !isValidId(roomName)) {
+            // TODO make binary
+            client.send(JoinError("no available handler for $roomName"))
+//            client.socket.sendAction(JoinError("no available handler for $roomName"))
+        } else {
+            // TODO: confirm retry logic, colyseus tries 3x
+            val joinRequest = this.matchMaker.onJoinRoomRequest(client, roomName, joinOptions)
+            client.sendJoinRoom(joinRequest.roomId, joinRequest.processId)
+        }
+    }
+
+
+    private suspend fun onJoinRequestText(client: Client, action: JoinRequest) {
+        logger.debug("onJoinRequestText: $action")
         val roomName = action.room
         val joinOptions = action.joinOptions
 //        joinOptions.clientId = client.id
@@ -199,7 +257,8 @@ class Sever {
         } else {
             // TODO: confirm retry logic, colyseus tries 3x
             val joinRequest = this.matchMaker.onJoinRoomRequest(client, roomName, joinOptions)
-            client.send(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
+//            client.send(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
+            client.sendJoinRoom(joinRequest.roomId, joinRequest.processId)
 //            client.socket.sendAction(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
             // once done
 //            send[Protocol.JOIN_REQUEST](client, joinOptions.requestId, response.roomId, response.processId);
