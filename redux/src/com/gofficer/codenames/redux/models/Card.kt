@@ -13,7 +13,6 @@ enum class CardType {
 data class Card(
         val id: Int,
         val text: String,
-//        val type: CardType?,
         val type: String,
         val isRevealed: Boolean = false)
 
