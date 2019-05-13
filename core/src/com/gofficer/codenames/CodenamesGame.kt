@@ -78,8 +78,6 @@ class CodenamesGame : Game() {
 
         initFonts()
 
-//        connectToServer()
-
         game = this
 
         createReduxStore()
