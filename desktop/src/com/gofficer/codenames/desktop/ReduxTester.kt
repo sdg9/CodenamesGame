@@ -8,7 +8,7 @@ package com.gofficer.codenames.desktop
 //}
 //
 //
-//fun create(coroutineScope: CoroutineScope): Store<State, Action> = coroutineScope
+//fun create(coroutineScope: CoroutineScope): Store<State, com.gofficer.codenames.redux.Action> = coroutineScope
 //        .createStore(
 //                name = "Pagination State Machine",
 //                initialState = State.LoadingFirstPageState,

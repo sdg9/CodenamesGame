@@ -8,30 +8,34 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.utils.Logger
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.models.*
+import com.gofficer.codenames.redux.actions.ChangeScene
+import com.gofficer.codenames.redux.actions.NetworkAction
+import com.gofficer.codenames.redux.actions.NetworkMessage
+import com.gofficer.codenames.redux.actions.SetupCards
+import com.gofficer.codenames.redux.createCodeNamesStore
+import com.gofficer.codenames.redux.middleware.loggingMiddleware
+import com.gofficer.codenames.redux.middleware.setupGameMiddleware
+import com.gofficer.codenames.redux.middleware.validActionMiddleware
+import com.gofficer.codenames.redux.models.Card
+import com.gofficer.codenames.redux.models.CardPressed
+import com.gofficer.codenames.redux.models.boardReduceSetup
+import com.gofficer.codenames.redux.models.cardReduce
+import com.gofficer.codenames.redux.reducers.reduceGameSetup
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.PlayScreen
-//import com.gofficer.codenames.screens.play.setupGameMiddleware
-import com.gofficer.codenames.utils.add
 import com.gofficer.codenames.utils.logger
 import com.gofficer.sampler.utils.toInternalFile
-import gofficer.codenames.game.GameState
-import gofficer.codenames.game.ResetGame
-import gofficer.codenames.game.SetupGame
-import gofficer.codenames.game.reduceGameSetup
+import gofficer.codenames.redux.game.GameState
 import io.colyseus.Client
-import redux.api.Dispatcher
 import redux.api.Store
-import redux.api.enhancer.Middleware
-import redux.applyMiddleware
-import redux.combineReducers
-import redux.createStore
 import io.colyseus.Room
 import io.colyseus.state_listener.PatchListenerCallback
 import io.colyseus.state_listener.DataChange
 import io.colyseus.state_listener.PatchObject
 import io.colyseus.state_listener.FallbackPatchListenerCallback
+import redux.api.Dispatcher
+import redux.api.enhancer.Middleware
 import java.util.*
 
 
@@ -83,21 +87,40 @@ class CodenamesGame : Game() {
     }
 
     private fun createReduxStore() {
-        store = createStore(
-                combineReducers(
-                        reduceGameSetup,
-                        boardReduceSetup,
-                        cardReduce
-                ),
-                initState,
-                applyMiddleware(
-                        loggingMiddleware,
-                        validActionMiddleware,
-                        networkActionMiddleware,
-                        navigationMiddleware(game)
-//                        setupGameMiddleware
-                ))
+
+        store = createCodeNamesStore(initState,
+            arrayOf(
+                reduceGameSetup,
+                boardReduceSetup,
+                cardReduce
+            ),
+            arrayOf(
+                loggingMiddleware,
+                validActionMiddleware,
+                setupGameMiddleware{ client != null },
+                getNetworkActionMiddleware(game),
+                getNavigationMiddleware(game)
+//                somethingBogus{
+//                    client != null
+//                }
+            )
+        )
+//        store = createStore(
+//                combineReducers(
+//                        getReduceGameSetup,
+//                        boardReduceSetup,
+//                        cardReduce
+//                ),
+//                initState,
+//                applyMiddleware(
+//                        getLoggingMiddleware,
+//                        getValidActionMiddleware,
+//                        getNetworkActionMiddleware,
+//                        getNavigationMiddleware(game)
+////                        getSetupGameMiddleware
+//                ))
     }
+
 
     fun connectToServer(onOpenCallback: (() -> Unit)? = null) {
         log.debug("Attempting connection to server")
@@ -283,23 +306,26 @@ class CodenamesGame : Game() {
     }
 
 
-    val networkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-        if (action is NetworkAction && !action.isFromServer && room != null) {
-            println("Dispatching remotely: $action")
 
-//            val gsonBuilder = GsonBuilder()
-//            gsonBuilder.registerTypeAdapter(action::class.java, MenuContentInterfaceAdapter())
-//            var gson = gsonBuilder.create()
 
-//            var gson = Gson()
-//            var jsonString = gson.toJson(NetworkMessage(action::class.java.simpleName, action))
-
-//            log.debug("Sending $jsonString")
-//            room?.send(action.toJson())
-            room?.send(NetworkMessage(action::class.java.simpleName, action))
-        }
-        next.dispatch(action)
-    }
+//
+//    val getNetworkActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+//        if (action is NetworkAction && !action.isFromServer && room != null) {
+//            println("Dispatching remotely: $action")
+//
+////            val gsonBuilder = GsonBuilder()
+////            gsonBuilder.registerTypeAdapter(action::class.java, MenuContentInterfaceAdapter())
+////            var gson = gsonBuilder.create()
+//
+////            var gson = Gson()
+////            var jsonString = gson.toJson(NetworkMessage(action::class.java.simpleName, action))
+//
+////            log.debug("Sending $jsonString")
+////            room?.send(action.toJson())
+//            room?.send(NetworkMessage(action::class.java.simpleName, action))
+//        }
+//        next.dispatch(action)
+//    }
 
 //    override fun render() {
 ////        super.render()
@@ -311,47 +337,47 @@ class CodenamesGame : Game() {
 ////            log.debug("R: ${client.rooms}")
 //        }
 //    }
-
-    val setupGameMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-
-        if (client != null) {
-            // don't do any of this if connected to server
-            null
-        } else {
-
-            val action = next.dispatch(action)
-            if (action is SetupGame) {
-                store.dispatch(ResetGame())
-                val isBlueFirst = Random().nextBoolean()
-//        val types: MutableList<CardType> = mutableListOf()
-                val types: MutableList<String> = mutableListOf()
-                val totalBlue = if (isBlueFirst) 9 else 8
-                val totalRed = if (!isBlueFirst) 9 else 8
-                // Add appropriate number of color types
-                for (i in 1..totalBlue) {
-//            types.add(CardType.BLUE)
-                    types.add("BLUE")
-                }
-                for (i in 1..totalRed) {
-//            types.add(CardType.RED)
-                    types.add("RED")
-                }
-//        types.add(CardType.DOUBLE_AGENT)
-                types.add("DOUBLE_AGENT")
-                for (i in 1..(25 - types.size)) {
-//            types.add(CardType.BYSTANDER)
-                    types.add("BYSTANDER")
-                }
-                // Shuffle colors
-                val shuffledList = types.shuffled()
-                for (i in 1..25) {
-                    store.dispatch(AddCard(Card(i, "test$i", shuffledList[i - 1])))
-                }
-            }
-
-            action
-        }
-    }
+//
+//    val getSetupGameMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+//
+//        if (client != null) {
+//            // don't do any of this if connected to server
+//            null
+//        } else {
+//
+//            val action = next.dispatch(action)
+//            if (action is SetupGame) {
+//                store.dispatch(ResetGame())
+//                val isBlueFirst = Random().nextBoolean()
+////        val types: MutableList<CardType> = mutableListOf()
+//                val types: MutableList<String> = mutableListOf()
+//                val totalBlue = if (isBlueFirst) 9 else 8
+//                val totalRed = if (!isBlueFirst) 9 else 8
+//                // Add appropriate number of color types
+//                for (i in 1..totalBlue) {
+////            types.add(CardType.BLUE)
+//                    types.add("BLUE")
+//                }
+//                for (i in 1..totalRed) {
+////            types.add(CardType.RED)
+//                    types.add("RED")
+//                }
+////        types.add(CardType.DOUBLE_AGENT)
+//                types.add("DOUBLE_AGENT")
+//                for (i in 1..(25 - types.size)) {
+////            types.add(CardType.BYSTANDER)
+//                    types.add("BYSTANDER")
+//                }
+//                // Shuffle colors
+//                val shuffledList = types.shuffled()
+//                for (i in 1..25) {
+//                    store.dispatch(AddCard(Card(i, "test$i", shuffledList[i - 1])))
+//                }
+//            }
+//
+//            action
+//        }
+//    }
 
 
     override fun dispose() {
@@ -396,38 +422,130 @@ class CodenamesGame : Game() {
 
 }
 
+//
+//val getLoggingMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+//    println("Action => $action")
+//    next.dispatch(action)
+//    println("New state => ${store.state}")
+//}
+//
+//val getValidActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+//    if (action !is Action) {
+//        println("Only allow action objects")
+//        null
+//    } else {
+//        next.dispatch(action)
+//        action
+//    }
+//}
+//
+//
+//interface Action
+//
+//interface NetworkAction : Action {
+//    var isFromServer: Boolean
+//}
+//
+//data class NetworkMessage(val type: String?, val payload: NetworkAction)
+//
+//data class ChangeScene(val screenName: String) : Action
+//
+//
+//data class SetupCards(val cards: List<Card>) : Action
+//
+//val getNavigationMiddleware = { game: CodenamesGame ->
+//    Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
+//
+////        println("Changing Screen $action")
+//        if (action is ChangeScene) {
+//            when (action.screenName) {
+//                "MainMenu" -> {
+////                    Gdx.app.postRunnable {
+//                    println("Calling close on client")
+//                    game.room?.leave()
+//                    game.client?.close()
+////                    game.client?.close()
+////                    game.client = null
+//                    game.screen = MainMenuScreen(game)
+////                    }
+//                }
+//                "PlayOnline" -> {
+//                    game.connectToServer {
+//                        Gdx.app.postRunnable {
+//                            println("Online play")
+//                            game.screen = PlayScreen(game)
+//                        }
+//                    }
+//                }
+//                "Play" -> {
+////                    Gdx.app.postRunnable {
+//                    game.screen = PlayScreen(game)
+////                    }
+//                }
+//                else -> null
+//            }
+//        } else {
+//            next.dispatch(action)
+//        }
+//    }
+//}
+//class MenuContentInterfaceAdapter : JsonDeserializer<Any>, JsonSerializer<Any> {
+//
+//    companion object {
+//        const val CLASSNAME = "CLASSNAME"
+//        const val DATA  = "DATA"
+//    }
+//
+//    @Throws(JsonParseException::class)
+//    override fun deserialize(jsonElement: JsonElement, type: Type,
+//                             jsonDeserializationContext: JsonDeserializationContext): Any {
+//
+//        val jsonObject = jsonElement.asJsonObject
+//        val prim = jsonObject.get(CLASSNAME) as JsonPrimitive
+//        val className = prim.asString
+//        val objectClass = getObjectClass(className)
+//        return jsonDeserializationContext.deserialize(jsonObject.get(DATA), objectClass)
+//    }
+//
+//    override fun serialize(jsonElement: Any, type: Type, jsonSerializationContext: JsonSerializationContext): JsonElement {
+//        val jsonObject = JsonObject()
+//        jsonObject.addProperty(CLASSNAME, jsonElement.javaClass.name)
+//        jsonObject.add(DATA, jsonSerializationContext.serialize(jsonElement))
+//        return jsonObject
+//    }
+//
+//    private fun getObjectClass(className: String): Class<*> {
+//        try {
+//            return Class.forName(className)
+//        } catch (e: ClassNotFoundException) {
+//            throw JsonParseException(e.message)
+//        }
+//
+//    }
+//}
+//room: Room ->
+val getNetworkActionMiddleware = { game: CodenamesGame ->
+    Middleware  { store: Store<GameState>, next: Dispatcher, action: Any ->
+        if (action is NetworkAction && !action.isFromServer && game.room != null) {
+            println("Dispatching remotely: $action")
 
-val loggingMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-    println("Action => $action")
-    next.dispatch(action)
-    println("New state => ${store.state}")
-}
+//            val gsonBuilder = GsonBuilder()
+//            gsonBuilder.registerTypeAdapter(action::class.java, MenuContentInterfaceAdapter())
+//            var gson = gsonBuilder.create()
 
-val validActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-    if (action !is Action) {
-        println("Only allow action objects")
-        null
-    } else {
+//            var gson = Gson()
+//            var jsonString = gson.toJson(NetworkMessage(action::class.java.simpleName, action))
+
+//            log.debug("Sending $jsonString")
+//            room?.send(action.toJson())
+            game.room?.send(NetworkMessage(action::class.java.simpleName, action))
+        }
         next.dispatch(action)
-        action
     }
 }
 
 
-interface Action
-
-interface NetworkAction : Action {
-    var isFromServer: Boolean
-}
-
-data class NetworkMessage(val type: String?, val payload: NetworkAction)
-
-data class ChangeScene(val screenName: String) : Action
-
-
-data class SetupCards(val cards: List<Card>) : Action
-
-val navigationMiddleware = { game: CodenamesGame ->
+val getNavigationMiddleware = { game: CodenamesGame ->
     Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
 
 //        println("Changing Screen $action")
@@ -463,37 +581,3 @@ val navigationMiddleware = { game: CodenamesGame ->
         }
     }
 }
-//class MenuContentInterfaceAdapter : JsonDeserializer<Any>, JsonSerializer<Any> {
-//
-//    companion object {
-//        const val CLASSNAME = "CLASSNAME"
-//        const val DATA  = "DATA"
-//    }
-//
-//    @Throws(JsonParseException::class)
-//    override fun deserialize(jsonElement: JsonElement, type: Type,
-//                             jsonDeserializationContext: JsonDeserializationContext): Any {
-//
-//        val jsonObject = jsonElement.asJsonObject
-//        val prim = jsonObject.get(CLASSNAME) as JsonPrimitive
-//        val className = prim.asString
-//        val objectClass = getObjectClass(className)
-//        return jsonDeserializationContext.deserialize(jsonObject.get(DATA), objectClass)
-//    }
-//
-//    override fun serialize(jsonElement: Any, type: Type, jsonSerializationContext: JsonSerializationContext): JsonElement {
-//        val jsonObject = JsonObject()
-//        jsonObject.addProperty(CLASSNAME, jsonElement.javaClass.name)
-//        jsonObject.add(DATA, jsonSerializationContext.serialize(jsonElement))
-//        return jsonObject
-//    }
-//
-//    private fun getObjectClass(className: String): Class<*> {
-//        try {
-//            return Class.forName(className)
-//        } catch (e: ClassNotFoundException) {
-//            throw JsonParseException(e.message)
-//        }
-//
-//    }
-//}

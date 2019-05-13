@@ -4,14 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.ScreenAdapter
 import com.gofficer.codenames.CodenamesGame
-import com.gofficer.codenames.models.AddCard
-import com.gofficer.codenames.models.Card
-import com.gofficer.codenames.models.CardType
-import com.gofficer.codenames.utils.add
+import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.utils.logger
-import gofficer.codenames.game.ResetGame
-import gofficer.codenames.game.SetupGame
-import java.util.*
 
 class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
 

@@ -11,11 +11,10 @@ import com.badlogic.gdx.utils.Align
 import com.gofficer.codenames.actions.FlipAction
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
+import com.gofficer.codenames.redux.models.getById
 import com.gofficer.codenames.utils.get
-import com.gofficer.codenames.models.CardType
-import com.gofficer.codenames.models.getById
 import com.gofficer.codenames.utils.logger
-import gofficer.codenames.game.GameState
+import gofficer.codenames.redux.game.GameState
 import redux.api.Store
 
 

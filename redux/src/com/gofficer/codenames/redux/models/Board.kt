@@ -1,9 +1,8 @@
-package com.gofficer.codenames.models
+package com.gofficer.codenames.redux.models
 
-import com.gofficer.codenames.Action
-import com.gofficer.codenames.utils.add
-import gofficer.codenames.game.GameState
-import gofficer.codenames.game.ResetGame
+import com.gofficer.codenames.redux.actions.Action
+import com.gofficer.codenames.redux.utils.add
+import gofficer.codenames.redux.game.GameState
 import redux.api.Reducer
 
 data class Board(
@@ -24,14 +23,14 @@ val boardReduceSetup = Reducer { state: GameState, action: Any ->
     }
 }
 
-//fun Board.reduceSetup(action: Action): Board {
+//fun Board.reduceSetup(action: com.gofficer.codenames.redux.Action): Board {
 //    return when (action) {
 //        is AddCard -> copy(cards = cards.add(action.card))
 //        else -> this
 //    }
 //}
 //
-//fun Board.reduceGameplay(action: Action): Board {
+//fun Board.reduceGameplay(action: com.gofficer.codenames.redux.Action): Board {
 //    return when (action) {
 //        is CardPressed -> {
 //            val card = cards.getById(action.id)

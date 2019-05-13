@@ -1,46 +1,46 @@
-package gofficer.codenames.game
+package gofficer.codenames.redux.game
 
-import com.gofficer.codenames.Action
-import com.gofficer.codenames.NetworkAction
-import com.gofficer.codenames.SetupCards
-import com.gofficer.codenames.models.*
+//import com.gofficer.codenames.Action
+//import com.gofficer.codenames.NetworkAction
+//import com.gofficer.codenames.SetupCards
+import com.gofficer.codenames.redux.models.*
+import com.gofficer.codenames.redux.actions.NetworkAction
 import redux.api.Reducer
 
-
 data class GameState(
-        val board: Board = Board(),
-        val lastPlayed: Int = 0,
-        val gameOver: Boolean = false,
-        val cards: List<Card> = listOf()
+    val board: Board = Board(),
+    val lastPlayed: Int = 0,
+    val gameOver: Boolean = false,
+    val cards: List<Card> = listOf()
 )
-
-
-val reduceGameSetup = Reducer { state: GameState, action: Any ->
-    when (action) {
-        is SetupCards -> {
-            println("Setting up cards")
-            state.copy(
-                    cards = action.cards
-            )
-
-        }
-        is ResetGame -> state.copy(
-                board = Board(),
-                lastPlayed = 0,
-                gameOver = false,
-                cards = listOf()
-        )
-        else -> state
-    }
-}
-
+//
+//
+//val getReduceGameSetup = Reducer { state: GameState, action: Any ->
+//    when (action) {
+//        is SetupCards -> {
+//            println("Setting up cards")
+//            state.copy(
+//                    cards = action.cards
+//            )
+//
+//        }
+//        is ResetGame -> state.copy(
+//                board = Board(),
+//                lastPlayed = 0,
+//                gameOver = false,
+//                cards = listOf()
+//        )
+//        else -> state
+//    }
+//}
+//
 //fun GameState.reduceSetup(action: Action): GameState {
 //    return when(action) {
 //        is AddCard -> reduceChildState(this, board, action, Board::reduceSetup)
 //        else -> this
 //    }
 //}
-
+//
 //val GameState.reduceGameplay = Reducer { state: GameState, action: Any ->
 //
 //    is ResetGame -> state.copy(
@@ -62,8 +62,8 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
 ////        else -> state
 ////    }
 //}
-
-
+//
+//
 //fun GameState.reduceGameplay(action: Action): GameState {
 //    return when(action) {
 //        is ResetGame -> copy(
@@ -85,8 +85,8 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
 //    }
 //}
 //
-
-//val reduceGameSetup = Reducer { state: GameState, action: Any ->
+//
+//val getReduceGameSetup = Reducer { state: GameState, action: Any ->
 //    when (action) {
 ////        is Action1 -> state.copy(todos = state.todos + 1)
 ////        is Action2 -> state.copy(todos = state.todos - 1)
@@ -99,8 +99,3 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
 ////        else -> state
 ////    }
 //}
-
-
-class ResetGame(override var isFromServer: Boolean = false) : NetworkAction
-
-class SetupGame(override var isFromServer: Boolean = false) : NetworkAction

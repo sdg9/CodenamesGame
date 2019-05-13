@@ -99,7 +99,7 @@ class CoroutineExamples {
             }
 
             val time = measureTimeMillis {
-                // we can initiate async actions outside of a coroutine
+                // we can initiate async com.gofficer.codenames.redux.actions outside of a coroutine
                 val one = somethingUsefulOneAsync()
                 val two = somethingUsefulTwoAsync()
                 // but waiting for a result must involve either suspending or blocking.

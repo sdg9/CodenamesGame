@@ -46,7 +46,7 @@ socket message types
 
 room action types
 =================
-  i.e. redux actions
+  i.e. redux com.gofficer.codenames.redux.actions
 
 */
 

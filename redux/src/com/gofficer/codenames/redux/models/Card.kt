@@ -1,10 +1,9 @@
-package com.gofficer.codenames.models
+package com.gofficer.codenames.redux.models
 
-import com.gofficer.codenames.Action
-import com.gofficer.codenames.NetworkAction
-import com.google.gson.Gson
-import gofficer.codenames.game.GameState
+import com.gofficer.codenames.redux.actions.NetworkAction
+import gofficer.codenames.redux.game.GameState
 import redux.api.Reducer
+import java.util.*
 
 
 enum class CardType {
@@ -47,7 +46,7 @@ fun List<Card>.getById(id: Int): Card? {
     return null
 }
 
-//fun Card.reduce(action: Action): Card {
+//fun Card.reduce(action: com.gofficer.codenames.redux.Action): Card {
 //    return when (action) {
 //        is CardPressed -> copy(isRevealed = true)
 //        else -> this

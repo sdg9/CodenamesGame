@@ -17,7 +17,7 @@ class MessageParsingTest {
 //        val protocol: Int
 //    }
 //
-//    interface Action {
+//    interface com.gofficer.codenames.redux.Action {
 //        val type: String
 //        val payload: Any
 //    }
@@ -26,7 +26,7 @@ class MessageParsingTest {
 //    data class SocketActionMessage(override val protocol: Int,
 //                                   override val type: String,
 //                                   override val payload: Any
-//    ) : SocketMessage, Action
+//    ) : SocketMessage, com.gofficer.codenames.redux.Action
 //
 //    data class NestedObject(val someString: String = "String", val someNumber: Int = 1)
 
