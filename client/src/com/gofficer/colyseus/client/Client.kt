@@ -139,6 +139,7 @@ class Client(
     }
 
     private fun createRoomRequest(roomName: String, options: LinkedHashMap<String, Any>?): Room {
+        println("Creating room request")
         var options = options
         //        System.out.println("createRoomRequest(" + roomName + "," + options + "," + reuseRoomInstance + "," + retryTimes + "," + retryCount)
         if (options == null) options = LinkedHashMap()
@@ -208,7 +209,7 @@ class Client(
     private fun connect(options: LinkedHashMap<String, Any>, connectTimeout: Int) {
         val uri: URI
         try {
-            uri = URI(buildEndpoint("", options) add -)
+            uri = URI(buildEndpoint("", options))
         } catch (e: URISyntaxException) {
             if (this@Client.listener != null)
                 this@Client.listener.onError(e)
@@ -226,21 +227,28 @@ class Client(
         println("Calling connect $uri")
         this.connection = Connection(uri, connectTimeout, httpHeaders, object : Connection.Listener {
             override fun onError(e: Exception) {
+                println("On error")
                 if (this@Client.listener != null)
                     this@Client.listener.onError(e)
             }
 
             override fun onClose(code: Int, reason: String, remote: Boolean) {
+                println("onClose")
                 if (this@Client.listener != null)
                     this@Client.listener.onClose(code, reason, remote)
             }
 
             override fun onOpen() {
-                if (this@Client.id != null && this@Client.listener != null)
+                println("Connection open!")
+                println("ID: $id")
+                if (this@Client.id != null && this@Client.listener != null) {
+                    println("Calling onOpen listener")
                     this@Client.listener.onOpen(this@Client.id)
+                }
             }
 
             override fun onMessage(bytes: ByteArray) {
+                println("On Message")
                 this@Client.onMessageCallback(bytes)
             }
         })
@@ -271,6 +279,7 @@ class Client(
     }
 
     private fun onMessageCallback(bytes: ByteArray) {
+        println("On message callback $bytes")
         //        System.out.println("Client.onMessageCallback()")
         try {
             val unpacker = MessagePack.newDefaultUnpacker(bytes)

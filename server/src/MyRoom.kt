@@ -1,7 +1,7 @@
 package com.example
 
+import com.example.common.Action
 import com.example.common.Client
-import com.example.common.presence.LocalPresence
 import com.example.common.sendAction
 import common.Room
 import common.RoomListener
@@ -34,11 +34,13 @@ class MyRoom : Room<MyRoomGameState>(listener = object : RoomListener {
     }
 
 }) {
-    override suspend fun onMessage(client: Client, data: Any) {
-        logger.debug("My custom implementation received $data")
+    override suspend fun onMessage(client: Client, action: Any) {
+        logger.debug("My custom implementation received $action")
 
         clients.forEach {
-            it.socket.sendAction(data)
+            // TODO address this casting, sloppy
+//            it.send(action as String)
+            it.socket.sendAction(action)
         }
 
     }

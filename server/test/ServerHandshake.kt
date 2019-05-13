@@ -57,8 +57,11 @@ suspend fun step4ClientConnectToRoom(serverIncoming: ReceiveChannel<Frame>, clie
     assertEquals(confirmedRoomId, roomId)
 }
 
-fun getEndpoint(id: String, roomId: String): String {
-    val endpoint = "/room/$roomId?colyseusid=$id&requestId=1"
+fun getEndpoint(id: String, roomId: String, useTextOverBinary: Boolean = false): String {
+    var endpoint = "/room/$roomId?colyseusid=$id&requestId=1"
+    if (useTextOverBinary) {
+        endpoint += "&useTextOverBinary=true"
+    }
     println("Connecting to $endpoint")
     return endpoint
 }

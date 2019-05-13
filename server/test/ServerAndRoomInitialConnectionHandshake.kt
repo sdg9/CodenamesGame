@@ -74,9 +74,9 @@ class ServerAndRoomInitialConnectionHandshake {
     val jsonAdapter = moshi.adapter(Map::class.java)
 
     @Test
-    fun testServerProvidesIdIfEmpty() {
+    fun testServerProvidesIdIfEmptyUsingText() {
         withTestApplication(Application::main) {
-            handleWebSocketConversation("/") { serverIncoming, clientOutgoing ->
+            handleWebSocketConversation("/?useTextOverBinary=true") { serverIncoming, clientOutgoing ->
                 val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
                 assertNotNull(id)
             }
@@ -84,14 +84,14 @@ class ServerAndRoomInitialConnectionHandshake {
     }
 
     @Test
-    fun testServerDoesNotProvideIdIfSpecified() {
+    fun testServerDoesNotProvideIdIfSpecifiedUsingText() {
         withTestApplication(Application::main) {
             val id = "1234"
-            handleWebSocketConversation("/?colyseusid=$id") { serverIncoming, clientOutgoing ->
+            handleWebSocketConversation("/?colyseusid=$id&useTextOverBinary=true") { serverIncoming, clientOutgoing ->
 //                val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
                 step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
                 val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
-                val endpoint = getEndpoint(id, roomId)
+                val endpoint = getEndpoint(id, roomId, true)
                 handleWebSocketConversation(endpoint) { roomIncoming, clientRoomOutgoing ->
                     step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
                 }
@@ -102,16 +102,16 @@ class ServerAndRoomInitialConnectionHandshake {
      * This is an integration test that verifies the behaviour of a simple conversation with an empty server.
      */
     @Test
-    fun testJoinRoomMessaging() {
+    fun testJoinRoomMessagingUsingText() {
         // First we create a [TestApplicationEngine] that includes the module [Application.main],
         // this executes that function and thus installs all the features and routes to this test application.
         withTestApplication(Application::main) {
             withTestApplication(Application::main) {
-                handleWebSocketConversation("/") { serverIncoming, clientOutgoing ->
+                handleWebSocketConversation("/?useTextOverBinary=true") { serverIncoming, clientOutgoing ->
                     val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
                     step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
                     val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
-                    val endpoint = getEndpoint(id, roomId)
+                    val endpoint = getEndpoint(id, roomId, true)
                     handleWebSocketConversation(endpoint) { roomIncoming, clientRoomOutgoing ->
                         step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
                     }

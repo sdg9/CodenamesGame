@@ -92,6 +92,9 @@ class Sever {
         val id = colyseusID ?: generateId()
         val auth = socket.call.parameters["auth"]
         val options = socket.call.parameters["options"]
+        val useTextOverBinary = socket.call.parameters["useTextOverBinary"] == "true"
+//        val useTextOverBinary = true
+        logger.debug("UseTextOverBinary: $useTextOverBinary")
         val pingCount = 0
         val client = Client(
             socket,
@@ -99,12 +102,14 @@ class Sever {
             session.id,
             null,
             auth,
-            pingCount
+            pingCount,
+            useTextOverBinary
         )
 
         // ensure client has it's "colyseusid"
         if (colyseusID == null) {
-            socket.sendAction(UserId(id, pingCount))
+            client.send(UserId(id, pingCount))
+//            socket.sendAction(UserId(id, pingCount))
         }
 
         logger.debug("onConnect $client")
@@ -140,7 +145,7 @@ class Sever {
                 if (frame is Frame.Text) {
                     val message = frame.readText()
                     logger.debug("Frame.Text: $message")
-                    receiveMessageMatchMaking(socket, client, message)
+                    receiveMessageMatchMaking(client, message)
 
                     // TODO look up clients in room, or room
                     client.onMessageListener.forEach { it(message) }
@@ -170,30 +175,32 @@ class Sever {
     /**
      * We received a message. Let's process it.
      */
-    private suspend fun receiveMessageMatchMaking(socket: WebSocketSession, client: Client, message: String) {
+    private suspend fun receiveMessageMatchMaking(client: Client, message: String) {
 
         val action = parseActionJSON(message)
 //        val type = getActionTypeFromJson(message)
         // We are going to handle commands (text starting with '/') and normal messages
         when (action?.type) {
-            ActionType.JOIN_REQUEST -> onJoinRequest(socket, client, action as JoinRequest)
+            ActionType.JOIN_REQUEST -> onJoinRequest(client, action as JoinRequest)
             ActionType.USER_ID -> this
             ActionType.ROOM_LIST -> this
         }
     }
 
-    private suspend fun onJoinRequest(socket: WebSocketSession, client: Client, action: JoinRequest) {
+    private suspend fun onJoinRequest(client: Client, action: JoinRequest) {
         logger.debug("onJoinRequest: $action")
         val roomName = action.room
         val joinOptions = action.joinOptions
 //        joinOptions.clientId = client.id
 
         if (!this.matchMaker.hasHandler(roomName) && !isValidId(roomName)) {
-            socket.sendAction(JoinError("no available handler for $roomName"))
+            client.send(JoinError("no available handler for $roomName"))
+//            client.socket.sendAction(JoinError("no available handler for $roomName"))
         } else {
             // TODO: confirm retry logic, colyseus tries 3x
             val joinRequest = this.matchMaker.onJoinRoomRequest(client, roomName, joinOptions)
-            socket.sendAction(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
+            client.send(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
+//            client.socket.sendAction(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
             // once done
 //            send[Protocol.JOIN_REQUEST](client, joinOptions.requestId, response.roomId, response.processId);
             // or send error

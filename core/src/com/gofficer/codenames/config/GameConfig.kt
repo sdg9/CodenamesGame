@@ -31,5 +31,6 @@ object GameConfig {
     const val DEFAULT_FPS_LIMIT = 60
 
     const val LOCAL_WEBSOCKET_ANDROID = "ws://10.0.2.2:2567"
-    const val LOCAL_WEBSOCKET_DESKTOP = "ws://localhost:2567"
+//    const val LOCAL_WEBSOCKET_DESKTOP = "ws://localhost:2567"
+    const val LOCAL_WEBSOCKET_DESKTOP = "ws://localhost:55655"
 }

@@ -240,7 +240,8 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
         if (roomId != null) {
             // TODO: Coroutine - Confirm if this is how I should do it
             GlobalScope.launch {
-                client.socket.sendAction(JoinResponseConfirmation(roomId))
+                client.send(JoinResponseConfirmation(roomId))
+//                client.socket.sendAction(JoinResponseConfirmation(roomId))
             }
         }
 
@@ -261,7 +262,8 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
 
     private suspend fun sendState(client: Client) {
         // TODO udpate to send room state
-        client.socket.send(Frame.Text("TODO send room state"))
+//        client.socket.send(Frame.Text("TODO send room state"))
+        client.send("TODO send room state")
     }
 
     private suspend fun _onMessage(client: Client, message: String) {
@@ -287,7 +289,13 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
             // TODO delay until after onLeave is fired
             client.socket.close()
         } else {
-            onMessage(client, message)
+            // TODO received string, convert to action:
+            val type = getActionTypeFromJson(message)
+            if (type != null) {
+                onMessage(client, message)
+            } else {
+                TODO ("Deal with non-Action style message")
+            }
         }
 
     }

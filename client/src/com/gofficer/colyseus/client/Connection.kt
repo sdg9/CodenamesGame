@@ -17,6 +17,8 @@ class Connection internal constructor(
     private val listener: Listener?
 ) : WebSocketClient(uri, Draft_6455(), httpHeaders, connectTimeout) {
 
+
+
     private val _enqueuedCalls = mutableListOf<Any>()
     private val msgpackMapper: ObjectMapper
 
@@ -37,6 +39,7 @@ class Connection internal constructor(
     //        System.out.println("url is " + uri);
 
     internal fun send(vararg data: Any) {
+        println("send: $data")
         if (isOpen()) {
             try {
                 send(msgpackMapper.writeValueAsBytes(data))
@@ -52,6 +55,7 @@ class Connection internal constructor(
     }
 
     override fun onOpen(handshakedata: ServerHandshake) {
+        println("onOpen: $handshakedata")
         if (this@Connection._enqueuedCalls.size > 0) {
             for (objects in this@Connection._enqueuedCalls) {
                 this@Connection.send(objects)
@@ -64,19 +68,23 @@ class Connection internal constructor(
     }
 
     override fun onMessage(message: String) {
+        println("onMessage: $message")
         //        System.out.println("Connection.onMessage(String message)");
         //        System.out.println(message);
     }
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
+        println("onClose: $code")
         if (this@Connection.listener != null) this@Connection.listener.onClose(code, reason, remote)
     }
 
     override fun onError(ex: Exception) {
+        println("onMessage: $ex")
         if (this@Connection.listener != null) this@Connection.listener.onError(ex)
     }
 
     override fun onMessage(buf: ByteBuffer) {
+        println("onMessage: $buf")
         //        System.out.println("Connection.onMessage(ByteBuffer bytes)");
         if (this@Connection.listener != null) {
             val bytes = ByteArray(buf.capacity())
