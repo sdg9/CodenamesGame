@@ -1,6 +1,6 @@
-import com.example.common.SomethingElse
-import com.example.common.toJSON
 import com.example.main
+import com.gofficer.codenames.redux.actions.SomethingElse
+import com.gofficer.codenames.redux.actions.toJSON
 import io.ktor.application.*
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText

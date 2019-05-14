@@ -1,4 +1,5 @@
-import com.example.common.getAttributeFromActionJson
+
+import com.gofficer.codenames.redux.actions.getAttributeFromActionJson
 import com.squareup.moshi.Moshi
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readText

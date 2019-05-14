@@ -1,5 +1,4 @@
 
-import com.example.common.getAttributeFromActionJson
 import com.example.main
 import com.squareup.moshi.Moshi
 import io.ktor.application.*
