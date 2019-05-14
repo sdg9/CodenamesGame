@@ -32,5 +32,12 @@ object GameConfig {
 
     const val LOCAL_WEBSOCKET_ANDROID = "ws://10.0.2.2:2567"
 //    const val LOCAL_WEBSOCKET_DESKTOP = "ws://localhost:2567"
-    const val LOCAL_WEBSOCKET_DESKTOP = "ws://localhost:55655"
+//const val LOCAL_WEBSOCKET_DESKTOP = "ws://localhost:55655"
+    const val LOCAL_WEBSOCKET_DESKTOP = "ws://localhost:8899"
+
+    // In whistle
+    // from command line run w2
+    // make sure rule "localhost:8899 localhost:2567" exists
+    // don't use it for anything else and we should be fine as reverse proxy
+
 }

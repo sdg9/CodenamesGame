@@ -5,6 +5,7 @@ import com.daveanthonythomas.moshipack.MoshiPack
 import com.example.common.*
 import okio.BufferedSource
 import okio.ByteString
+import org.apache.commons.codec.binary.Hex
 import org.msgpack.core.MessagePack
 import org.msgpack.value.ValueType
 import java.io.ByteArrayOutputStream
@@ -46,7 +47,9 @@ class MessagePackTest {
         val bytes2 = ByteString.decodeHex("82a7636f6d70616374c3a6736368656d6100").toByteArray()
         val bytes3 = MoshiPack().packToByteArray(MessagePackWebsitePlug())
 
-    assertNotEquals(bytes, bytes3)
+
+//        println("Hex Bytes: ${Hex.encodeHex( bytes2 ).toString()}")
+//        assertNotEquals(bytes, bytes3)
 
         val unpacked1: MessagePackWebsitePlug = MoshiPack().unpack(bytes)
 //        println(unpacked1)

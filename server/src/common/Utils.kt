@@ -4,7 +4,12 @@ import io.ktor.util.generateNonce
 
 
 fun generateId(): String {
-    return generateNonce()
+//    return generateNonce()
+    val size = 9
+    val allowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz0123456789"
+    return (1..size)
+        .map { allowedChars.random() }
+        .joinToString("")
 }
 
 

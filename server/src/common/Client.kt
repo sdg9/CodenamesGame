@@ -1,5 +1,6 @@
 package com.example.common
 
+import com.daveanthonythomas.moshipack.MoshiPack
 import common.Sever
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
@@ -11,7 +12,7 @@ import org.msgpack.core.MessagePack.PackerConfig
 import org.slf4j.LoggerFactory
 import kotlin.reflect.jvm.jvmName
 
-
+var moshiPack = MoshiPack()
 var packer = MessagePack.newDefaultBufferPacker()
 
 
@@ -43,15 +44,21 @@ data class Client(
 
 
     suspend fun sendUserId(id: String) {
-        val packer = MessagePack.newDefaultBufferPacker()
-        packer.packArrayHeader(2)
-            .packInt(Protocol.USER_ID)
-            .packString(id)
-            .close()
-
-
         logger.debug("Sending USER_ID")
-        socket.send(packer.toByteArray())
+        val byteArray = moshiPack.packToByteArray(listOf(
+            Protocol.USER_ID,
+            id
+        ))
+        socket.send(byteArray)
+
+//        val packer = MessagePack.newDefaultBufferPacker()
+//        packer.packArrayHeader(2)
+//            .packInt(Protocol.USER_ID)
+//            .packString(id)
+//            .close()
+//
+//
+//        socket.send(packer.toByteArray())
 //        val packer = PackerConfig()
 //            .withSmallStringOptimizationThreshold(256) // String
 //            .newBufferPacker()
@@ -66,16 +73,50 @@ data class Client(
     }
 
     suspend fun sendJoinRoom(roomId: String, processId: String?) {
-        val packer = MessagePack.newDefaultBufferPacker()
-        packer.packArrayHeader(3)
-            .packInt(Protocol.JOIN_ROOM)
-            .packString(roomId)
-            .packInt(1) // TODO watching colyseus they send a value here, so far I only see 1 (default if local process?), this fails if a string
-//            .packString(processId ?: "1")
-            .close()
-
         logger.debug("Sending JOIN_ROOM")
-        socket.send(packer.toByteArray())
+        val byteArray = moshiPack.packToByteArray(listOf(
+            Protocol.JOIN_ROOM,
+            roomId,
+            1
+        ))
+        socket.send(byteArray)
+//        val packer = MessagePack.newDefaultBufferPacker()
+//        packer.packArrayHeader(3)
+//            .packInt(Protocol.JOIN_ROOM)
+//            .packString(roomId)
+//            .packInt(1) // TODO watching colyseus they send a value here, so far I only see 1 (default if local process?), this fails if a string
+////            .packString(processId ?: "1")
+//            .close()
+
+//        socket.send(packer.toByteArray())
+    }
+
+    suspend fun <T> sendRoomState(state: T) {
+        logger.debug("Sending ROOM_STATE")
+        val byteArray = moshiPack.packToByteArray(listOf(
+            Protocol.ROOM_STATE,
+            state
+        ))
+        socket.send(byteArray)
+    }
+
+
+    suspend fun <T> sendRoomData(data: T) {
+        logger.debug("Sending ROOM_STATE")
+        val byteArray = moshiPack.packToByteArray(listOf(
+            Protocol.ROOM_DATA,
+            data
+        ))
+        socket.send(byteArray)
+    }
+
+    suspend fun sendJoinConfirmation(roomId: String) {
+        logger.debug("Sending JOIN_CONFIRMATION")
+        val byteArray = moshiPack.packToByteArray(listOf(
+            Protocol.JOIN_ROOM,
+            roomId
+        ))
+        socket.send(byteArray)
     }
 //
 //    suspend fun send(action: Action) {
@@ -106,7 +147,7 @@ data class Client(
 //}
 
 suspend inline fun <reified T> Client.send(input: T) {
-    println("Temporarily disabling generic send")
+    println("Temporarily disabling generic send $input")
     return
     if (useTextOverBinary) {
         when (input) {

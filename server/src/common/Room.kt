@@ -240,7 +240,8 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
         if (roomId != null) {
             // TODO: Coroutine - Confirm if this is how I should do it
             GlobalScope.launch {
-                client.send(JoinResponseConfirmation(roomId))
+                client.sendJoinConfirmation(roomId)
+//                client.send(JoinResponseConfirmation(roomId))
 //                client.socket.sendAction(JoinResponseConfirmation(roomId))
             }
         }
@@ -264,6 +265,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
         // TODO udpate to send room state
 //        client.socket.send(Frame.Text("TODO send room state"))
         client.send("TODO send room state")
+        client.sendRoomState(this.state)
     }
 
     private suspend fun _onMessage(client: Client, message: String) {
