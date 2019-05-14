@@ -1,6 +1,7 @@
 package com.gofficer.codenames.redux.reducers
 
 import com.gofficer.codenames.redux.actions.ResetGame
+import com.gofficer.codenames.redux.actions.SetState
 import com.gofficer.codenames.redux.actions.SetupCards
 import com.gofficer.codenames.redux.models.Board
 import gofficer.codenames.redux.game.GameState
@@ -21,6 +22,12 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
             lastPlayed = 0,
             gameOver = false,
             cards = listOf()
+        )
+        is SetState -> state.copy(
+            board = state.board,
+            lastPlayed = state.lastPlayed,
+            gameOver = state.gameOver,
+            cards = state.cards
         )
         else -> state
     }

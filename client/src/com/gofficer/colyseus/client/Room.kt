@@ -69,7 +69,7 @@ class Room internal constructor(
         /**
          * This event is triggered when the server updates its state.
          */
-        fun onStateChange(state: LinkedHashMap<String, Any>) {
+        open fun onStateChange(state: Any) {
 
         }
     }
@@ -151,6 +151,11 @@ class Room internal constructor(
                             //                    const remoteElapsedTime = message[3];
 //                            setState(messageArray.get(1) as ByteArray)
                             println("Room State")
+
+                            for (listener in listeners) {
+//                                listener?.onMessage()
+                                listener?.onStateChange(messageArray.get(1) as LinkedHashMap<String, Any>)
+                            }
                         }
 
                         Protocol.ROOM_STATE_PATCH -> {

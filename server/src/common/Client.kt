@@ -1,19 +1,15 @@
 package com.example.common
 
 import com.daveanthonythomas.moshipack.MoshiPack
-import common.Sever
+import com.gofficer.codenames.redux.actions.ClientOptions
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import io.ktor.http.cio.websocket.send
 import java.nio.ByteBuffer
-import org.msgpack.core.MessagePack
-import org.msgpack.core.MessageBufferPacker
-import org.msgpack.core.MessagePack.PackerConfig
 import org.slf4j.LoggerFactory
 import kotlin.reflect.jvm.jvmName
 
 var moshiPack = MoshiPack()
-var packer = MessagePack.newDefaultBufferPacker()
 
 
 private val logger by lazy { LoggerFactory.getLogger(Client::class.jvmName) }
@@ -149,27 +145,21 @@ data class Client(
 suspend inline fun <reified T> Client.send(input: T) {
     println("Temporarily disabling generic send $input")
     return
-    if (useTextOverBinary) {
-        when (input) {
-            is Action -> socket.send(toJSON(input))
-            is String -> socket.send(input)
-            else -> throw Error("Unable to understand message format for $input")
-        }
-    } else {
-        when (input) {
-            is Action -> socket.send(Frame.Binary(true, ByteBuffer.wrap(toJSON(input).toByteArray())))
-            is String -> socket.send(Frame.Binary(true, ByteBuffer.wrap(input.toByteArray())))
-            else -> throw Error("Unable to understand message format for $input")
-        }
-    }
+//    if (useTextOverBinary) {
+//        when (input) {
+//            is Action -> socket.send(toJSON(input))
+//            is String -> socket.send(input)
+//            else -> throw Error("Unable to understand message format for $input")
+//        }
+//    } else {
+//        when (input) {
+//            is Action -> socket.send(Frame.Binary(true, ByteBuffer.wrap(toJSON(input).toByteArray())))
+//            is String -> socket.send(Frame.Binary(true, ByteBuffer.wrap(input.toByteArray())))
+//            else -> throw Error("Unable to understand message format for $input")
+//        }
+//    }
 }
 
-
-data class ClientOptions(
-    var auth: String?,
-    var requestId: Int?,
-    var sessionId: String?
-)
 
 //interface ClientListner {
 //    fun message(message: String)

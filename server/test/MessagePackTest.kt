@@ -5,9 +5,6 @@ import com.daveanthonythomas.moshipack.MoshiPack
 import com.example.common.*
 import okio.BufferedSource
 import okio.ByteString
-import org.apache.commons.codec.binary.Hex
-import org.msgpack.core.MessagePack
-import org.msgpack.value.ValueType
 import java.io.ByteArrayOutputStream
 import java.util.*
 import kotlin.test.*

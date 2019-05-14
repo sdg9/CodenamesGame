@@ -1,6 +1,6 @@
 package com.gofficer.codenames.redux.models
 
-import com.gofficer.codenames.redux.actions.NetworkAction
+import com.gofficer.codenames.redux.actions.CardPressed
 import gofficer.codenames.redux.game.GameState
 import redux.api.Reducer
 import java.util.*
@@ -69,10 +69,10 @@ val cardReduce = Reducer { state: GameState, action: Any ->
 }
 
 
-data class CardPressed(val id: Int, val word: String, override var isFromServer: Boolean = false): NetworkAction {
+//data class CardPressed(val id: Int, val word: String, override var isFromServer: Boolean = false): NetworkAction {
 //    override fun toJson(): String {
 //        var gson = Gson()
 //        var jsonString = gson.toJson(this)
 //        return jsonString
 //    }
-}
+//}

@@ -1,8 +1,5 @@
 package com.gofficer.codenames.redux
 
-import com.gofficer.codenames.redux.actions.ResetGame
-import com.gofficer.codenames.redux.actions.SetupCards
-import com.gofficer.codenames.redux.models.Board
 import gofficer.codenames.redux.game.GameState
 import redux.api.Reducer
 import redux.api.Store

@@ -14,14 +14,14 @@ data class Board(
 
 }
 
-data class AddCard(val card: Card) : Action
+//data class AddCard(val card: Card) : Action
 
-val boardReduceSetup = Reducer { state: GameState, action: Any ->
-    when (action) {
-        is AddCard -> state.copy(cards = state.cards.add(action.card))
-        else -> state
-    }
-}
+//val boardReduceSetup = Reducer { state: GameState, action: Any ->
+//    when (action) {
+//        is AddCard -> state.copy(cards = state.cards.add(action.card))
+//        else -> state
+//    }
+//}
 
 //fun Board.reduceSetup(action: com.gofficer.codenames.redux.Action): Board {
 //    return when (action) {

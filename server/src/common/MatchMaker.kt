@@ -3,6 +3,7 @@ package com.example.common
 import com.example.common.matchmaker.RegisteredHandler
 import com.example.common.presence.LocalPresence
 import com.example.common.presence.Presence
+import com.gofficer.codenames.redux.actions.ClientOptions
 import common.MatchMakingListener
 import common.Room
 import common.RoomListener

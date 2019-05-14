@@ -3,11 +3,14 @@ package common
 import com.example.common.*
 import com.example.common.Protocol.Companion.WS_CLOSE_CONSENTED
 import com.example.common.presence.Presence
+import com.gofficer.codenames.redux.actions.ClientOptions
+import com.gofficer.codenames.redux.actions.getActionTypeFromJson
 import io.ktor.http.cio.websocket.Frame
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
+import redux.api.Store
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.concurrent.schedule
@@ -65,7 +68,8 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
     var patchRate =DEFAULT_PATCH_RATE
     var autoDispose = true
 
-    abstract val state: T
+    abstract val store: Store<T>
+//    abstract val state: T
     var metaData: Any? = null
 
     val clients: MutableList<Client> = mutableListOf()
@@ -247,7 +251,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
         }
 
         // send current state when new client joins the room
-        if (this.state != null) {
+        if (this.store.state != null) {
             this.sendState(client)
         }
 
@@ -265,7 +269,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
         // TODO udpate to send room state
 //        client.socket.send(Frame.Text("TODO send room state"))
         client.send("TODO send room state")
-        client.sendRoomState(this.state)
+        client.sendRoomState(this.store.state)
     }
 
     private suspend fun _onMessage(client: Client, message: String) {

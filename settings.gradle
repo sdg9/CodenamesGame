@@ -10,4 +10,5 @@ pluginManagement {
 include 'desktop', 'android', 'ios', 'core'
 include 'redux'
 include 'client'
+include 'server'
 

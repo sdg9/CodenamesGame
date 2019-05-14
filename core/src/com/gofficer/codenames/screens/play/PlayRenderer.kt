@@ -18,15 +18,11 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.gofficer.codenames.CodenamesGame
-import com.gofficer.codenames.actions.FlipAction
 import com.gofficer.codenames.assets.AssetPaths
-import com.gofficer.codenames.screens.menu.MainMenuScreen
+import com.gofficer.codenames.redux.actions.CardPressed
 import redux.api.Store
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction
 import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.redux.actions.SetupGame
-import com.gofficer.codenames.redux.models.CardPressed
 import gofficer.codenames.redux.game.GameState
 
 

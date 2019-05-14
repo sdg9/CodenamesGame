@@ -6,19 +6,15 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.net.HttpRequestBuilder.json
 import com.badlogic.gdx.utils.Logger
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.redux.actions.ChangeScene
-import com.gofficer.codenames.redux.actions.NetworkAction
-import com.gofficer.codenames.redux.actions.NetworkMessage
-import com.gofficer.codenames.redux.actions.SetupCards
+import com.gofficer.codenames.redux.actions.*
 import com.gofficer.codenames.redux.createCodeNamesStore
 import com.gofficer.codenames.redux.middleware.loggingMiddleware
 import com.gofficer.codenames.redux.middleware.setupGameMiddleware
 import com.gofficer.codenames.redux.middleware.validActionMiddleware
 import com.gofficer.codenames.redux.models.Card
-import com.gofficer.codenames.redux.models.CardPressed
-import com.gofficer.codenames.redux.models.boardReduceSetup
 import com.gofficer.codenames.redux.models.cardReduce
 import com.gofficer.codenames.redux.reducers.reduceGameSetup
 import com.gofficer.codenames.screens.loading.LoadingScreen
@@ -91,7 +87,7 @@ class CodenamesGame : Game() {
         store = createCodeNamesStore(initState,
             arrayOf(
                 reduceGameSetup,
-                boardReduceSetup,
+//                boardReduceSetup,
                 cardReduce
             ),
             arrayOf(
@@ -130,6 +126,18 @@ class CodenamesGame : Game() {
 //                    }
 //                })
                 room?.addListener(object : Room.Listener() {
+
+                    override fun onStateChange(message: Any){
+                        log.debug("TODO finish meOn state change callback: $message")
+                        // TODO convert
+//                        val newState: GameState = GameState()
+
+                        //TODO
+//                        dispatchJsonAsOriginalAction(message, store)
+//                        val newState = parseActionJSON(json) as VGameState
+//                        store.dispatch(SetState(newState))
+                    }
+
 
                     override fun onMessage(message: Any) {
                         log.debug("onMessage: $message")
@@ -187,8 +195,6 @@ class CodenamesGame : Game() {
 
             override fun onMessage(message: Any) {
                 log.debug("Client.onMessage(): $message")
-
-
             }
 
             override fun onClose(code: Int, reason: String, remote: Boolean) {
@@ -259,7 +265,8 @@ val getNetworkActionMiddleware = { game: CodenamesGame ->
 
 //            log.debug("Sending $jsonString")
 //            room?.send(action.toJson())
-            game.room?.send(NetworkMessage(action::class.java.simpleName, action))
+            game.room?.send(action)
+//            game.room?.send(NetworkMessage(action::class.java.simpleName, action))
         }
         next.dispatch(action)
     }

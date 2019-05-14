@@ -1,8 +1,6 @@
 package com.gofficer.codenames.redux.middleware
 
 import com.gofficer.codenames.redux.actions.*
-import com.gofficer.codenames.redux.models.AddCard
-import com.gofficer.codenames.redux.models.Card
 import com.gofficer.codenames.redux.utils.getXUniqueCards
 import gofficer.codenames.redux.game.GameState
 import redux.api.Dispatcher
