@@ -15,7 +15,7 @@ val loggingMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, 
 }
 
 val validActionMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-    if (action !is Action) {
+    if (action !is BaseAction) {
         println("Only allow action objects")
         null
     } else {

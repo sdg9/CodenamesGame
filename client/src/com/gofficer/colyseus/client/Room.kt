@@ -69,7 +69,7 @@ class Room internal constructor(
         /**
          * This event is triggered when the server updates its state.
          */
-        open fun onStateChange(state: Any) {
+        open fun onStateChange(state: java.util.LinkedHashMap<String, Any>) {
 
         }
     }
@@ -154,7 +154,20 @@ class Room internal constructor(
 
                             for (listener in listeners) {
 //                                listener?.onMessage()
-                                listener?.onStateChange(messageArray.get(1) as LinkedHashMap<String, Any>)
+//                                println("Respons: ${messageArray.get(1)}")
+                                // TODO pick up here
+                                // determine how to best handle restoring message pack back to object
+                                // Ideally work directly with object and not maps
+                                val result = messageArray.get(1)
+                                when (result) {
+                                    String -> println("Result is string")
+                                    else -> {
+                                        print("Result is not string $result")
+                                        print(result::class.java)
+                                        print(result::class.java.simpleName)
+                                    }
+                                }
+//                                listener?.onStateChange(messageArray.get(1) as String)
                             }
                         }
 

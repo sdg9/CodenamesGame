@@ -60,7 +60,7 @@ data class ClientOptions(
 )
 
 
-sealed class Action(val type: ActionType)
+sealed class Action(val type: ActionType): BaseAction
 
 interface NetworkAction {
     var isFromServer: Boolean
@@ -109,9 +109,29 @@ fun getActionTypeFromJson(json: String): ActionType? {
 }
 
 fun dispatchJsonAsOriginalAction(json: String, store: Store<*>) {
-    store.dispatch(parseActionJSON(json))
+    println("Test")
+    val action = parseActionJSON(json)
+    println("Dispatching action $action")
+    store.dispatch(action)
 }
 
+fun parseActionJSON(json: java.util.LinkedHashMap<String, Any>): Action? {
+    println("Type: ${json.get("type")}")
+    when (json) {
+//        Int -> {}
+//        String -> {}
+        LinkedHashMap<String, Any>() -> println("Action is a hash map ${json}")
+        LinkedHashMap<Any, Any>() -> println("Action is a any hash map ${json}")
+        else -> {
+            println("Unknown type")
+            println(json.javaClass.name)                 // double
+            println(json.javaClass.kotlin)               // class kotlin.Double
+            println(json.javaClass.kotlin.qualifiedName)
+
+        }
+    }
+    return null
+}
 
 fun parseActionJSON(json: String): Action? {
     val type = getActionTypeFromJson(json) ?: return null

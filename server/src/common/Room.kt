@@ -252,7 +252,10 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
 
         // send current state when new client joins the room
         if (this.store.state != null) {
+            logger.debug("State isn't null, sending to client")
             this.sendState(client)
+        } else {
+            logger.debug("State is null, nothing to send client")
         }
 
         val reconnection = client.sessionId?.let { reconnections?.get(it) }
@@ -266,9 +269,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
     }
 
     private suspend fun sendState(client: Client) {
-        // TODO udpate to send room state
-//        client.socket.send(Frame.Text("TODO send room state"))
-        client.send("TODO send room state")
+        logger.debug("STate: ${store.state}")
         client.sendRoomState(this.store.state)
     }
 

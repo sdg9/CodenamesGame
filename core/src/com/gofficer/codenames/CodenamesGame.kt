@@ -127,13 +127,18 @@ class CodenamesGame : Game() {
 //                })
                 room?.addListener(object : Room.Listener() {
 
-                    override fun onStateChange(message: Any){
+                    override fun onStateChange(message: LinkedHashMap<String, Any>){
                         log.debug("TODO finish meOn state change callback: $message")
                         // TODO convert
 //                        val newState: GameState = GameState()
-
+                        try {
+                            val newState = parseActionJSON(message)
+                            log.debug("New state: $newState")
+                        } catch(e: Exception) {
+                            log.error("$e")
+                        }
                         //TODO
-//                        dispatchJsonAsOriginalAction(message, store)
+                        dispatchJsonAsOriginalAction(message as String, store)
 //                        val newState = parseActionJSON(json) as VGameState
 //                        store.dispatch(SetState(newState))
                     }
