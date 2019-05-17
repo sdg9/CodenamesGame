@@ -5,9 +5,11 @@ import com.daveanthonythomas.moshipack.MoshiPack
 import com.example.common.*
 import okio.BufferedSource
 import org.msgpack.core.MessagePack
+import org.msgpack.core.MessagePacker
 import org.msgpack.value.ValueType
 import kotlin.test.*
 import org.msgpack.value.Value
+import reactor.core.publisher.toMono
 
 
 /**
@@ -109,8 +111,15 @@ class MessagePackBetweenClientAndServer {
         assertEquals(subProtocol, someObject.subProtocol)
 
         // TODO figure out how to convert me to desired object
+        // Ideally i don't convert to and from again, can I directly return buffer instead of desearializing?
         println("Message to convert ${someObject.message}")
 
+        var somePack = MessagePack.newDefaultBufferPacker()
+        // if we had byte array
+        someObject.message?.writeTo(somePack)
+        somePack.close()
+        println(somePack.toByteArray())
+        val unpacked: MessageComplexSubObject = moshiPack.unpack(somePack.toByteArray())
 
 //        val unpacker = MessagePack.newDefaultUnpacker(packed)
 //        val firstVal = unpacker.unpackValue()
@@ -310,18 +319,20 @@ fun getValueAsInt(item: Value): Int? {
 }
 
 fun unpackUnknown(packed: BufferedSource): ProtocolMessage {
+    val retVal = ProtocolMessage()
+
     val unpacker = MessagePack.newDefaultUnpacker(packed)
     val firstVal = unpacker.unpackValue()
-    val retVal = ProtocolMessage()
     if (firstVal.isArrayValue) {
         val arrayValue = firstVal.asArrayValue()
-        val protocol = getValueAsInt(arrayValue.get(0))
+        val protocol = getValueAsInt(arrayValue.getOrNilValue(0))
         if (protocol != null && protocol == Protocol.ROOM_DATA) {
             retVal.protocol = protocol
-            val subProtocol = getValueAsInt(arrayValue.get(1))
+            val subProtocol = getValueAsInt(arrayValue.getOrNilValue(1))
             if (subProtocol != null) {
                 retVal.subProtocol = subProtocol
-                retVal.message = arrayValue.get(2)
+                retVal.message = arrayValue.getOrNilValue(2).as
+
             }
         } else {
             fail("Not an item with subprotocol")
