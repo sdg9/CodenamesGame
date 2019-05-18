@@ -1,6 +1,7 @@
-package com.example
+package com.gofficer.codenames.myServer
 
-import com.example.common.Client
+import com.gofficer.colyseus.server.Client
+import common.GameSession2
 import common.Room
 import common.RoomListener
 import common.Sever
@@ -29,18 +30,18 @@ fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
  * an extension of the [Application] class, and thus can be accessed like a normal member `myapplication.main()`.
  */
 fun Application.main() {
-    SomeApplication().apply { main() }
+    MyCodenamesServer().apply { main() }
 }
 
 
-private val logger by lazy { LoggerFactory.getLogger(SomeApplication::class.jvmName) }
+private val logger by lazy { LoggerFactory.getLogger(MyCodenamesServer::class.jvmName) }
 
 //fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 
 /**
  * In this case we have a class holding our application state so it is not global and can be tested easier.
  */
-class SomeApplication {
+class MyCodenamesServer {
     /**
      * This class handles the logic of a [Sever].
      * With the standard handlers [Sever.memberJoin] or [Sever.memberLeft] and operations like
@@ -51,7 +52,7 @@ class SomeApplication {
 
     init {
         logger.debug("Init, about to register rooms")
-        gameServer.register("public", ::MyRoom, null, object : RoomListener{
+        gameServer.register("public", ::MyRoom, null, object : RoomListener {
             override fun create(room: Room<*>) {
                 logger.debug("Listener Room created: ${room.roomId}")
             }
@@ -94,14 +95,14 @@ class SomeApplication {
         }
         // This enables the use of sessions to keep information between requests/refreshes of the browser.
         install(Sessions) {
-//            cookie<GameSession>("SESSION")
-            header<GameSession>("Session")
+//            cookie<GameSession2>("SESSION")
+            header<GameSession2>("Session")
         }
 
         // This adds an interceptor that will create a specific session in each request if no session is available already.
         intercept(ApplicationCallPipeline.Features) {
-            if (call.sessions.get<GameSession>() == null) {
-                call.sessions.set(GameSession(generateNonce()))
+            if (call.sessions.get<GameSession2>() == null) {
+                call.sessions.set(GameSession2(generateNonce()))
             }
         }
 
@@ -130,7 +131,7 @@ class SomeApplication {
 
 //                gameServer.register("room_name", MyRoom::javaClass)
 //                // First of all we get the session.
-//                val session = call.sessions.get<GameSession>()
+//                val session = call.sessions.get<GameSession2>()
 //
 //                // We check that we actually have a session. We should always have one,
 //                // since we have defined an interceptor before to set one.
@@ -178,7 +179,7 @@ class SomeApplication {
 //    /**
 //     * A chat session is identified by a unique nonce ID. This nonce comes from a secure random source.
 //     */
-    data class GameSession(val id: String)
+//    data class GameSession2(val id: String)
 //
 //    /**
 //     * We received a message. Let's process it.

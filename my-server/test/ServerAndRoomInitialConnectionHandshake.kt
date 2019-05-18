@@ -1,8 +1,7 @@
 
-import com.example.main
+import com.gofficer.codenames.myServer.main
 import com.squareup.moshi.Moshi
 import io.ktor.application.*
-import io.ktor.http.cio.websocket.*
 import io.ktor.server.testing.*
 import org.junit.Rule
 import org.junit.rules.Timeout

@@ -1,4 +1,4 @@
-package com.example.common.presence
+package com.gofficer.colyseus.server.presence
 
 import org.redisson.api.RFuture
 

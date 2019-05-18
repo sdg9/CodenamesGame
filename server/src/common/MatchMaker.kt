@@ -1,8 +1,8 @@
-package com.example.common
+package com.gofficer.colyseus.server
 
-import com.example.common.matchmaker.RegisteredHandler
-import com.example.common.presence.LocalPresence
-import com.example.common.presence.Presence
+import com.gofficer.colyseus.server.matchmaker.RegisteredHandler
+import com.gofficer.colyseus.server.presence.LocalPresence
+import com.gofficer.colyseus.server.presence.Presence
 import com.gofficer.codenames.redux.actions.ClientOptions
 import common.MatchMakingListener
 import common.Room

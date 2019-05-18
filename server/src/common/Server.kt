@@ -2,11 +2,10 @@ package common
 
 
 import com.daveanthonythomas.moshipack.MoshiPack
-import com.example.SomeApplication
-import com.example.common.*
-import com.example.common.matchmaker.RegisteredHandler
-import com.example.common.presence.LocalPresence
-import com.example.common.presence.Presence
+import com.gofficer.colyseus.server.*
+import com.gofficer.colyseus.server.matchmaker.RegisteredHandler
+import com.gofficer.colyseus.server.presence.LocalPresence
+import com.gofficer.colyseus.server.presence.Presence
 import com.gofficer.codenames.redux.actions.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.*
@@ -17,6 +16,9 @@ import org.slf4j.LoggerFactory
 import java.lang.Error
 import kotlin.reflect.jvm.jvmName
 
+
+
+data class GameSession2(val id: String)
 
 /**
  * Class in charge of the logic of the chat server.
@@ -84,7 +86,7 @@ class Sever {
         logger.debug("onConnection")
         // TODO determine if this is necessary
         // First of all we get the session.
-        val session = socket.call.sessions.get<SomeApplication.GameSession>()
+        val session = socket.call.sessions.get<GameSession2>()
         // We check that we actually have a session. We should always have one,
         // since we have defined an interceptor before to set one.
         if (session == null) {
@@ -202,7 +204,7 @@ class Sever {
     /**
      * A chat session is identified by a unique nonce ID. This nonce comes from a secure random source.
      */
-//    data class GameSession(val sessionId: String)
+//    data class GameSession2(val sessionId: String)
 
     /**
      * We received a message. Let's process it.

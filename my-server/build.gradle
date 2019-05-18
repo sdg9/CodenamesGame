@@ -1,0 +1,14 @@
+apply plugin: 'kotlin'
+
+sourceCompatibility = 1.6
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+sourceSets {
+    main.kotlin.srcDirs = main.java.srcDirs = ['src']
+    main.java.srcDirs = [ "src/" ]
+    main.resources.srcDirs  = [ "resources/" ]
+    test.kotlin.srcDirs = test.java.srcDirs = ['test']
+}
+eclipse.project {
+    name = appName + "-my-server"
+}

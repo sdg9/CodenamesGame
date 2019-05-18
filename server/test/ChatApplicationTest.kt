@@ -1,4 +1,3 @@
-package com.example
 
 /**
  * Tests the [SomeApplication].

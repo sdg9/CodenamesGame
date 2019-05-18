@@ -1,4 +1,4 @@
-package com.example.common
+package com.gofficer.colyseus.server
 
 import java.io.ByteArrayOutputStream
 import java.util.*

@@ -1,8 +1,6 @@
-package com.example
-
 
 import com.daveanthonythomas.moshipack.MoshiPack
-import com.example.common.*
+import com.gofficer.colyseus.server.*
 import com.gofficer.codenames.redux.actions.ActionType
 import com.gofficer.codenames.redux.actions.UserConnected
 import com.gofficer.codenames.redux.actions.getActionTypeFromJson

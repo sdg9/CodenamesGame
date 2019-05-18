@@ -1,6 +1,5 @@
-package com.example
 
-
+import com.gofficer.codenames.myServer.main
 import io.ktor.application.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.*

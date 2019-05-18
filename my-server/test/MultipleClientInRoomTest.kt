@@ -1,11 +1,8 @@
-import com.example.common.Protocol
-import com.example.main
-import com.gofficer.codenames.redux.actions.SomethingElse
-import com.gofficer.codenames.redux.actions.toJSON
+import com.gofficer.colyseus.server.Protocol
+import com.gofficer.codenames.myServer.main
 import io.ktor.application.*
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readBytes
-import io.ktor.http.cio.websocket.readText
 import io.ktor.server.testing.*
 import org.junit.Rule
 import org.junit.rules.Timeout

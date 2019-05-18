@@ -1,15 +1,12 @@
-package com.example
 
 
 import com.daveanthonythomas.moshipack.MoshiPack
-import com.example.common.*
+import com.gofficer.colyseus.Protocol
+import com.gofficer.colyseus.unpackUnknown
+import junit.framework.TestCase.*
 import okio.BufferedSource
-import org.msgpack.core.MessagePack
-import org.msgpack.value.ValueType
-import kotlin.test.*
 import org.apache.commons.codec.binary.Hex;
-import org.msgpack.core.MessageUnpacker
-import javax.print.DocFlavor
+import org.junit.Test
 
 /**
  * Testing out how to conveniently pack and unpack unknown types using message pack
@@ -21,6 +18,7 @@ import javax.print.DocFlavor
  */
 class MessagePackBetweenClientAndServer {
 
+    val moshiPack = MoshiPack()
 
     /**
      * Ints and strings
@@ -163,111 +161,7 @@ class MessagePackBetweenClientAndServer {
     // TODO add test where item doesn't have message, (don't crash on bad index)
 }
 
-/**
- * Assumes messages are all arrays of 2 - 3 items
- * [protocol, message]
- * or
- * [protocol, subprotocol, message]
- */
-fun unpackUnknown(packed: ByteArray): ProtocolMessage? {
-
-    val unpacker = MessagePack.newDefaultUnpacker(packed)
-    val format = unpacker.nextFormat
-    if (format.valueType == ValueType.ARRAY) {
-        val length = unpacker.unpackArrayHeader()
-        if (length == 2) {
-            return unpackLength2(unpacker, packed.size)
-        } else if (length == 3) {
-            return unpackLength3(unpacker, packed.size)
-        } else {
-            return null
-        }
-    } else {
-        return null
-    }
-
-//        if (length == 2 || length == 3) {
-//            val firstArrayItem = unpacker.nextFormat
-//            if (firstArrayItem.valueType == ValueType.INTEGER) {
-////                println("First bytes: ${Hex.encodeHexString(unpacker.readPayload(1))}")
-//                // 0d = 13 (good)
-//                retVal.protocol = unpacker.unpackInt()
-//            } else {
-//                fail("First item must be an integer")
-//            }
-//            val secondArrayItem = unpacker.nextFormat
-//            if (secondArrayItem.valueType == ValueType.INTEGER) {
-////                println("Second bytes: ${Hex.encodeHexString(unpacker.readPayload(1))}")
-//                // 02 = 2 (good)
-//                retVal.subProtocol = unpacker.unpackInt()
-//            }
-//            val thirdArrayItem = unpacker.nextFormat
-//            if (thirdArrayItem.valueType == ValueType.MAP) {
-//
-//                println("Total read: ${unpacker.totalReadBytes}")
-//
-//                // Only works when this is the last item, should be sufficient for what I need
-//                val remainderUnreadBytes = packed.size - unpacker.totalReadBytes.toInt()
-//                retVal.message = unpacker.readPayload(remainderUnreadBytes)
-//            }
-//        } else {
-//            fail("Arrays can only have 2 or 3 items")
-//        }
-//    } else {
-//        fail("Type should be Array")
-//    }
-//    return retVal
-}
-
-
-fun unpackLength2(unpacker: MessageUnpacker, totalSize: Int): ProtocolMessage {
-    val retVal = ProtocolMessage()
-    val firstArrayItem = unpacker.nextFormat
-    if (firstArrayItem.valueType == ValueType.INTEGER) {
-        retVal.protocol = unpacker.unpackInt()
-    } else {
-        fail("First item must be an integer")
-    }
-    val remainderUnreadBytes = totalSize - unpacker.totalReadBytes.toInt()
-    retVal.message = unpacker.readPayload(remainderUnreadBytes)
-    return retVal
-}
-
-fun unpackLength3(unpacker: MessageUnpacker, totalSize: Int): ProtocolMessage {
-    val retVal = ProtocolMessage()
-
-    val firstArrayItem = unpacker.nextFormat
-    if (firstArrayItem.valueType == ValueType.INTEGER) {
-        retVal.protocol = unpacker.unpackInt()
-    } else {
-        fail("First item must be an integer")
-    }
-    val secondArrayItem = unpacker.nextFormat
-    if (secondArrayItem.valueType == ValueType.INTEGER) {
-        retVal.subProtocol = unpacker.unpackInt()
-    }
-    val thirdArrayItem = unpacker.nextFormat
-    if (thirdArrayItem.valueType == ValueType.MAP) {
-
-        println("Total read: ${unpacker.totalReadBytes}")
-
-        // Only works when this is the last item, should be sufficient for what I need
-        val remainderUnreadBytes = totalSize - unpacker.totalReadBytes.toInt()
-        retVal.message = unpacker.readPayload(remainderUnreadBytes)
-    }
-    return retVal
-}
-
-//data class SomeObject(var compact: Boolean = true, var schema: Int = 0, var text: String = "hi")
-data class UntypedMessage(val protocol: Int, val subProtocol: Int)
-
 data class MessageObject(var protocol: Int? = null, var subProtocol: Int? = null, var message: Any? = null)
-
-data class ProtocolMessage(
-    var protocol: Int? = null,
-    var subProtocol: Int? = null,
-    var message: ByteArray? = null
-)
 
 data class MessageComplexSubObject(val protocol: Int, val subProtocol: Int, val message: ComplexSubObject)
 

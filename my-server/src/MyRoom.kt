@@ -1,7 +1,7 @@
-package com.example
+package com.gofficer.codenames.myServer
 
-import com.example.common.Client
-import com.example.common.sendAction
+import com.gofficer.colyseus.server.Client
+import com.gofficer.colyseus.server.sendAction
 import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.redux.createCodeNamesStore
 import com.gofficer.codenames.redux.middleware.loggingMiddleware

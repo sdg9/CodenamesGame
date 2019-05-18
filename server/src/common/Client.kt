@@ -1,4 +1,4 @@
-package com.example.common
+package com.gofficer.colyseus.server
 
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.redux.actions.ClientOptions

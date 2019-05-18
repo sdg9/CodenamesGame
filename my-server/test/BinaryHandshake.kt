@@ -1,8 +1,7 @@
-import com.example.main
+import com.gofficer.codenames.myServer.main
 import com.squareup.moshi.Moshi
 import io.ktor.application.Application
 import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.cio.websocket.readText
 import io.ktor.server.testing.withTestApplication
 import org.junit.Rule
 import org.junit.Test

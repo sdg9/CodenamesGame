@@ -1,8 +1,7 @@
-package com.example
 
 
 import com.daveanthonythomas.moshipack.MoshiPack
-import com.example.common.*
+import com.gofficer.colyseus.server.*
 import okio.BufferedSource
 import okio.ByteString
 import java.io.ByteArrayOutputStream

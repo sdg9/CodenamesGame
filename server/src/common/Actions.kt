@@ -1,4 +1,4 @@
-package com.example.common
+package com.gofficer.colyseus.server
 
 import com.gofficer.codenames.redux.actions.ClientOptions
 import com.gofficer.codenames.redux.actions.toJSON

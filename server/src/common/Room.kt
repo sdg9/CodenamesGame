@@ -1,8 +1,8 @@
 package common
 
-import com.example.common.*
-import com.example.common.Protocol.Companion.WS_CLOSE_CONSENTED
-import com.example.common.presence.Presence
+import com.gofficer.colyseus.server.*
+import com.gofficer.colyseus.server.Protocol.Companion.WS_CLOSE_CONSENTED
+import com.gofficer.colyseus.server.presence.Presence
 import com.gofficer.codenames.redux.actions.ClientOptions
 import com.gofficer.codenames.redux.actions.getActionTypeFromJson
 import io.ktor.http.cio.websocket.Frame
@@ -152,7 +152,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
 //    suspend fun onConnection(ws: DefaultWebSocketServerSession, incoming: ReceiveChannel<Frame>) {
 //
 //        // First of all we get the session.
-//        val session = ws.call.sessions.get<SomeApplication.GameSession>()
+//        val session = ws.call.sessions.get<SomeApplication.GameSession2>()
 //
 //        // We check that we actually have a session. We should always have one,
 //        // since we have defined an interceptor before to set one.

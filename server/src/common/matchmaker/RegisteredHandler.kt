@@ -1,6 +1,6 @@
-package com.example.common.matchmaker
+package com.gofficer.colyseus.server.matchmaker
 
-import com.example.common.Event
+import com.gofficer.colyseus.server.Event
 import common.Room
 import common.RoomListener
 
