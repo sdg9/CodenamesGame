@@ -18,40 +18,41 @@ class MultipleClientInRoomTest {
     @get:Rule
     val timeout = Timeout(5L, TimeUnit.SECONDS)
 
-    // TODO sometimes this one passes
-    @Test
-    fun testTwoClientsCanJoinSameRoomUsingText() {
-        withTestApplication(Application::main) {
-            handleWebSocketConversation("/?useTextOverBinary=true") { serverIncoming, clientOutgoing ->
-                println("============\nClient 1 connecting\n============")
-                val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
-                step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
-                val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
-                val endpoint = getEndpoint(id, roomId, true)
-                handleWebSocketConversation(endpoint) { roomIncoming, clientRoomOutgoing ->
-                    step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
-
-
-                    handleWebSocketConversation("/?useTextOverBinary=true") { client2ServerIncoming, clinet2Outgoing ->
-                        println("============\nClient 2 connecting\n============")
-                        // Join 1 second later, just in case I currently have concurrency issues
-//                        Thread.sleep(10)
-                        val client2Id = step1GetIDFromServer(client2ServerIncoming, clinet2Outgoing)
-                        step2ClientRequestRoomToJoin(client2ServerIncoming, clinet2Outgoing)
-                        val client2RoomId = step3ServerReturnRoomID(client2ServerIncoming, clinet2Outgoing)
-                        val client2Endpoint = getEndpoint(client2Id, client2RoomId, true)
-                        handleWebSocketConversation(client2Endpoint) { client2RoomIncoming, client2RoomOutgoing ->
-                            step4ClientConnectToRoom(client2RoomIncoming, client2RoomOutgoing, client2RoomId)
-
-                            // Since both clients requested same type of room, it should be same id
-                            assertEquals(roomId, client2RoomId)
-
-                        }
-                    }
-                }
-            }
-        }
-    }
+    // Text no longer supported, only binary
+//    // TODO sometimes this one passes
+//    @Test
+//    fun testTwoClientsCanJoinSameRoomUsingText() {
+//        withTestApplication(Application::main) {
+//            handleWebSocketConversation("/?useTextOverBinary=true") { serverIncoming, clientOutgoing ->
+//                println("============\nClient 1 connecting\n============")
+//                val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
+//                step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
+//                val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
+//                val endpoint = getEndpoint(id, roomId, true)
+//                handleWebSocketConversation(endpoint) { roomIncoming, clientRoomOutgoing ->
+//                    step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
+//
+//
+//                    handleWebSocketConversation("/?useTextOverBinary=true") { client2ServerIncoming, clinet2Outgoing ->
+//                        println("============\nClient 2 connecting\n============")
+//                        // Join 1 second later, just in case I currently have concurrency issues
+////                        Thread.sleep(10)
+//                        val client2Id = step1GetIDFromServer(client2ServerIncoming, clinet2Outgoing)
+//                        step2ClientRequestRoomToJoin(client2ServerIncoming, clinet2Outgoing)
+//                        val client2RoomId = step3ServerReturnRoomID(client2ServerIncoming, clinet2Outgoing)
+//                        val client2Endpoint = getEndpoint(client2Id, client2RoomId, true)
+//                        handleWebSocketConversation(client2Endpoint) { client2RoomIncoming, client2RoomOutgoing ->
+//                            step4ClientConnectToRoom(client2RoomIncoming, client2RoomOutgoing, client2RoomId)
+//
+//                            // Since both clients requested same type of room, it should be same id
+//                            assertEquals(roomId, client2RoomId)
+//
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
     @Test

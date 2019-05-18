@@ -8,6 +8,7 @@ fun getRandomArbitrary(min: Int, max: Int): Int {
 }
 
 fun getXUniqueCards(count: Int): List<Card> {
+    println("Getting $count unique cards")
     val cards = mutableListOf<Card>()
     var attempts = 0
 
@@ -29,9 +30,9 @@ fun getXUniqueCards(count: Int): List<Card> {
     val shuffledTypes = types.shuffled()
 
     while (cards.size < count) {
-        println("Adding more: ${cards.size}")
+//        println("Adding more: ${cards.size}")
         val random = getRandomArbitrary(0, vanillaWordList.size)
-        println("Random: $random")
+//        println("Random: $random")
         val exists = cards.any { it.text == vanillaWordList[random] }
         if (!exists) {
             cards.add(Card(cards.size + 1, vanillaWordList.get(random), shuffledTypes.get(cards.size), false))

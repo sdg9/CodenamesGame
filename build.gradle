@@ -123,6 +123,9 @@ project(":redux") {
 
 }
 
+/**
+ * Game server core logic (not customized to codenames)
+ */
 project(":server") {
     apply plugin: "kotlin"
 
@@ -149,7 +152,9 @@ project(":server") {
 }
 
 
-
+/**
+ * Game server client
+ */
 project(":client") {
     apply plugin: "kotlin"
 
@@ -166,7 +171,9 @@ project(":client") {
 
 }
 
-
+/**
+ * Across the wire logic, deserializing/serializing message pack to POJOs
+ */
 project(":network") {
     apply plugin: "kotlin"
 
@@ -192,6 +199,7 @@ project(":my-server") {
     dependencies {
         compile project(":redux")
         compile project(":server")
+        compile project(":network")
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
         testCompile "io.ktor:ktor-server-tests:$ktor_version"
     }
