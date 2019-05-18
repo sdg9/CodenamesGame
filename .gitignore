@@ -68,6 +68,10 @@ com_crashlytics_export_strings.xml
 /html/build/
 /ios/build/
 /ios-moe/build/
+/network/build/
+/server/build/
+/client/build/
+/redux/build/
 
 /nbbuild/
 /android/nbbuild/
