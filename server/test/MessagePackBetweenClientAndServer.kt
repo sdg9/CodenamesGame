@@ -5,11 +5,9 @@ import com.daveanthonythomas.moshipack.MoshiPack
 import com.example.common.*
 import okio.BufferedSource
 import org.msgpack.core.MessagePack
-import org.msgpack.core.MessagePacker
 import org.msgpack.value.ValueType
 import kotlin.test.*
 import org.msgpack.value.Value
-import reactor.core.publisher.toMono
 
 
 /**
@@ -114,12 +112,21 @@ class MessagePackBetweenClientAndServer {
         // Ideally i don't convert to and from again, can I directly return buffer instead of desearializing?
         println("Message to convert ${someObject.message}")
 
-        var somePack = MessagePack.newDefaultBufferPacker()
+        val byteArrayMesage = someObject.message
+
+
+        if (byteArrayMesage != null) {
+            // TODO fix me
+            val unpacked: ComplexSubObject = moshiPack.unpack(byteArrayMesage)
+            println("Unpacked: $unpacked")
+        }
+
+//        var somePack = MessagePack.newDefaultBufferPacker()
         // if we had byte array
-        someObject.message?.writeTo(somePack)
-        somePack.close()
-        println(somePack.toByteArray())
-        val unpacked: MessageComplexSubObject = moshiPack.unpack(somePack.toByteArray())
+//        someObject.message?.writeTo(somePack)
+//        somePack.close()
+//        println(somePack.toByteArray())
+//        val unpacked: MessageComplexSubObject = moshiPack.unpack(somePack.toByteArray())
 
 //        val unpacker = MessagePack.newDefaultUnpacker(packed)
 //        val firstVal = unpacker.unpackValue()
@@ -322,8 +329,39 @@ fun unpackUnknown(packed: BufferedSource): ProtocolMessage {
     val retVal = ProtocolMessage()
 
     val unpacker = MessagePack.newDefaultUnpacker(packed)
-    val firstVal = unpacker.unpackValue()
-    if (firstVal.isArrayValue) {
+    val format = unpacker.nextFormat
+    if (format.valueType == ValueType.ARRAY) {
+        val length = unpacker.unpackArrayHeader()
+
+        println("Found array! $length")
+
+
+
+        if (length >= 3) {
+            val firstArrayItem = unpacker.nextFormat
+            if (firstArrayItem.valueType == ValueType.INTEGER) {
+                retVal.protocol = unpacker.unpackInt()
+            }
+            val secondArrayItem = unpacker.nextFormat
+            if (secondArrayItem.valueType == ValueType.INTEGER) {
+                retVal.subProtocol = unpacker.unpackInt()
+            }
+            val thirdArrayItem = unpacker.nextFormat
+            if (thirdArrayItem.valueType == ValueType.MAP) {
+                val mapLength = unpacker.unpackMapHeader()
+                val byteArray = unpacker.readPayload(mapLength)
+                retVal.message = byteArray
+                println("ByteArray: $byteArray")
+//                retVal.subProtocol = unpacker.unpackInt()
+            }
+//            retVal.message = unpacker.read
+            println("RV: $retVal")
+
+        }
+
+//    val firstVal = unpacker.unpackValue()
+//    if (firstVal.isArrayValue) {
+        /*
         val arrayValue = firstVal.asArrayValue()
         val protocol = getValueAsInt(arrayValue.getOrNilValue(0))
         if (protocol != null && protocol == Protocol.ROOM_DATA) {
@@ -331,12 +369,14 @@ fun unpackUnknown(packed: BufferedSource): ProtocolMessage {
             val subProtocol = getValueAsInt(arrayValue.getOrNilValue(1))
             if (subProtocol != null) {
                 retVal.subProtocol = subProtocol
-                retVal.message = arrayValue.getOrNilValue(2).as
+                retVal.message = arrayValue.getOrNilValue(2)
+                arrayValue.
 
             }
-        } else {
-            fail("Not an item with subprotocol")
-        }
+            */
+//        } else {
+//            fail("Not an item with subprotocol")
+//        }
     } else {
         fail("Type should be Array")
     }
@@ -376,7 +416,11 @@ data class UntypedMessage(val protocol: Int, val subProtocol: Int)
 
 data class MessageObject(var protocol: Int? = null, var subProtocol: Int? = null, var message: Any? = null)
 
-data class ProtocolMessage(var protocol: Int? = null, var subProtocol: Int? = null, var message: Value? = null)
+data class ProtocolMessage(
+    var protocol: Int? = null,
+    var subProtocol: Int? = null,
+    var message: ByteArray? = null
+)
 
 data class MessageComplexSubObject(val protocol: Int, val subProtocol: Int, val message: ComplexSubObject)
 
