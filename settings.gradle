@@ -7,8 +7,5 @@ pluginManagement {
         }
     }
 }
-include 'desktop', 'android', 'ios', 'core'
-include 'redux'
-include 'client'
-include 'server'
+include 'desktop', 'android', 'ios', 'core', 'redux', 'client', 'server', 'network'
 
