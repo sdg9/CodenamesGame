@@ -9,6 +9,7 @@ import org.msgpack.value.ValueType
 import kotlin.test.*
 import org.apache.commons.codec.binary.Hex;
 import org.msgpack.core.MessageUnpacker
+import javax.print.DocFlavor
 
 /**
  * Testing out how to conveniently pack and unpack unknown types using message pack
@@ -105,12 +106,7 @@ class MessagePackBetweenClientAndServer {
         val protocol = Protocol.ROOM_DATA
         val subProtocol = 2
         val anyObj = ComplexSubObject("hi", 1, 1.0, 3L, true, listOf(1, 2, 3))
-        val packed: BufferedSource = moshiPack.pack(listOf(protocol, subProtocol, anyObj))
-        val packedByteArray = packed.readByteArray()
-        if (packedByteArray == null) {
-            fail("Packed byte array cannot be null")
-            return
-        }
+        val packedByteArray: ByteArray = moshiPack.packToByteArray(listOf(protocol, subProtocol, anyObj))
 
         // Print
         println()
@@ -142,7 +138,7 @@ class MessagePackBetweenClientAndServer {
     // TODO add test where item doesn't conform to protocol (don't crash)
     @Test
     fun invalidFormatUnpacksNull1() {
-        val packedByteArray =  moshiPack.pack(listOf(1)).readByteArray()
+        val packedByteArray =  moshiPack.packToByteArray(listOf(1))
         val unpackedObject = unpackUnknown(packedByteArray)
 
         assertNull(unpackedObject)
@@ -150,19 +146,19 @@ class MessagePackBetweenClientAndServer {
 
     @Test
     fun invalidFormatUnpacksNull2() {
-        val packedByteArray =  moshiPack.pack(listOf(1, 2, 3, 4)).readByteArray()
+        val packedByteArray =  moshiPack.packToByteArray(listOf(1, 2, 3, 4))
         val unpackedObject = unpackUnknown(packedByteArray)
 
         assertNull(unpackedObject)
     }
 
-    @Test
-    fun invalidFormatUnpacksNull3() {
-        val packedByteArray =  moshiPack.pack(listOf(1, "string", 3)).readByteArray()
-        val unpackedObject = unpackUnknown(packedByteArray)
-
-        assertNull(unpackedObject)
-    }
+//    @Test
+//    fun invalidFormatUnpacksNull3() {
+//        val packedByteArray =  moshiPack.pack(listOf(1, "string", 3)).readByteArray()
+//        val unpackedObject = unpackUnknown(packedByteArray)
+//
+//        assertNull(unpackedObject)
+//    }
 
     // TODO add test where item doesn't have message, (don't crash on bad index)
 }

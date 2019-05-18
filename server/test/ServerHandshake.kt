@@ -109,6 +109,7 @@ suspend fun step4ClientConnectToRoom(serverIncoming: ReceiveChannel<Frame>, clie
     val moshiPack = MoshiPack()
     val plug: Array<Any> = moshiPack.unpack(roomJoinConfirmationMessage)
 
+    // TODO sometimes this errors out, i think order of reply may change
     val confirmedRoomId = plug.get(1) as String
     println("Confirmed ID: $confirmedRoomId")
 //    val confirmedRoomId = getAttributeFromActionJson(roomJoinConfirmationMessage,"roomId") as String
