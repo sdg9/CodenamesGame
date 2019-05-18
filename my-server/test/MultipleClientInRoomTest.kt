@@ -63,7 +63,7 @@ class MultipleClientInRoomTest {
                 val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
                 step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
                 val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
-                val endpoint = getEndpoint(id, roomId, true)
+                val endpoint = getEndpoint(id, roomId)
                 handleWebSocketConversation(endpoint) { client1RoomIncoming, client1RoomOutgoing ->
                     step4ClientConnectToRoom(client1RoomIncoming, client1RoomOutgoing, roomId)
 
@@ -75,7 +75,7 @@ class MultipleClientInRoomTest {
                         val client2Id = step1GetIDFromServer(client2ServerIncoming, clinet2Outgoing)
                         step2ClientRequestRoomToJoin(client2ServerIncoming, clinet2Outgoing)
                         val client2RoomId = step3ServerReturnRoomID(client2ServerIncoming, clinet2Outgoing)
-                        val client2Endpoint = getEndpoint(client2Id, client2RoomId, true)
+                        val client2Endpoint = getEndpoint(client2Id, client2RoomId)
                         handleWebSocketConversation(client2Endpoint) { client2RoomIncoming, client2RoomOutgoing ->
                             step4ClientConnectToRoom(client2RoomIncoming, client2RoomOutgoing, client2RoomId)
                             assertEquals(roomId, client2RoomId)

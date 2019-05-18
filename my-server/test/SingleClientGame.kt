@@ -1,4 +1,5 @@
 
+import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.myServer.main
 import com.squareup.moshi.Moshi
 import io.ktor.application.*
@@ -11,7 +12,8 @@ import kotlin.test.*
 /**
  * Tests the [ChatApplication].
  */
-class ServerAndRoomInitialConnectionHandshake {
+class SingleClientGame {
+    val moshiPack = MoshiPack()
 
     // TODO: Initial connect http://localhost:2567/?colyseusid=
     // TODO: subsequent connect http://localhost:2567/zk2-pgKfC?colyseusid=uoZN4BhzJ&requestId=1
@@ -86,7 +88,6 @@ class ServerAndRoomInitialConnectionHandshake {
         withTestApplication(Application::main) {
             val id = "1234"
             handleWebSocketConversation("/?colyseusid=$id") { serverIncoming, clientOutgoing ->
-//                val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
                 step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
                 val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
                 println("====Room ID: $roomId")
@@ -95,31 +96,15 @@ class ServerAndRoomInitialConnectionHandshake {
                 println("====Endpoint: $endpoint")
                 handleWebSocketConversation(endpoint) { roomIncoming, clientRoomOutgoing ->
                     step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
+
+                    // By here game state is sent to client
+
+                    // Send pressed event
+
+                    // Confirm state is updated accordingly
+
                 }
             }
         }
     }
-//    /**
-//     * This is an integration test that verifies the behaviour of a simple conversation with an empty server.
-//     */
-//    @Test
-//    fun testJoinRoomMessagingUsingText() {
-//        // First we create a [TestApplicationEngine] that includes the module [Application.main],
-//        // this executes that function and thus installs all the features and routes to this test application.
-//        withTestApplication(Application::main) {
-//            withTestApplication(Application::main) {
-//                handleWebSocketConversation("/") { serverIncoming, clientOutgoing ->
-//                    val id = step1GetIDFromServer(serverIncoming, clientOutgoing)
-//                    step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
-//                    val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
-//                    val endpoint = getEndpoint(id, roomId, true)
-//                    handleWebSocketConversation(endpoint) { roomIncoming, clientRoomOutgoing ->
-//                        step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-
 }

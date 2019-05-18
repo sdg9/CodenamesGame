@@ -243,11 +243,11 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
         val roomId = this.roomId
         if (roomId != null) {
             // TODO: Coroutine - Confirm if this is how I should do it
-            GlobalScope.launch {
-                client.sendJoinConfirmation(roomId)
+//            GlobalScope.launch {
+              client.sendJoinConfirmation(roomId)
 //                client.send(JoinResponseConfirmation(roomId))
 //                client.socket.sendAction(JoinResponseConfirmation(roomId))
-            }
+//            }
         }
 
         // send current state when new client joins the room
@@ -269,7 +269,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
     }
 
     private suspend fun sendState(client: Client) {
-        logger.debug("STate: ${store.state}")
+        logger.debug("State: ${store.state}")
         client.sendRoomState(this.store.state)
     }
 

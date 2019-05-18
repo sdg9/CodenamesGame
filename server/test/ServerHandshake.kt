@@ -1,19 +1,14 @@
 
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.colyseus.server.Protocol
-import com.gofficer.codenames.redux.actions.getAttributeFromActionJson
-import com.squareup.moshi.Moshi
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readBytes
-import io.ktor.http.cio.websocket.readText
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import java.nio.ByteBuffer
 
-val moshi = Moshi.Builder().build()
-val jsonAdapter = moshi.adapter(Map::class.java)
 var moshiPack = MoshiPack()
 
 // Step 1: Server sends user ID to client on connection
@@ -22,33 +17,11 @@ suspend fun step1GetIDFromServer(serverIncoming: ReceiveChannel<Frame>, clientOu
 //    [1,"9DJlP0XN7"]
     val bytes = (serverIncoming.receive() as Frame.Binary).readBytes()
 
-    val moshiPack = MoshiPack()
     val plug: Array<Any> = moshiPack.unpack(bytes)
 
     val id = plug.get(1)
 
     return id as String
-}
-
-suspend fun step1GetIDFromServerOldText(serverIncoming: ReceiveChannel<Frame>, clientOutgoing: SendChannel<Frame>): String {
-    println("Step 1")
-//    [1,"9DJlP0XN7"]
-    val serverProvideIdMessage = (serverIncoming.receive() as Frame.Text).readText()
-    val id = getAttributeFromActionJson(serverProvideIdMessage,"id") as String
-    println("1 <-- $serverProvideIdMessage")
-//    println("Server provides id $id [$serverProvideIdMessage]")
-    assertNotNull(id)
-    return id
-}
-
-suspend fun step2ClientRequestRoomToJoinOldText(serverIncoming: ReceiveChannel<Frame>, clientOutgoing: SendChannel<Frame>) {
-    println("Step 2")
-//    [10,"public",{"requestId":1}]
-    val requestedRoom = "public"
-    val clientHandShake = mapOf("requestId" to 1, "room" to requestedRoom, "type" to "JOIN_REQUEST")
-    val clientMessage = Frame.Text(jsonAdapter.toJson(clientHandShake))
-    println("2 --> ${jsonAdapter.toJson(clientHandShake)}")
-    clientOutgoing.send(clientMessage)
 }
 
 // Step 2 Client responds with desired room
@@ -73,7 +46,6 @@ suspend fun step3ServerReturnRoomID(serverIncoming: ReceiveChannel<Frame>, clien
     val roomCreatedMessage = (serverIncoming.receive() as Frame.Binary).readBytes()
     assertNotNull(roomCreatedMessage)
     println("3 <-- $roomCreatedMessage")
-    val moshiPack = MoshiPack()
     val plug: Array<Any> = moshiPack.unpack(roomCreatedMessage)
 
 
@@ -83,58 +55,31 @@ suspend fun step3ServerReturnRoomID(serverIncoming: ReceiveChannel<Frame>, clien
     return roomId as String
 }
 
-// Step 3 Server creates room and responds with room ID
-suspend fun step3ServerReturnRoomIDOldText(serverIncoming: ReceiveChannel<Frame>, clientOutgoing: SendChannel<Frame>): String {
-    println("Step 3")
-    val roomCreatedMessage = (serverIncoming.receive() as Frame.Text).readText()
-    assertNotNull(roomCreatedMessage)
-    println("3 <-- $roomCreatedMessage")
-    val roomId = getAttributeFromActionJson(roomCreatedMessage,"roomId") as String
-    assertNotNull(roomId)
-
-    return roomId
-}
-
 // Step 4 Connect to game room
 suspend fun step4ClientConnectToRoom(serverIncoming: ReceiveChannel<Frame>, clientOutgoing: SendChannel<Frame>, roomId: String) {
     println("Step 4")
+    // Game server will return connection and then game state
     // [10,"gnoLgHxDv"]
-    // Server also should return initial room state
-//    val initialRoomStateMessage = (serverIncoming.receive() as Frame.Binary).readBytes()
-//    assertNotNull(initialRoomStateMessage)
-
+    // [14,{"board":{"cards":[]},"lastPlayed":0,"gameOver":false,"cards":[{"id":1,"text":"STAR","type":"BLUE","isRevealed":false},{"id":2,"text":"PUMPKIN","type":"BLUE","isRevealed":false},{"id":3,"text":"DRAGON","type":"RED","isRevealed":false},{"id":4,"text":"NET","type":"BYSTANDER","isRevealed":false},{"id":5,"text":"ROW","type":"RED","isRevealed":false},{"id":6,"text":"SUPERHERO","type":"RED","isRevealed":false},{"id":7,"text":"SCHOOL","type":"RED","isRevealed":false},{"id":8,"text":"NEW YORK","type":"BYSTANDER","isRevealed":false},{"id":9,"text":"MOUSE","type":"BYSTANDER","isRevealed":false},{"id":10,"text":"EUROPE","type":"BLUE","isRevealed":false},{"id":11,"text":"HOOD","type":"RED","isRevealed":false},{"id":12,"text":"DOCTOR","type":"RED","isRevealed":false},{"id":13,"text":"CENTER","type":"BLUE","isRevealed":false},{"id":14,"text":"PLATYPUS","type":"BYSTANDER","isRevealed":false},{"id":15,"text":"REVOLUTION","type":"BYSTANDER","isRevealed":false},{"id":16,"text":"BOMB","type":"RED","isRevealed":false},{"id":17,"text":"CAR","type":"BLUE","isRevealed":false},{"id":18,"text":"OPERA","type":"DOUBLE_AGENT","isRevealed":false},{"id":19,"text":"TAP","type":"BLUE","isRevealed":false},{"id":20,"text":"PUPIL","type":"RED","isRevealed":false},{"id":21,"text":"PLANE","type":"BYSTANDER","isRevealed":false},{"id":22,"text":"BUFFALO","type":"BLUE","isRevealed":false},{"id":23,"text":"CASINO","type":"BLUE","isRevealed":false},{"id":24,"text":"SCUBA DIVER","type":"BYSTANDER","isRevealed":false},{"id":25,"text":"RACKET","type":"BLUE","isRevealed":false}]}]
     val roomJoinConfirmationMessage = (serverIncoming.receive() as Frame.Binary).readBytes()
-//    val roomJoinConfirmationMessage = (serverIncoming.receive() as Frame.Text).readText()
-    println("4.2 <-- $roomJoinConfirmationMessage")
-    val moshiPack = MoshiPack()
     val plug: Array<Any> = moshiPack.unpack(roomJoinConfirmationMessage)
 
     // TODO sometimes this errors out, i think order of reply may change
     val confirmedRoomId = plug.get(1) as String
-    println("Confirmed ID: $confirmedRoomId")
-//    val confirmedRoomId = getAttributeFromActionJson(roomJoinConfirmationMessage,"roomId") as String
+    println("4.1 <-- Confirming room id $confirmedRoomId")
     assertEquals(confirmedRoomId, roomId)
-}
 
-suspend fun step4ClientConnectToRoomOldText(serverIncoming: ReceiveChannel<Frame>, clientOutgoing: SendChannel<Frame>, roomId: String) {
-    println("Step 4")
-    // [10,"gnoLgHxDv"]
-    // Server also should return initial room state
-    val initialRoomStateMessage = (serverIncoming.receive() as Frame.Text).readText()
+    val initialRoomStateMessage = (serverIncoming.receive() as Frame.Binary).readBytes()
     assertNotNull(initialRoomStateMessage)
-    println("4.1 <-- $initialRoomStateMessage")
 
-    val roomJoinConfirmationMessage = (serverIncoming.receive() as Frame.Text).readText()
-    println("4.2 <-- $roomJoinConfirmationMessage")
-    val confirmedRoomId = getAttributeFromActionJson(roomJoinConfirmationMessage,"roomId") as String
-    assertEquals(confirmedRoomId, roomId)
+    val roomStateUnpacked: Array<Any> = moshiPack.unpack(initialRoomStateMessage)
+    println("4.2 <-- Confirming game state is sent ${roomStateUnpacked.get(1)}")
+    assertEquals(Protocol.ROOM_STATE.toDouble(), roomStateUnpacked.get(0))
+
 }
 
-fun getEndpoint(id: String, roomId: String, useTextOverBinary: Boolean = false): String {
+fun getEndpoint(id: String, roomId: String): String {
     var endpoint = "/$roomId?colyseusid=$id&requestId=1"
-    if (useTextOverBinary) {
-//        endpoint += "&useTextOverBinary=true"
-    }
     println("Connecting to $endpoint")
     return endpoint
 }
