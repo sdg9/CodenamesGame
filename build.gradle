@@ -141,6 +141,8 @@ project(":server") {
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
         implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
         compile 'org.redisson:redisson:3.10.7'
+        // https://mvnrepository.com/artifact/commons-codec/commons-codec
+        compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
         testCompile "io.ktor:ktor-server-tests:$ktor_version"
     }
 
