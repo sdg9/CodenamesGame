@@ -8,7 +8,7 @@ import org.msgpack.core.MessagePack
 import org.msgpack.value.ValueType
 import kotlin.test.*
 import org.msgpack.value.Value
-
+import org.apache.commons.codec.binary.Hex;
 
 /**
  * Testing out how to conveniently pack and unpack unknown types using message pack
@@ -100,25 +100,38 @@ class MessagePackBetweenClientAndServer {
 
         val packed: BufferedSource = moshiPack.pack(listOf(protocol, subProtocol, anyObj))
 
+        val packedByteArray = packed.readByteArray()
+
         println()
-        println(packed)
+        println(Hex.encodeHexString(packedByteArray))
 
-        val someObject = unpackUnknown(packed)
+        // This gets byte array that I would need to parse with message pack
+        // 87 A3 69 6E 74 01 A5 66 6C 6F 61 74 CB 3F E0 00 00 00 00 00 00 A7 62 6F 6F 6C 65 61 6E C3 A4 6E 75 6C 6C C0 A6 73 74 72 69 6E 67 A7 66 6F 6F 20 62 61 72 A5 61 72 72 61 79 92 A3 66 6F 6F A3 62 61 72 A6 6F 62 6A 65 63 74 82 A3 66 6F 6F 01 A3 62 61 7A CB 3F E0 00 00 00 00 00 00
+//        println("ByteArray Before: ${Hex.encodeHexString(packed.readByteArray())}")
+        if (packedByteArray != null) {
+            val someObject = unpackUnknown(packedByteArray)
+//        930d0286aa736f6d65537472696e67a26869a7736f6d65496e7401aa736f6d65446f75626c6501a8736f6d654c6f6e6703ab736f6d65426f6f6c65616ec3a8736f6d654c69737493010203
+            assertEquals(protocol, someObject.protocol)
+            assertEquals(subProtocol, someObject.subProtocol)
 
-        assertEquals(protocol, someObject.protocol)
-        assertEquals(subProtocol, someObject.subProtocol)
+            // TODO figure out how to convert me to desired object
+            // Ideally i don't convert to and from again, can I directly return buffer instead of desearializing?
+            println("Message to convert ${someObject.message}")
 
-        // TODO figure out how to convert me to desired object
-        // Ideally i don't convert to and from again, can I directly return buffer instead of desearializing?
-        println("Message to convert ${someObject.message}")
-
-        val byteArrayMesage = someObject.message
+            val byteArrayMesage = someObject.message
 
 
-        if (byteArrayMesage != null) {
-            // TODO fix me
-            val unpacked: ComplexSubObject = moshiPack.unpack(byteArrayMesage)
-            println("Unpacked: $unpacked")
+            if (byteArrayMesage != null) {
+                // TODO fix me
+                val unpacked: ComplexSubObject = moshiPack.unpack(byteArrayMesage)
+                println("Unpacked: $unpacked")
+
+                assertEquals(anyObj, unpacked)
+            } else {
+                fail("Message must not be null")
+            }
+        } else {
+            fail("Packed byte array cannot be null")
         }
 
 //        var somePack = MessagePack.newDefaultBufferPacker()
@@ -325,33 +338,49 @@ fun getValueAsInt(item: Value): Int? {
     return null
 }
 
-fun unpackUnknown(packed: BufferedSource): ProtocolMessage {
+fun unpackUnknown(packed: ByteArray): ProtocolMessage {
     val retVal = ProtocolMessage()
 
     val unpacker = MessagePack.newDefaultUnpacker(packed)
     val format = unpacker.nextFormat
     if (format.valueType == ValueType.ARRAY) {
         val length = unpacker.unpackArrayHeader()
-
         println("Found array! $length")
-
-
-
         if (length >= 3) {
             val firstArrayItem = unpacker.nextFormat
             if (firstArrayItem.valueType == ValueType.INTEGER) {
+//                println("First bytes: ${Hex.encodeHexString(unpacker.readPayload(1))}")
+                // 0d = 13 (good)
                 retVal.protocol = unpacker.unpackInt()
             }
             val secondArrayItem = unpacker.nextFormat
             if (secondArrayItem.valueType == ValueType.INTEGER) {
+//                println("Second bytes: ${Hex.encodeHexString(unpacker.readPayload(1))}")
+                // 02 = 2 (good)
                 retVal.subProtocol = unpacker.unpackInt()
             }
             val thirdArrayItem = unpacker.nextFormat
             if (thirdArrayItem.valueType == ValueType.MAP) {
-                val mapLength = unpacker.unpackMapHeader()
-                val byteArray = unpacker.readPayload(mapLength)
-                retVal.message = byteArray
-                println("ByteArray: $byteArray")
+
+                println("Total read: ${unpacker.totalReadBytes}")
+//                val someMap = unpacker.unpackMapHeader()
+//                println("Map header: $someMap")
+//                val mapLength = unpacker.unpackMapHeader()
+//                println("Map length: $mapLength")
+
+//                Length = 72, how do I find this?
+//                86 aa 73 6f 6d 65 53 74 72 69 6e 67 a2 68 69 a7 73 6f 6d 65 49 6e 74 01 aa 73 6f 6d 65 44 6f 75 62 6c 65 01 a8 73 6f 6d 65 4c 6f 6e 67 03 ab 73 6f 6d 65 42 6f 6f 6c 65 61 6e c3 a8 73 6f 6d 65 4c 69 73 74 93 01 02 03
+//                println("Third bytes: ${Hex.encodeHexString(unpacker.readPayload(72))}")
+
+                // TODO find better way to get size of map? (72 in example)
+                // Only works when this is the last item, should be sufficient for what I need
+                val remainderUnreadBytes = packed.size - unpacker.totalReadBytes.toInt()
+                retVal.message = unpacker.readPayload(remainderUnreadBytes)
+
+//                val byteArray = unpacker.readPayload(mapLength)
+//                retVal.message = byteArray
+//                println("ByteArray: $byteArray")
+//                println("ByteArray2: ${Hex.encodeHexString(byteArray)}")
 //                retVal.subProtocol = unpacker.unpackInt()
             }
 //            retVal.message = unpacker.read
