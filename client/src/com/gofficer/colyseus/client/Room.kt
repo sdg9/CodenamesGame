@@ -277,13 +277,36 @@ class Room internal constructor(
         }
     }
 
-    /**
-     * Send message to the room handler.
-     */
-    fun send(data: Any) {
-        val id = this.id
-        if (this.connection != null && id != null)
-            this.connection!!.send(Protocol.ROOM_DATA, id, data)
+//    /**
+//     * Send message to the room handler.
+//     */
+//    fun send(data: Any) {
+//        val id = this.id
+//        if (this.connection != null && id != null)
+//            this.connection!!.send(Protocol.ROOM_DATA, id, data)
+//        else {
+//            // room is created but not joined yet
+//            for (listener in listeners) {
+//                listener?.onError(Exception("send error: Room is created but not joined yet"))
+//            }
+//        }
+//    }
+//
+//    fun send(data: Any) {
+//        val id = this.id
+//        if (this.connection != null && id != null)
+//            this.connection!!.send(Protocol.ROOM_DATA, id, data)
+//        else {
+//            // room is created but not joined yet
+//            for (listener in listeners) {
+//                listener?.onError(Exception("send error: Room is created but not joined yet"))
+//            }
+//        }
+//    }
+
+    fun send(byteArray: ByteArray?) {
+        if (this.connection != null && id != null && byteArray != null)
+            this.connection?.send(byteArray)
         else {
             // room is created but not joined yet
             for (listener in listeners) {

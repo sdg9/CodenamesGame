@@ -57,46 +57,31 @@ data class ClientOptions(
 
 sealed class Action(val type: ActionType): BaseAction
 
-sealed class Type(val type: SubProtocol): BaseAction
-
 sealed class NetworkAction: BaseAction {
     var isFromServer: Boolean = false
 }
 
-sealed class NetworkProtocolAction(val type: Int) : BaseAction {
-    var isFromServer: Boolean = false
-}
-
-
 // GamePlay Action
-
-//data class TouchCard(val id: Int): NetworkProtocolAction(SubProtocol.TOUCH_CARD)
 
 data class TouchCard(val id: Int): NetworkAction()
 
-//data class CardPressed(val id: Int, val word: String, override var isFromServer: Boolean = false): Action(ActionType.CARD_PRESSED), NetworkAction
+data class SetupCards(val cards: List<Card>) : NetworkAction()
+
+class ResetGame : NetworkAction()
+
+class SetupGame : NetworkAction()
 
 
-//
-data class SetupCards(val cards: List<Card>) : Action(ActionType.SETUP_CARDS)
-//
-class ResetGame : Action(ActionType.RESET_GAME)
-//
-class SetupGame : Action(ActionType.SETUP_GAME)
-
-
-data class SetState(val state: GameState): BaseAction
+data class SetState(val state: GameState): NetworkAction()
 //data class SetState(val state: GameState): Action(ActionType.SET_STATE)
 //data class UserHandshakeStep1()
 data class JoinError(val message: String): Action(ActionType.JOIN_ERROR)
 data class JoinRequest(val room: String, val joinOptions: ClientOptions?): Action(ActionType.JOIN_REQUEST)
-data class JoinResponse(val requestId: Int?, val roomId: String, val processId: String?): Action(ActionType.JOIN_RESPONSE)
-data class JoinResponseConfirmation(val roomId: String): Action(ActionType.JOIN_RESPONSE_CONFIRMATION)
-data class UserId(val id: String, val pingCount: Int) :Action(ActionType.USER_ID)
+//data class JoinResponse(val requestId: Int?, val roomId: String, val processId: String?): Action(ActionType.JOIN_RESPONSE)
+//data class JoinResponseConfirmation(val roomId: String): Action(ActionType.JOIN_RESPONSE_CONFIRMATION)
+//data class UserId(val id: String, val pingCount: Int) :Action(ActionType.USER_ID)
 data class UserConnected(val id: String, val name : String ) : Action(ActionType.USER_CONNECTED)
-data class SomethingElse(val name : String ) : Action(ActionType.SOMETHING_ELSE)
-
-
+//data class SomethingElse(val name : String ) : Action(ActionType.SOMETHING_ELSE)
 
 
 // Data Flow:
@@ -119,6 +104,10 @@ fun protocolToAction(protocolMessage: ProtocolMessage?) : NetworkAction? {
 
         return when (subProtocol) {
             SubProtocol.TOUCH_CARD -> MoshiPack.unpack<TouchCard>(message)
+            SubProtocol.SETUP_CARDS -> MoshiPack.unpack<SetupCards>(message)
+            SubProtocol.RESET_GAME -> MoshiPack.unpack<ResetGame>(message)
+            SubProtocol.SETUP_GAME -> MoshiPack.unpack<SetupGame>(message)
+            SubProtocol.SET_STATE -> MoshiPack.unpack<SetState>(message)
             else -> null
         }
 }
@@ -131,138 +120,14 @@ fun actionToNetworkBytes(action: NetworkAction) : ByteArray? {
     val protocol = Protocol.ROOM_DATA
     return when (action) {
         is TouchCard -> pack(protocol, SubProtocol.TOUCH_CARD, action)
-        else -> null
+        is SetupCards -> pack(protocol, SubProtocol.SETUP_CARDS, action)
+        is ResetGame -> pack(protocol, SubProtocol.RESET_GAME, action)
+        is SetupGame -> pack(protocol, SubProtocol.SETUP_GAME, action)
+        is SetState -> pack(protocol, SubProtocol.SET_STATE, action)
     }
 }
-
-//
-//fun actionToProtocol(action: NetworkAction) : ByteArray? {
-//    val protocol = Protocol.ROOM_DATA
-//    return when (action) {
-//        is TouchCard -> pack(protocol, SubProtocol.TOUCH_CARD, action)
-//        else -> null
-//    }
-//}
 
 fun bytesToHexString(byteArray: ByteArray?): String {
     val pattern: Regex = "(\\S{2})".toRegex()
     return Hex.encodeHexString(byteArray).replace(pattern, "$1 ")
 }
-
-
-
-
-
-
-
-
-
-
-
-//fun getAdapterFromActionType(type: ActionType?): Class? {
-//    return when (type) {
-//        ActionType.USER_CONNECTED -> UserConnected
-//        ActionType.SOMETHING_ELSE -> SomethingElse
-//        else -> null
-//    }
-//}
-
-//fun getActionTypeFromJson(json: String): ActionType? {
-//    val reader = JsonReader.of(Buffer().writeUtf8(json))
-//    try {
-//        val value = reader.readJsonValue() as Map<String, Object>
-//        val type = value.get("type") as String
-//        return ActionType.valueOf(type)
-//    } catch (e: Exception) {
-//        println("Error $e")
-//    }
-//    return null
-//}
-//
-//fun dispatchJsonAsOriginalAction(json: String, store: Store<*>) {
-//    println("Test")
-//    val action = parseActionJSON(json)
-//    println("Dispatching action $action")
-//    store.dispatch(action)
-//}
-//
-//fun parseActionJSON(json: java.util.LinkedHashMap<String, Any>): Action? {
-//    println("Type: ${json.get("type")}")
-//    when (json) {
-////        Int -> {}
-////        String -> {}
-//        LinkedHashMap<String, Any>() -> println("Action is a hash map ${json}")
-//        LinkedHashMap<Any, Any>() -> println("Action is a any hash map ${json}")
-//        else -> {
-//            println("Unknown type")
-//            println(json.javaClass.name)                 // double
-//            println(json.javaClass.kotlin)               // class kotlin.Double
-//            println(json.javaClass.kotlin.qualifiedName)
-//
-//        }
-//    }
-//    return null
-//}
-
-//fun parseActionJSON(json: String): Action? {
-//    val type = getActionTypeFromJson(json) ?: return null
-//    return when (type) {
-//        ActionType.SET_STATE -> fromJson<SetState>(json)
-//        ActionType.USER_ID -> fromJson<UserId>(json)
-//        ActionType.USER_CONNECTED -> fromJson<UserConnected>(json)
-////        else -> null
-//        ActionType.SOMETHING_ELSE -> fromJson<SomethingElse>(json)
-//        ActionType.PARSE_ERROR -> TODO()
-//        ActionType.JOIN_REQUEST -> fromJson<JoinRequest>(json)
-//        ActionType.ROOM_LIST -> TODO()
-//        ActionType.JOIN_ERROR -> TODO()
-//        ActionType.JOIN_RESPONSE -> TODO()
-//        ActionType.JOIN_RESPONSE_CONFIRMATION -> TODO()
-//        ActionType.SETUP_GAME -> fromJson<SetupGame>(json)
-//        ActionType.RESET_GAME -> fromJson<ResetGame>(json)
-//        ActionType.SETUP_CARDS -> fromJson<SetupCards>(json)
-//        ActionType.CARD_PRESSED -> fromJson<CardPressed>(json)
-//    }
-//}
-//
-//fun getMoshiBuilder(): Moshi {
-//    var builder: Moshi? = null
-//
-//    val time = measureTimeMillis {
-//        builder = Moshi.Builder()
-//            .add(
-//                PolymorphicJsonAdapterFactory.of(Action::class.java, "action")
-//                    .withSubtype(UserConnected::class.java, ActionType.USER_CONNECTED.name)
-//                    .withSubtype(UserId::class.java, ActionType.USER_ID.name)
-//                    .withSubtype(SomethingElse::class.java, ActionType.SOMETHING_ELSE.name)
-//
-//            )
-////        .add(KotlinJsonAdapterFactory())
-//            .build()
-//    }
-//    println("Builder took $time")
-//
-//    return builder!!
-//}
-//
-//
-//fun getAttributeFromActionJson(json: String, attribute: String): Any? {
-//    val reader = JsonReader.of(Buffer().writeUtf8(json))
-//    try {
-//        val value = reader.readJsonValue() as Map<String, Object>
-//        return value.get(attribute)
-//    } catch (e: Exception) {
-//        println("Error $e")
-//    }
-//    return null
-//}
-
-//inline fun <reified T> toJSON(message: T): String {
-//    val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
-//    return jsonAdapter.toJson(message)
-//}
-//
-//private inline fun <reified T> fromJson(json: String): T? {
-//    val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
-//    return jsonAdapter.fromJson(json)
-//}

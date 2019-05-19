@@ -158,7 +158,7 @@ class CodenamesGame : Game() {
 
 
                     override fun onMessage(protocolMessage: ProtocolMessage) {
-                        log.debug("onMessage 1: $protocolMessage")
+//                        log.debug("onMessage 1: $protocolMessage")
 
 //                        val protocolMessage = unpackUnknown(message)
                         if (protocolMessage == null) {
@@ -167,16 +167,20 @@ class CodenamesGame : Game() {
 
                         when (protocolMessage?.protocol) {
                             Protocol.ROOM_DATA -> {
-                                log.debug("onMessage Room Data $protocolMessage")
+//                                log.debug("onMessage Room Data $protocolMessage")
+                                val action = protocolToAction(protocolMessage)
+                                log.debug("onMessage.ROOM_DATA - Received action: $action")
+                                action?.isFromServer = true
+                                store.dispatch(action)
                             }
                             Protocol.ROOM_STATE -> {
-                                log.debug("onMessage Room State ${protocolMessage?.message}")
-                                // TODO convert state
-
+                                log.debug("onMessage.ROOM_STATE - ${protocolMessage?.message}")
                                 val message = protocolMessage?.message
                                 if (message != null) {
                                     val state = moshiPack.unpack<GameState>(message)
-                                    store.dispatch(SetState(state))
+                                    val action = SetState(state)
+                                    action.isFromServer = true
+                                    store.dispatch(action)
                                 }
 
 //                                store.dispatch()
@@ -273,14 +277,14 @@ class CodenamesGame : Game() {
         font24 = generator.generateFont(params)
     }
 
-    private fun checkLatency() {
-        log.debug("Room: $room")
-        if (room == null) return
-        val data = LinkedHashMap<String, String>()
-        data["op"] = "ping"
-        log.debug("Sending message to server")
-        room?.send(data)
-    }
+//    private fun checkLatency() {
+//        log.debug("Room: $room")
+//        if (room == null) return
+//        val data = LinkedHashMap<String, String>()
+//        data["op"] = "ping"
+//        log.debug("Sending message to server")
+//        room?.send(data)
+//    }
 
 
     private fun calculateLerp(currentLatency: Float) {
@@ -301,35 +305,13 @@ class CodenamesGame : Game() {
 val getNetworkActionMiddleware = { game: CodenamesGame ->
     Middleware  { store: Store<GameState>, next: Dispatcher, action: Any ->
         println("getNetworkMiddleware $action")
-        if (action is NetworkProtocolAction && !action.isFromServer) {
-//            NetworkProtocolAction
+        if (action is NetworkAction && !action.isFromServer) {
             println("Dispatching remotely: $action")
             if (game.room == null) {
                 println("No connected game room to dispatch network action")
             } else {
-
-                game.room?.send(action.type, action)
+                game.room?.send(actionToNetworkBytes(action))
             }
-        }
-        if (action is NetworkAction && !action?.isFromServer) {
-            println("Dispatching remotely: $action")
-            if (game.room == null) {
-                println("No connected game room to dispatch network action")
-            } else {
-
-                game.room?.send(action)
-            }
-
-//            val gsonBuilder = GsonBuilder()
-//            gsonBuilder.registerTypeAdapter(action::class.java, MenuContentInterfaceAdapter())
-//            var gson = gsonBuilder.create()
-
-//            var gson = Gson()
-//            var jsonString = gson.toJson(NetworkMessage(action::class.java.simpleName, action))
-
-//            log.debug("Sending $jsonString")
-//            room?.send(action.toJson())
-//            game.room?.send(NetworkMessage(action::class.java.simpleName, action))
         }
         next.dispatch(action)
     }
