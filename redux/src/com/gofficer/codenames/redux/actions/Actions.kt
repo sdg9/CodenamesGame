@@ -7,20 +7,19 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import gofficer.codenames.redux.game.GameState
 import okio.Buffer
-import redux.api.Dispatcher
 import redux.api.Store
 import java.lang.Exception
 import kotlin.system.measureTimeMillis
 
-
-//
-//interface NetworkAction : Action {
-//    var isFromServer: Boolean
-//}
-//
-//data class NetworkMessage(val type: String?, val payload: NetworkAction)
-//
-
+/**
+ * Generic Actions:
+ *
+ *
+ * Gameplay Actions:
+ * SetupGame
+ * CardPressed
+ *
+ */
 
 interface BaseAction
 

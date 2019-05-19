@@ -1,15 +1,8 @@
 package gofficer.codenames.redux.game
 
-//import com.gofficer.codenames.Action
-//import com.gofficer.codenames.NetworkAction
-//import com.gofficer.codenames.SetupCards
 import com.gofficer.codenames.redux.models.*
-import com.gofficer.codenames.redux.actions.NetworkAction
-import redux.api.Reducer
 
 data class GameState(
-    val board: Board = Board(),
-    val lastPlayed: Int = 0,
     val gameOver: Boolean = false,
     val cards: List<Card> = listOf()
 )

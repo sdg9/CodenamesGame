@@ -1,14 +1,25 @@
-package com.gofficer.colyseus
+package com.gofficer.colyseus.network
 
+import com.daveanthonythomas.moshipack.MoshiPack
 import org.msgpack.core.MessagePack
 import org.msgpack.core.MessageUnpacker
 import org.msgpack.value.ValueType
+
+val moshiPack = MoshiPack()
 
 data class ProtocolMessage(
     var protocol: Int? = null,
     var subProtocol: Int? = null,
     var message: ByteArray? = null
 )
+
+fun pack(protocol: Int, subProtocol: Enum<*>, message: Any): ByteArray {
+    return pack(protocol, subProtocol.ordinal, message)
+}
+fun pack(protocol: Int, subProtocol: Int, message: Any): ByteArray {
+    return moshiPack.packToByteArray(listOf(protocol, subProtocol, message))
+}
+
 
 /**
  * Assumes messages are all arrays of 2 - 3 items
@@ -65,7 +76,7 @@ private fun unpackLength3(unpacker: MessageUnpacker, totalSize: Int): ProtocolMe
     val thirdArrayItem = unpacker.nextFormat
     if (thirdArrayItem.valueType == ValueType.MAP) {
 
-        println("Total read: ${unpacker.totalReadBytes}")
+//        println("Total read: ${unpacker.totalReadBytes}")
 
         // Only works when this is the last item, should be sufficient for what I need
         val remainderUnreadBytes = totalSize - unpacker.totalReadBytes.toInt()
