@@ -14,6 +14,7 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
         is SetupCards -> {
             println("Setting up cards")
             state.copy(
+                gameOver = false,
                 cards = action.cards
             )
         }

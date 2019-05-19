@@ -151,7 +151,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
 //    suspend fun onConnection(ws: DefaultWebSocketServerSession, incoming: ReceiveChannel<Frame>) {
 //
 //        // First of all we get the session.
-//        val session = ws.call.sessions.get<SomeApplication.GameSession2>()
+//        val session = ws.call.sessions.get<SomeApplication.GameSession>()
 //
 //        // We check that we actually have a session. We should always have one,
 //        // since we have defined an interceptor before to set one.

@@ -6,7 +6,6 @@ import gofficer.codenames.redux.game.GameState
 import redux.api.Dispatcher
 import redux.api.Store
 import redux.api.enhancer.Middleware
-import java.util.*
 
 val loggingMiddleware = Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
     println("loggingMiddleware Action => $action")
@@ -37,7 +36,7 @@ fun setupGameMiddleware(isClient: () -> Boolean): Middleware<GameState> {
             println("Setting up game no server")
 
             val action = next.dispatch(action)
-            if (action is SetupGame) {
+            if (action is SetupGame || action is ResetGame) {
                 store.dispatch(SetupCards(getXUniqueCards(25)))
             }
             next.dispatch(action)

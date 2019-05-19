@@ -20,7 +20,7 @@ import kotlin.reflect.jvm.jvmName
 
 
 
-data class GameSession2(val id: String)
+data class GameSession(val id: String)
 
 /**
  * Class in charge of the logic of the chat server.
@@ -88,7 +88,7 @@ class Sever {
         logger.debug("onConnection")
         // TODO determine if this is necessary
         // First of all we get the session.
-        val session = socket.call.sessions.get<GameSession2>()
+        val session = socket.call.sessions.get<GameSession>()
         // We check that we actually have a session. We should always have one,
         // since we have defined an interceptor before to set one.
         if (session == null) {
@@ -229,7 +229,7 @@ class Sever {
 //    /**
 //     * A chat session is identified by a unique nonce ID. This nonce comes from a secure random source.
 //     */
-////    data class GameSession2(val sessionId: String)
+////    data class GameSession(val sessionId: String)
 //
 //    /**
 //     * We received a message. Let's process it.

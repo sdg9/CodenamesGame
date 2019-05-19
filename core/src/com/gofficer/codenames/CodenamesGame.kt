@@ -46,16 +46,6 @@ class CodenamesGame : Game() {
     private val initState: GameState = GameState()
     internal lateinit var store: Store<GameState>
 
-//    private val endpoint = "ws://10.0.2.2:2567" //ws://localhost:2567
-//    private val endpoint = "ws://127.0.0.1:2567" //ws://localhost:2567
-//    private val endpoint = "ws://localhost:2567" //ws://localhost:2567
-
-    private val checkLatencyInterval = 10000
-
-    private var lastLatencyCheckTime: Long = 0
-
-    private val lastNetworkUpdateTime: Long = 0
-
     private val LATENCY_MIN = 100f // ms
     private val LATENCY_MAX = 500f // ms
 
@@ -84,8 +74,6 @@ class CodenamesGame : Game() {
         store = createCodeNamesStore(initState,
             arrayOf(
                 reduceGameSetup
-//                boardReduceSetup,
-//                cardReduce
             ),
             arrayOf(
                 loggingMiddleware,
@@ -141,19 +129,6 @@ class CodenamesGame : Game() {
                             }
 
                         }
-//                        log.debug("TODO finish meOn state change callback: $message")
-//                        // TODO convert
-////                        val newState: GameState = GameState()
-//                        try {
-//                            val newState = parseActionJSON(message)
-//                            log.debug("New state: $newState")
-//                        } catch(e: Exception) {
-//                            log.error("$e")
-//                        }
-//                        //TODO
-//                        dispatchJsonAsOriginalAction(message as String, store)
-////                        val newState = parseActionJSON(json) as VGameState
-////                        store.dispatch(SetState(newState))
                     }
 
 
@@ -190,54 +165,6 @@ class CodenamesGame : Game() {
                                 log.debug("onMessage other $protocolMessage")
                             }
                         }
-
-//
-//                        if (message == "pong") {
-//                            calculateLerp((System.currentTimeMillis() - lastLatencyCheckTime).toFloat())
-//                        }
-//
-//                        if (message is LinkedHashMap<*, *>) {
-//                            val type = message["type"]
-//
-//                            if (type == CardPressed::class.java.simpleName) {
-//
-//                                val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
-//                                val id = payload["id"] as Int
-//                                val word = payload["word"] as String
-//
-//                                log.debug("Type is $type")
-//                                log.debug("Payload is $payload")
-//                                log.debug("id is $id")
-//                                log.debug("word is $word")
-//
-//
-//                                store.dispatch(CardPressed(id, word, true))
-//                            }
-//                            if (type == "GameSetup") {
-//                                log.debug("Game setup found")
-//                                try {
-//
-//                                    val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
-//                                    val cardsFromServer = payload["cards"] as List<LinkedHashMap<*, *>>
-//                                    val cards = cardsFromServer.map {
-//                                        Card(it["id"] as Int, it["text"] as String, it["type"] as String, it["isRevealed"] as Boolean)
-//                                    }
-//
-//                                    log.debug("Cards $cards")
-//                                    log.debug("Payload: $cards")
-//
-//                                    store.dispatch(SetupCards(cards))
-//                                } catch (e: Exception) {
-//                                    log.error(e.toString())
-//                                }
-//                            }
-
-//                        } else {
-//                            log.debug("Message is not string $message")
-//
-//
-//                            log.debug("Message type is ${message?.javaClass?.kotlin}")
-//                        }
                     }
                 })
 

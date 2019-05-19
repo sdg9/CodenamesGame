@@ -1,6 +1,7 @@
 
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.myServer.main
+import com.gofficer.codenames.redux.actions.ResetGame
 import com.gofficer.codenames.redux.actions.TouchCard
 import com.gofficer.codenames.redux.actions.actionToNetworkBytes
 import com.gofficer.codenames.redux.actions.networkBytesToAction
@@ -96,7 +97,7 @@ class SingleClientGame {
     }
 
     @Test
-    fun testServerDoesNotProvideIdIfSpecified() {
+    fun testTouchCardAction() {
         withTestApplication(Application::main) {
             val id = "1234"
             handleWebSocketConversation("/?colyseusid=$id") { serverIncoming, clientOutgoing ->
@@ -124,6 +125,46 @@ class SingleClientGame {
 
                     assertEquals(receivedAction.id, cardId)
                     assertEquals(receivedAction.isFromServer, true)
+                }
+            }
+        }
+    }
+
+
+    @Test
+    fun testResetGameAction() {
+        withTestApplication(Application::main) {
+            val id = "1234"
+            handleWebSocketConversation("/?colyseusid=$id") { serverIncoming, clientOutgoing ->
+                step2ClientRequestRoomToJoin(serverIncoming, clientOutgoing)
+                val roomId = step3ServerReturnRoomID(serverIncoming, clientOutgoing)
+                println("====Room ID: $roomId")
+                val endpoint = getEndpoint(id, roomId)
+
+                println("====Endpoint: $endpoint")
+                handleWebSocketConversation(endpoint) { roomIncoming, clientRoomOutgoing ->
+                    step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
+
+                    // By here game state is sent to client
+                    val cardId = 1
+                    val actionToSend = TouchCard(cardId)
+                    assertEquals(actionToSend.isFromServer, false)
+
+                    // Send touch card action to server
+                    val bytes = actionToNetworkBytes(actionToSend)
+                    val clientMessage = Frame.Binary(true, ByteBuffer.wrap(bytes))
+                    clientRoomOutgoing.send(clientMessage)
+
+                    // Expect to receive same action from server
+                    val serverUpdate = (roomIncoming.receive() as Frame.Binary).readBytes()
+                    val receivedAction = networkBytesToAction(serverUpdate) as TouchCard
+                    assertEquals(receivedAction.id, cardId)
+                    assertEquals(receivedAction.isFromServer, true)
+
+
+                    clientRoomOutgoing.send(Frame.Binary(true, ByteBuffer.wrap(actionToNetworkBytes(ResetGame()))))
+                    val receivedAction2 = networkBytesToAction((roomIncoming.receive() as Frame.Binary).readBytes())
+                    println(receivedAction2)
                 }
             }
         }
