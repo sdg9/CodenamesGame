@@ -89,11 +89,13 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
                 log.debug("Pressed new game")
                 store.dispatch(SetupGame())
             })
+            table.add(makeButton("View Key") {
+                store.dispatch(ChangeScene("KeyCode"))
+            })
             table.add(makeButton("Quit Game") {
                 log.debug("Pressed quit game")
                 // TODO dispatch instead
                 store.dispatch(ChangeScene("MainMenu"))
-//                game.screen = MainMenuScreen(game)
             })
             for (j in 0..4) {
                 table.row().pad(10f) // padding on all sides between cards

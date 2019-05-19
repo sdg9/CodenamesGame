@@ -19,6 +19,7 @@ import com.gofficer.codenames.redux.utils.actionToNetworkBytes
 import com.gofficer.codenames.redux.utils.protocolToAction
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
+import com.gofficer.codenames.screens.play.KeyCodeScreen
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.colyseus.client.Client
@@ -249,6 +250,14 @@ val getNavigationMiddleware = { game: CodenamesGame ->
                             game.screen = PlayScreen(game)
                         }
                     }
+                }
+                "PlayScreen" -> {
+                    // Assumes game already open
+                    game.screen = PlayScreen(game)
+                }
+                "KeyCode" -> {
+                    // Assumes game already open
+                    game.screen = KeyCodeScreen(game)
                 }
                 "Play" -> {
 //                    Gdx.app.postRunnable {
