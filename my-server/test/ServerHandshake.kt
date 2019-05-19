@@ -1,3 +1,4 @@
+package com.gofficer.colyseus.myServer.test
 
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.colyseus.network.Protocol
@@ -9,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import java.nio.ByteBuffer
 
-var moshiPack = MoshiPack()
+private var moshiPack = MoshiPack()
 
 // Step 1: Server sends user ID to client on connection
 suspend fun step1GetIDFromServer(serverIncoming: ReceiveChannel<Frame>, clientOutgoing: SendChannel<Frame>): String {
@@ -17,7 +18,7 @@ suspend fun step1GetIDFromServer(serverIncoming: ReceiveChannel<Frame>, clientOu
 //    [1,"9DJlP0XN7"]
     val bytes = (serverIncoming.receive() as Frame.Binary).readBytes()
 
-    val plug: Array<Any> = moshiPack.unpack(bytes)
+    val plug: Array<Any> = MoshiPack.unpack(bytes)
 
     val id = plug.get(1)
 

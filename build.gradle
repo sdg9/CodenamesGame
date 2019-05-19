@@ -128,6 +128,7 @@ project(":redux") {
 ///**
 // * Game server core logic (not customized to codenames)
 // */
+//
 //project(":server") {
 //    apply plugin: "kotlin"
 //
@@ -235,6 +236,8 @@ project(":server") {
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
         compile 'org.redisson:redisson:3.10.7'
         compile 'org.msgpack:msgpack-core:0.8.16'
+//        // https://mvnrepository.com/artifact/commons-codec/commons-codec
+        compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
 //        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
 //        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 //        // https://mvnrepository.com/artifact/commons-codec/commons-codec

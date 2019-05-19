@@ -5,15 +5,22 @@ import common.GameSession2
 import common.Room
 import common.RoomListener
 import common.Sever
-import io.ktor.application.*
-import io.ktor.features.*
-import io.ktor.http.content.*
-import io.ktor.routing.*
+import io.ktor.application.Application
+import io.ktor.application.ApplicationCallPipeline
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.features.CallLogging
+import io.ktor.features.DefaultHeaders
+import io.ktor.http.content.defaultResource
+import io.ktor.http.content.resources
+import io.ktor.http.content.static
+import io.ktor.routing.routing
 import io.ktor.sessions.*
-import io.ktor.util.*
-import io.ktor.websocket.*
+import io.ktor.util.generateNonce
+import io.ktor.websocket.WebSockets
+import io.ktor.websocket.webSocket
 import org.slf4j.LoggerFactory
-import java.time.*
+import java.time.Duration
 import kotlin.reflect.jvm.jvmName
 
 
