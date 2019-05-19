@@ -2,6 +2,8 @@
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.myServer.main
 import com.gofficer.codenames.redux.actions.TouchCard
+import com.gofficer.codenames.redux.actions.actionToNetworkBytes
+import com.gofficer.codenames.redux.actions.networkBytesToAction
 import com.gofficer.colyseus.network.Protocol
 import com.gofficer.colyseus.network.SubProtocol
 import com.gofficer.colyseus.network.pack
@@ -108,31 +110,20 @@ class SingleClientGame {
                     step4ClientConnectToRoom(roomIncoming, clientRoomOutgoing, roomId)
 
                     // By here game state is sent to client
+                    val cardId = 1
+                    val actionToSend = TouchCard(cardId)
+                    assertEquals(actionToSend.isFromServer, false)
 
-                    // Send pressed event
-                    val byteArray = pack(Protocol.ROOM_DATA, SubProtocol.TOUCH_CARD, TouchCard(1))
+                    val bytes = actionToNetworkBytes(actionToSend)
 
-                    val pattern: Regex = "(\\S{2})".toRegex()
-//                    println()
-//                    println(Hex.encodeHexString(packedByteArray).replace(pattern, "$1 "))
-                    println("String hex: ${Hex.encodeHexString(byteArray).replace(pattern, "$1 ")}")
-                    val clientMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
+                    val clientMessage = Frame.Binary(true, ByteBuffer.wrap(bytes))
                     clientRoomOutgoing.send(clientMessage)
-                    // Confirm state is updated accordingly
-//
+
                     val serverUpdate = (roomIncoming.receive() as Frame.Binary).readBytes()
-                    val unpacked = unpackUnknown(serverUpdate)
+                    val receivedAction = networkBytesToAction(serverUpdate) as TouchCard
 
-                    println("Unpacked $unpacked")
-
-//                    val touchCard = moshi.un
-//                    val unpacked: Array<Any> = moshiPack.unpack(serverUpdate)
-//                    println("Unpacked; ${unpacked.get(2)}")
-
-//                    expect
-
-                    // TODO press card
-
+                    assertEquals(receivedAction.id, cardId)
+                    assertEquals(receivedAction.isFromServer, true)
                 }
             }
         }

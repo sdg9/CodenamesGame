@@ -1,15 +1,11 @@
 package com.gofficer.codenames.myServer
 
-import com.daveanthonythomas.moshipack.MoshiPack
+import com.gofficer.codenames.redux.actions.*
 import com.gofficer.colyseus.server.Client
-import com.gofficer.colyseus.server.sendAction
-import com.gofficer.codenames.redux.actions.SetupGame
-import com.gofficer.codenames.redux.actions.TouchCard
 import com.gofficer.codenames.redux.createCodeNamesStore
 import com.gofficer.codenames.redux.middleware.loggingMiddleware
 import com.gofficer.codenames.redux.middleware.setupGameMiddleware
 import com.gofficer.codenames.redux.middleware.validActionMiddleware
-//import com.gofficer.codenames.redux.models.cardReduce
 import com.gofficer.codenames.redux.reducers.reduceGameSetup
 import com.gofficer.colyseus.network.*
 import common.Room
@@ -17,10 +13,8 @@ import common.RoomListener
 import gofficer.codenames.redux.game.GameState
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
-import org.apache.commons.codec.binary.Hex
 import org.slf4j.LoggerFactory
 import redux.api.Store
-import java.lang.Exception
 import java.nio.ByteBuffer
 import kotlin.reflect.jvm.jvmName
 
@@ -86,27 +80,39 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
             return
         }
 
-        when (subProtocol) {
-            SubProtocol.TOUCH_CARD -> {
-                logger.debug("Got touch card")
-                val pattern: Regex = "(\\S{2})".toRegex()
-                println()
-                println(Hex.encodeHexString(message).replace(pattern, "$1 "))
-                try {
-                    val unpacked = MoshiPack.unpack<TouchCard>(message)
-//
-                    logger.debug("Unpack touch card: $unpacked")
-                } catch (e: Exception) {
-                    logger.error(e.toString())
-                }
+        val deserializedAction = protocolToAction(protocolMessage)
 
-//                store.dispatch(unpacked)
-                sendAllClients(protocolMessage)
+        when (deserializedAction) {
+            is TouchCard -> {
+                deserializedAction.isFromServer = true
+                sendAllClients(deserializedAction)
             }
             else -> {
-                logger.debug("Custom protocol $subProtocol")
+                logger.debug("Unidentified action for subprotocol $subProtocol")
             }
         }
+
+//        when (subProtocol) {
+//            SubProtocol.TOUCH_CARD -> {
+//                logger.debug("Got touch card")
+//                val pattern: Regex = "(\\S{2})".toRegex()
+//                println()
+//                println(Hex.encodeHexString(message).replace(pattern, "$1 "))
+//                try {
+//                    val unpacked = MoshiPack.unpack<TouchCard>(message)
+////
+//                    logger.debug("Unpack touch card: $unpacked")
+//                } catch (e: Exception) {
+//                    logger.error(e.toString())
+//                }
+//
+////                store.dispatch(unpacked)
+//                sendAllClients(protocolMessage)
+//            }
+//            else -> {
+//                logger.debug("Custom protocol $subProtocol")
+//            }
+//        }
 //
 //        // TODO for now send back to show it's working
 //        val byteArray = pack(Protocol.ROOM_DATA, SubProtocol.TOUCH_CARD, TouchCard(18))
@@ -123,6 +129,17 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
         logger.debug("Total clients: ${clients.size}")
         clients.forEach {
             it.socket.sendProtocolMessage(protocolMessage)
+        }
+    }
+
+
+    private suspend fun sendAllClients(action: NetworkAction?) {
+        logger.debug("Total clients: ${clients.size}")
+        if (action == null) {
+            return
+        }
+        clients.forEach {
+            it.socket.sendAction(action)
         }
     }
 
@@ -177,5 +194,23 @@ suspend inline fun WebSocketSession.sendProtocolMessage(protocolMessage: Protoco
 //    val byteArray = pack(protocolMessage)
     val byteArray = protocolMessage.originalMessage
     val clientMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
+    send(clientMessage)
+}
+
+
+
+suspend inline fun WebSocketSession.sendBytes(byteArray: ByteArray) {
+    val clientMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
+    send(clientMessage)
+}
+
+
+suspend inline fun WebSocketSession.sendAction(action: NetworkAction?) {
+    if (action == null) {
+        println("Action is null")
+        return
+    }
+    val bytes = actionToNetworkBytes(action)
+    val clientMessage = Frame.Binary(true, ByteBuffer.wrap(bytes))
     send(clientMessage)
 }
