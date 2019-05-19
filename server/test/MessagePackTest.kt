@@ -1,6 +1,7 @@
 
 
 import com.daveanthonythomas.moshipack.MoshiPack
+import com.gofficer.colyseus.network.Protocol
 import com.gofficer.colyseus.server.*
 import okio.BufferedSource
 import okio.ByteString

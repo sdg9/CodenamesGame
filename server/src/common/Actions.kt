@@ -1,7 +1,6 @@
 package com.gofficer.colyseus.server
 
 import com.gofficer.codenames.redux.actions.ClientOptions
-import com.gofficer.codenames.redux.actions.toJSON
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.Moshi
@@ -162,8 +161,9 @@ room action types
 //}
 
 suspend inline fun <reified T> WebSocketSession.sendAction(action: T) {
+    TODO("Not currently implemented")
 //    val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
 //    val json = jsonAdapter.toJson(action)
 //    send(json)
-    send(toJSON(action))
+//    send(toJSON(action))
 }

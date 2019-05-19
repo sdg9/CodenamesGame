@@ -6,16 +6,14 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.net.HttpRequestBuilder.json
 import com.badlogic.gdx.utils.Logger
+import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.redux.actions.*
 import com.gofficer.codenames.redux.createCodeNamesStore
 import com.gofficer.codenames.redux.middleware.loggingMiddleware
 import com.gofficer.codenames.redux.middleware.setupGameMiddleware
 import com.gofficer.codenames.redux.middleware.validActionMiddleware
-import com.gofficer.codenames.redux.models.Card
-import com.gofficer.codenames.redux.models.cardReduce
 import com.gofficer.codenames.redux.reducers.reduceGameSetup
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
@@ -23,15 +21,12 @@ import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.colyseus.client.Client
 import com.gofficer.colyseus.client.Room
+import com.gofficer.colyseus.network.Protocol
+import com.gofficer.colyseus.network.ProtocolMessage
+import com.gofficer.colyseus.network.unpackUnknown
 import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.redux.game.GameState
-//import io.colyseus.Client
 import redux.api.Store
-//import io.colyseus.Room
-//import io.colyseus.state_listener.PatchListenerCallback
-//import io.colyseus.state_listener.DataChange
-//import io.colyseus.state_listener.PatchObject
-//import io.colyseus.state_listener.FallbackPatchListenerCallback
 import redux.api.Dispatcher
 import redux.api.enhancer.Middleware
 import java.util.*
@@ -69,6 +64,8 @@ class CodenamesGame : Game() {
     private var lerp = LERP_MAX
     private lateinit var game: CodenamesGame
 
+    private val moshiPack = MoshiPack()
+
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
         assetManager.logger.level = Logger.DEBUG
@@ -86,9 +83,9 @@ class CodenamesGame : Game() {
 
         store = createCodeNamesStore(initState,
             arrayOf(
-                reduceGameSetup,
+                reduceGameSetup
 //                boardReduceSetup,
-                cardReduce
+//                cardReduce
             ),
             arrayOf(
                 loggingMiddleware,
@@ -127,71 +124,116 @@ class CodenamesGame : Game() {
 //                })
                 room?.addListener(object : Room.Listener() {
 
-                    override fun onStateChange(message: LinkedHashMap<String, Any>){
-                        log.debug("TODO finish meOn state change callback: $message")
-                        // TODO convert
-//                        val newState: GameState = GameState()
-                        try {
-                            val newState = parseActionJSON(message)
-                            log.debug("New state: $newState")
-                        } catch(e: Exception) {
-                            log.error("$e")
+                    override fun onStateChange(message: Any){
+
+                        val protocolMessage = unpackUnknown(message)
+
+                        when (protocolMessage?.protocol) {
+                            Protocol.ROOM_DATA -> {
+
+                                log.debug("onStateChange Room Data $message")
+                            }
+                            Protocol.ROOM_STATE -> {
+                                log.debug("onStateChange Room State $message")
+                            }
+                            else -> {
+                                log.debug("onStateChange other $message")
+                            }
+
                         }
-                        //TODO
-                        dispatchJsonAsOriginalAction(message as String, store)
-//                        val newState = parseActionJSON(json) as VGameState
-//                        store.dispatch(SetState(newState))
+//                        log.debug("TODO finish meOn state change callback: $message")
+//                        // TODO convert
+////                        val newState: GameState = GameState()
+//                        try {
+//                            val newState = parseActionJSON(message)
+//                            log.debug("New state: $newState")
+//                        } catch(e: Exception) {
+//                            log.error("$e")
+//                        }
+//                        //TODO
+//                        dispatchJsonAsOriginalAction(message as String, store)
+////                        val newState = parseActionJSON(json) as VGameState
+////                        store.dispatch(SetState(newState))
                     }
 
 
-                    override fun onMessage(message: Any) {
-                        log.debug("onMessage: $message")
-                        if (message == "pong") {
-                            calculateLerp((System.currentTimeMillis() - lastLatencyCheckTime).toFloat())
+                    override fun onMessage(protocolMessage: ProtocolMessage) {
+                        log.debug("onMessage 1: $protocolMessage")
+
+//                        val protocolMessage = unpackUnknown(message)
+                        if (protocolMessage == null) {
+                            log.error("Cannot read protocol $protocolMessage")
                         }
 
-                        if (message is LinkedHashMap<*, *>) {
-                            val type = message["type"]
-
-                            if (type == CardPressed::class.java.simpleName) {
-
-                                val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
-                                val id = payload["id"] as Int
-                                val word = payload["word"] as String
-
-                                log.debug("Type is $type")
-                                log.debug("Payload is $payload")
-                                log.debug("id is $id")
-                                log.debug("word is $word")
-
-
-                                store.dispatch(CardPressed(id, word, true))
+                        when (protocolMessage?.protocol) {
+                            Protocol.ROOM_DATA -> {
+                                log.debug("onMessage Room Data $protocolMessage")
                             }
-                            if (type == "GameSetup") {
-                                log.debug("Game setup found")
-                                try {
+                            Protocol.ROOM_STATE -> {
+                                log.debug("onMessage Room State ${protocolMessage?.message}")
+                                // TODO convert state
 
-                                    val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
-                                    val cardsFromServer = payload["cards"] as List<LinkedHashMap<*, *>>
-                                    val cards = cardsFromServer.map {
-                                        Card(it["id"] as Int, it["text"] as String, it["type"] as String, it["isRevealed"] as Boolean)
-                                    }
-
-                                    log.debug("Cards $cards")
-                                    log.debug("Payload: $cards")
-
-                                    store.dispatch(SetupCards(cards))
-                                } catch (e: Exception) {
-                                    log.error(e.toString())
+                                val message = protocolMessage?.message
+                                if (message != null) {
+                                    val state = moshiPack.unpack<GameState>(message)
+                                    store.dispatch(SetState(state))
                                 }
+
+//                                store.dispatch()
                             }
-
-                        } else {
-                            log.debug("Message is not string $message")
-
-
-                            log.debug("Message type is ${message?.javaClass?.kotlin}")
+                            else -> {
+                                log.debug(protocolMessage?.protocol!!::class.simpleName)
+                                log.debug("onMessage other $protocolMessage")
+                            }
                         }
+
+//
+//                        if (message == "pong") {
+//                            calculateLerp((System.currentTimeMillis() - lastLatencyCheckTime).toFloat())
+//                        }
+//
+//                        if (message is LinkedHashMap<*, *>) {
+//                            val type = message["type"]
+//
+//                            if (type == CardPressed::class.java.simpleName) {
+//
+//                                val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
+//                                val id = payload["id"] as Int
+//                                val word = payload["word"] as String
+//
+//                                log.debug("Type is $type")
+//                                log.debug("Payload is $payload")
+//                                log.debug("id is $id")
+//                                log.debug("word is $word")
+//
+//
+//                                store.dispatch(CardPressed(id, word, true))
+//                            }
+//                            if (type == "GameSetup") {
+//                                log.debug("Game setup found")
+//                                try {
+//
+//                                    val payload: LinkedHashMap<*, *> = message["payload"] as LinkedHashMap<*, *>
+//                                    val cardsFromServer = payload["cards"] as List<LinkedHashMap<*, *>>
+//                                    val cards = cardsFromServer.map {
+//                                        Card(it["id"] as Int, it["text"] as String, it["type"] as String, it["isRevealed"] as Boolean)
+//                                    }
+//
+//                                    log.debug("Cards $cards")
+//                                    log.debug("Payload: $cards")
+//
+//                                    store.dispatch(SetupCards(cards))
+//                                } catch (e: Exception) {
+//                                    log.error(e.toString())
+//                                }
+//                            }
+
+//                        } else {
+//                            log.debug("Message is not string $message")
+//
+//
+//                            log.debug("Message type is ${message?.javaClass?.kotlin}")
+//                        }
                     }
                 })
 
@@ -258,8 +300,25 @@ class CodenamesGame : Game() {
 
 val getNetworkActionMiddleware = { game: CodenamesGame ->
     Middleware  { store: Store<GameState>, next: Dispatcher, action: Any ->
-        if (action is NetworkAction && !action.isFromServer && game.room != null) {
+        println("getNetworkMiddleware $action")
+        if (action is NetworkProtocolAction && !action.isFromServer) {
+//            NetworkProtocolAction
             println("Dispatching remotely: $action")
+            if (game.room == null) {
+                println("No connected game room to dispatch network action")
+            } else {
+
+                game.room?.send(action.type, action)
+            }
+        }
+        if (action is NetworkAction && !action.isFromServer) {
+            println("Dispatching remotely: $action")
+            if (game.room == null) {
+                println("No connected game room to dispatch network action")
+            } else {
+
+                game.room?.send(action)
+            }
 
 //            val gsonBuilder = GsonBuilder()
 //            gsonBuilder.registerTypeAdapter(action::class.java, MenuContentInterfaceAdapter())
@@ -270,7 +329,6 @@ val getNetworkActionMiddleware = { game: CodenamesGame ->
 
 //            log.debug("Sending $jsonString")
 //            room?.send(action.toJson())
-            game.room?.send(action)
 //            game.room?.send(NetworkMessage(action::class.java.simpleName, action))
         }
         next.dispatch(action)
@@ -280,7 +338,7 @@ val getNetworkActionMiddleware = { game: CodenamesGame ->
 
 val getNavigationMiddleware = { game: CodenamesGame ->
     Middleware { store: Store<GameState>, next: Dispatcher, action: Any ->
-
+        println("getNavigationMiddleware $action")
 //        println("Changing Screen $action")
         if (action is ChangeScene) {
             when (action.screenName) {

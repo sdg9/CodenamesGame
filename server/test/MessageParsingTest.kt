@@ -3,8 +3,8 @@ import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.colyseus.server.*
 import com.gofficer.codenames.redux.actions.ActionType
 import com.gofficer.codenames.redux.actions.UserConnected
-import com.gofficer.codenames.redux.actions.getActionTypeFromJson
-import com.gofficer.codenames.redux.actions.getMoshiBuilder
+//import com.gofficer.codenames.redux.actions.getActionTypeFromJson
+//import com.gofficer.codenames.redux.actions.getMoshiBuilder
 import okio.BufferedSource
 import okio.ByteString
 import kotlin.test.*
@@ -37,41 +37,41 @@ class MessageParsingTest {
     /**
      * This is an integration test that verifies the behaviour of a simple conversation with an empty server.
      */
-    @Test
-    fun testUserConnectedJSON() {
+//    @Test
+//    fun testUserConnectedJSON() {
+//
+//        val originalMessage = UserConnected("1234","User1")
+//        val json = toJSON(originalMessage)
+//
+//        assertEquals(
+//            "{\"id\":\"1234\",\"name\":\"User1\",\"type\":\"USER_CONNECTED\"}", json
+//        )
+//
+//        val parsedMessage = fromJson<UserConnected>(json)
+//        assertEquals(
+//            originalMessage, parsedMessage
+//        )
+//    }
 
-        val originalMessage = UserConnected("1234","User1")
-        val json = toJSON(originalMessage)
-
-        assertEquals(
-            "{\"id\":\"1234\",\"name\":\"User1\",\"type\":\"USER_CONNECTED\"}", json
-        )
-
-        val parsedMessage = fromJson<UserConnected>(json)
-        assertEquals(
-            originalMessage, parsedMessage
-        )
-    }
-
-    @Test
-    fun testParseJSONWithoutKnowingType() {
-        val json = "{\"name\":\"User1\",\"type\":\"USER_CONNECTED\"}"
-        val type = getActionTypeFromJson(json)
-
-        assertEquals(
-            type, ActionType.USER_CONNECTED
-        )
-    }
-
-    @Test
-    fun testParseJSONHandlingUnknownType() {
-        val json = "{\"name\":\"User1\",\"type\":\"SOME_UNKNOWN_TYPE\"}"
-        val type = getActionTypeFromJson(json)
-
-        assertEquals(
-            type, null
-        )
-    }
+//    @Test
+//    fun testParseJSONWithoutKnowingType() {
+//        val json = "{\"name\":\"User1\",\"type\":\"USER_CONNECTED\"}"
+//        val type = getActionTypeFromJson(json)
+//
+//        assertEquals(
+//            type, ActionType.USER_CONNECTED
+//        )
+//    }
+//
+//    @Test
+//    fun testParseJSONHandlingUnknownType() {
+//        val json = "{\"name\":\"User1\",\"type\":\"SOME_UNKNOWN_TYPE\"}"
+//        val type = getActionTypeFromJson(json)
+//
+//        assertEquals(
+//            type, null
+//        )
+//    }
 
     @Test
     fun testUserConnectedMessagePack() {
@@ -248,15 +248,15 @@ class MessageParsingTest {
     }
 
 
-    private inline fun <reified T> toJSON(message: T): String {
-        val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
-        return jsonAdapter.toJson(message)
-    }
-
-    private inline fun <reified T> fromJson(json: String): T? {
-        val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
-        return jsonAdapter.fromJson(json)
-    }
+//    private inline fun <reified T> toJSON(message: T): String {
+//        val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
+//        return jsonAdapter.toJson(message)
+//    }
+//
+//    private inline fun <reified T> fromJson(json: String): T? {
+//        val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
+//        return jsonAdapter.fromJson(json)
+//    }
 
 //    @FromJson
 //    fun fromJson(reader: JsonReader, newFollowerAdapter: JsonAdapter<NewFollower>): Content {

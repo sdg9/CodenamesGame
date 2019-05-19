@@ -1,6 +1,6 @@
 
 import com.daveanthonythomas.moshipack.MoshiPack
-import com.gofficer.colyseus.server.Protocol
+import com.gofficer.colyseus.network.Protocol
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readBytes
 import kotlinx.coroutines.channels.ReceiveChannel

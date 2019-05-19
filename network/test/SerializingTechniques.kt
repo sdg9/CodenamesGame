@@ -1,10 +1,7 @@
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.gofficer.colyseus.network.ProtocolMessage
-import com.gofficer.colyseus.network.moshiPack
-import com.gofficer.colyseus.network.pack
-import com.gofficer.colyseus.network.unpackUnknown
+import com.gofficer.colyseus.network.*
 import org.apache.commons.codec.binary.Hex;
 import org.junit.Test
 import org.msgpack.jackson.dataformat.MessagePackFactory
@@ -42,8 +39,38 @@ class SerializingTechniques {
         val message2 = messageHelper(unpacked2)
         testHelper(message2)
     }
+
+    @Test
+    fun appraoch2() {
+        val protocol = 1
+        val anyObj = "hello"
+        val packedByteArray = pack(protocol, TestSubType.ITEM_1, TestTouchCard(12))
+
+        val pattern: Regex = "(\\S{2})".toRegex()
+        println()
+        println(Hex.encodeHexString(packedByteArray).replace(pattern, "$1 "))
+
+        val unpacked = unpackUnknown(packedByteArray)
+
+        println(unpacked)
+//        val message = messageHelper(unpacked)
+//        testHelper(message)
+//
+//        val packedByteArray2 = pack(protocol, TestSubType.ITEM_2, SomeOtherType(1, "Ahoy"))
+//        val unpacked2 = unpackUnknown(packedByteArray2)
+//        val message2 = messageHelper(unpacked2)
+//        testHelper(message2)
+    }
 }
 
+interface BaseAction
+
+sealed class TestNetworkProtocolAction(var type: Int) : BaseAction {
+    var isFromServer: Boolean = false
+}
+
+data class TestTouchCard(val id: Int): TestNetworkProtocolAction(SubProtocol.TOUCH_CARD)
+data class TestTouchCard2(val id: Int): BaseAction
 
 // Order matter when using ordinal
 //enum class SubType {

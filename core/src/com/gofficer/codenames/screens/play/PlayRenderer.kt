@@ -23,6 +23,7 @@ import com.gofficer.codenames.redux.actions.CardPressed
 import redux.api.Store
 import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.redux.actions.SetupGame
+import com.gofficer.codenames.redux.actions.TouchCard
 import gofficer.codenames.redux.game.GameState
 
 
@@ -119,7 +120,8 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
 //                                    FlipAction.flipOut(myCard.x, myCard.width, duration / 2),
 //                                    FlipAction.flipIn(myCard.x, myCard.width, duration / 2)
 //                            ))
-                            store.dispatch(CardPressed(id, cardName))
+//                            store.dispatch(CardPressed(id, cardName))
+                            store.dispatch(TouchCard(id))
                             // TODO: If possible...
                             // TODO: dispatch action saying pressed
                             // TODO: have action update state tree saying item is pressed

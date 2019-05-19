@@ -55,6 +55,7 @@ fun List<Card>.getById(id: Int): Card? {
 val cardReduce = Reducer { state: GameState, action: Any ->
     when (action) {
         is CardPressed -> {
+            println("PRocessing card pressed")
             val card = state.cards.getById(action.id)
             if (card != null) {
 //                val updated = card.reduce(action)

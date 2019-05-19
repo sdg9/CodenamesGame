@@ -1,19 +1,26 @@
 package com.gofficer.codenames.myServer
 
+import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.colyseus.server.Client
 import com.gofficer.colyseus.server.sendAction
 import com.gofficer.codenames.redux.actions.SetupGame
+import com.gofficer.codenames.redux.actions.TouchCard
 import com.gofficer.codenames.redux.createCodeNamesStore
 import com.gofficer.codenames.redux.middleware.loggingMiddleware
 import com.gofficer.codenames.redux.middleware.setupGameMiddleware
 import com.gofficer.codenames.redux.middleware.validActionMiddleware
 import com.gofficer.codenames.redux.models.cardReduce
 import com.gofficer.codenames.redux.reducers.reduceGameSetup
+import com.gofficer.colyseus.network.*
 import common.Room
 import common.RoomListener
 import gofficer.codenames.redux.game.GameState
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.WebSocketSession
+import org.apache.commons.codec.binary.Hex
 import org.slf4j.LoggerFactory
 import redux.api.Store
+import java.nio.ByteBuffer
 import kotlin.reflect.jvm.jvmName
 
 
@@ -67,15 +74,50 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
         store.dispatch(SetupGame())
     }
 
-    override suspend fun onMessage(client: Client, action: Any) {
-        logger.debug("My custom implementation received $action")
+    override suspend fun onMessage(client: Client, protocolMessage: ProtocolMessage) {
+        logger.debug("My custom implementation received $protocolMessage")
+//        val protocolMessage = unpackUnknown(action)
+        val subProtocol = protocolMessage?.subProtocol
+        val message = protocolMessage?.message
 
-        clients.forEach {
-            // TODO address this casting, sloppy
-//            it.send(action as String)
-            it.socket.sendAction(action)
+        if(subProtocol == null || message == null) {
+            logger.warn("ProtocolMessage fields are null $protocolMessage")
+            return
         }
 
+        when (subProtocol) {
+            SubProtocol.TOUCH_CARD -> {
+                logger.debug("Got touch card")
+                val pattern: Regex = "(\\S{2})".toRegex()
+                println()
+                println(Hex.encodeHexString(message).replace(pattern, "$1 "))
+//                val unpacked = MoshiPack.unpack<TouchCard>(message)
+//
+//                logger.debug("Unpack touch card: $unpacked")
+//                store.dispatch(unpacked)
+                sendAllClients(protocolMessage)
+            }
+            else -> {
+                logger.debug("Custom protocol $subProtocol")
+            }
+        }
+//
+//        // TODO for now send back to show it's working
+//        val byteArray = pack(Protocol.ROOM_DATA, SubProtocol.TOUCH_CARD, TouchCard(18))
+//        val someMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
+//        clients.forEach {
+//////            it.send(action as String)
+////            it.socket.send(someMessage)
+//////            it.socket.send(pack(action))
+//////            it.socket.sendAction(action)
+//        }
+    }
+
+    private suspend fun sendAllClients(protocolMessage: ProtocolMessage) {
+        logger.debug("Total clients: ${clients.size}")
+        clients.forEach {
+            it.socket.sendProtocolMessage(protocolMessage)
+        }
     }
 
     override fun onJoin(client: Client, options: Any?, auth: Any?) {
@@ -109,3 +151,25 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
 //        next.dispatch(action)
 //    }
 //}
+//fun messageHelper(protocolMessage: ProtocolMessage?) : Type? {
+//    val subProtocol = protocolMessage?.subProtocol
+//    val message = protocolMessage?.message
+//    if(subProtocol == null || message == null) {
+//        return null
+//    }
+//
+//    return when (subProtocol) {
+//        TestSubType.ITEM_1 -> moshiPack.unpack<SomeType>(message)
+//        TestSubType.ITEM_2 -> moshiPack.unpack<SomeOtherType>(message)
+//        else -> null
+//    }
+//}
+
+
+suspend inline fun WebSocketSession.sendProtocolMessage(protocolMessage: ProtocolMessage) {
+    // TODO fix me.
+//    val byteArray = pack(protocolMessage)
+    val byteArray = protocolMessage.originalMessage
+    val clientMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
+    send(clientMessage)
+}

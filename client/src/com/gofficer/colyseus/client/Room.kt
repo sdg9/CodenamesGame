@@ -2,11 +2,15 @@ package com.gofficer.colyseus.client
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gofficer.colyseus.network.Protocol
+import com.gofficer.colyseus.network.ProtocolMessage
+import com.gofficer.colyseus.network.unpackUnknown
 import org.java_websocket.framing.CloseFrame;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+
 //import io.colyseus.fossil_delta.FossilDelta
 //import io.colyseus.state_listener.StateContainer
 
@@ -38,7 +42,7 @@ class Room internal constructor(
     val state: LinkedHashMap<String, Any>
         get() = state
 
-    abstract class Listener () {
+    abstract class Listener() {
 
         /**
          * This event is triggered when the client leave the room.
@@ -57,7 +61,7 @@ class Room internal constructor(
         /**
          * This event is triggered when the server sends a message directly to the client.
          */
-        open fun onMessage(message: Any) {}
+        open fun onMessage(message: ProtocolMessage) {}
 
         /**
          * This event is triggered when the client successfuly joins the room.
@@ -69,7 +73,7 @@ class Room internal constructor(
         /**
          * This event is triggered when the server updates its state.
          */
-        open fun onStateChange(state: java.util.LinkedHashMap<String, Any>) {
+        open fun onStateChange(state: Any) {
 
         }
     }
@@ -124,74 +128,120 @@ class Room internal constructor(
     private fun onMessageCallback(bytes: ByteArray) {
         //        System.out.println("Room.onMessageCallback()");
         try {
-            val message = msgpackMapper.readValue<Any>(bytes, object : TypeReference<Any>() {
+            val protocolMessage = unpackUnknown(bytes)
 
-            })
-            if (message is List<*>) {
-                val messageArray = message as List<Any>
-                if (messageArray.get(0) is Int) {
-                    val code = messageArray.get(0) as Int
-                    when (code) {
-                        Protocol.JOIN_ROOM -> {
-                            sessionId = messageArray.get(1) as String
-                            for (listener in listeners) {
-                                listener?.onJoin()
-                            }
-                        }
+            when (protocolMessage?.protocol) {
+                Protocol.JOIN_ROOM -> {
+                    val message = msgpackMapper.readValue<Any>(bytes, object : TypeReference<Any>() {})
+                    val messageArray = message as List<Any>
 
-                        Protocol.JOIN_ERROR -> {
-                            System.err.println("Error: " + messageArray.get(1))
-                            for (listener in listeners) {
-                                listener?.onError(Exception(messageArray.get(1).toString()))
-                            }
-                        }
-
-                        Protocol.ROOM_STATE -> {
-                            //                    const remoteCurrentTime = message[2];
-                            //                    const remoteElapsedTime = message[3];
-//                            setState(messageArray.get(1) as ByteArray)
-                            println("Room State")
-
-                            for (listener in listeners) {
-//                                listener?.onMessage()
-//                                println("Respons: ${messageArray.get(1)}")
-                                // TODO pick up here
-                                // determine how to best handle restoring message pack back to object
-                                // Ideally work directly with object and not maps
-                                val result = messageArray.get(1)
-                                when (result) {
-                                    String -> println("Result is string")
-                                    else -> {
-                                        print("Result is not string $result")
-                                        print(result::class.java)
-                                        print(result::class.java.simpleName)
-                                    }
-                                }
-//                                listener?.onStateChange(messageArray.get(1) as String)
-                            }
-                        }
-
-                        Protocol.ROOM_STATE_PATCH -> {
-//                            patch(messageArray.get(1) as ArrayList<Int>)
-                            println("Room state patch")
-                        }
-
-                        Protocol.ROOM_DATA -> {
-                            for (listener in listeners) {
-                                listener?.onMessage(messageArray.get(1))
-                            }
-                        }
-
-                        Protocol.LEAVE_ROOM -> {
-                            leave()
-                        }
-
-                        else -> dispatchOnMessage(message)
+                    sessionId = messageArray[1] as String
+                    for (listener in listeners) {
+                        listener?.onJoin()
                     }
-                } else
-                    dispatchOnMessage(message)
-            } else
-                dispatchOnMessage(message)
+                }
+                Protocol.JOIN_ERROR -> {
+                    val message = msgpackMapper.readValue<Any>(bytes, object : TypeReference<Any>() {})
+                    val messageArray = message as List<Any>
+
+                    println("Error: " + messageArray[1])
+                    for (listener in listeners) {
+                        listener?.onError(Exception(messageArray[1].toString()))
+                    }
+                }
+                Protocol.ROOM_STATE -> {
+                    for (listener in listeners) {
+                        listener?.onMessage(protocolMessage)
+                    }
+                }
+                Protocol.ROOM_STATE_PATCH -> {
+                    // TODO althought likely not required for my approach
+                }
+
+                Protocol.ROOM_DATA -> {
+                    for (listener in listeners) {
+                        listener?.onMessage(protocolMessage)
+                    }
+                }
+
+                Protocol.LEAVE_ROOM -> {
+                    leave()
+                }
+            }
+//
+//            val message = msgpackMapper.readValue<Any>(bytes, object : TypeReference<Any>() {
+//
+//            })
+//            if (message is List<*>) {
+//                val messageArray = message as List<Any>
+//                if (messageArray.get(0) is Int) {
+//                    val code = messageArray.get(0) as Int
+//                    when (code) {
+//                        Protocol.JOIN_ROOM -> {
+//                            sessionId = messageArray.get(1) as String
+//                            for (listener in listeners) {
+//                                listener?.onJoin()
+//                            }
+//                        }
+//
+//                        Protocol.JOIN_ERROR -> {
+//                            System.err.println("Error: " + messageArray.get(1))
+//                            for (listener in listeners) {
+//                                listener?.onError(Exception(messageArray.get(1).toString()))
+//                            }
+//                        }
+//
+////                        Protocol.ROOM_STATE -> {
+////                            //                    const remoteCurrentTime = message[2];
+////                            //                    const remoteElapsedTime = message[3];
+//////                            setState(messageArray.get(1) as ByteArray)
+////                            println("Room State")
+////
+////                            for (listener in listeners) {
+//////                                listener?.onMessage()
+//////                                println("Respons: ${messageArray.get(1)}")
+////                                // TODO pick up here
+////                                // determine how to best handle restoring message pack back to object
+////                                // Ideally work directly with object and not maps
+////                                val result = messageArray.get(1)
+////                                when (result) {
+////                                    String -> println("Result is string")
+////                                    else -> {
+////                                        print("Result is not string $result")
+////                                        print(result::class.java)
+////                                        print(result::class.java.simpleName)
+////                                    }
+////                                }
+////                                listener?.onStateChange(messageArray)
+//////                                listener?.onStateChange(messageArray.get(1) as String)
+////                            }
+////                        }
+//
+//                        Protocol.ROOM_STATE_PATCH -> {
+////                            patch(messageArray.get(1) as ArrayList<Int>)
+//                            println("Room state patch")
+//                            for (listener in listeners) {
+//                                listener?.onMessage(messageArray)
+//                            }
+//
+//                        }
+//
+//                        Protocol.ROOM_DATA, Protocol.ROOM_STATE  -> {
+//                            for (listener in listeners) {
+//                                listener?.onMessage(messageArray)
+//                            }
+//                        }
+//
+//                        Protocol.LEAVE_ROOM -> {
+//                            leave()
+//                        }
+//
+//                        else -> dispatchOnMessage(message)
+//                    }
+//                } else
+//                    dispatchOnMessage(message)
+//            } else
+//                dispatchOnMessage(message)
         } catch (e: Exception) {
             for (listener in listeners) {
                 listener?.onError(e)
@@ -200,7 +250,7 @@ class Room internal constructor(
 
     }
 
-    private fun dispatchOnMessage(message: Any) {
+    private fun dispatchOnMessage(message: ProtocolMessage) {
         for (listener in listeners) {
             listener?.onMessage(message)
         }
@@ -234,6 +284,17 @@ class Room internal constructor(
         val id = this.id
         if (this.connection != null && id != null)
             this.connection!!.send(Protocol.ROOM_DATA, id, data)
+        else {
+            // room is created but not joined yet
+            for (listener in listeners) {
+                listener?.onError(Exception("send error: Room is created but not joined yet"))
+            }
+        }
+    }
+
+    fun send(subProtocol: Int, data: Any) {
+        if (this.connection != null && id != null)
+            this.connection!!.send(Protocol.ROOM_DATA, subProtocol, data)
         else {
             // room is created but not joined yet
             for (listener in listeners) {

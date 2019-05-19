@@ -1,19 +1,18 @@
 package common
 
 import com.gofficer.colyseus.server.*
-import com.gofficer.colyseus.server.Protocol.Companion.WS_CLOSE_CONSENTED
 import com.gofficer.colyseus.server.presence.Presence
 import com.gofficer.codenames.redux.actions.ClientOptions
-import com.gofficer.codenames.redux.actions.getActionTypeFromJson
-import io.ktor.http.cio.websocket.Frame
-import kotlinx.coroutines.Deferred
+import com.gofficer.colyseus.network.Protocol
+import com.gofficer.colyseus.network.Protocol.Companion.WS_CLOSE_CONSENTED
+import com.gofficer.colyseus.network.ProtocolMessage
+import com.gofficer.colyseus.network.unpackUnknown
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.slf4j.LoggerFactory
 import redux.api.Store
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.concurrent.schedule
 import kotlin.reflect.jvm.jvmName
 
 
@@ -107,7 +106,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
     }
 
     // Abstract methods
-    abstract suspend fun onMessage(client: Client, data: Any): Unit
+    abstract suspend fun onMessage(client: Client, data: ProtocolMessage): Unit
 
     // Optional interfaces
     open fun onInit(clientOptions: ClientOptions?, handlerOptions: Object?): Unit {}
@@ -264,6 +263,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
             TODO("Implement reconnection")
 //            reconnection.resolve(client)
         } else {
+            logger.debug("Calling onJoin")
             return this?.onJoin(client, options, auth)
         }
     }
@@ -274,37 +274,24 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
     }
 
     private suspend fun _onMessage(client: Client, message: Any) {
-        logger.debug("Message $message from $client")
+        logger.debug("_onMessage $message from $client")
 
-        if (message == null) {
+        val unpacked = unpackUnknown(message)
+        if (message == null || unpacked == null) {
             // Or in future if trouble decoding
             logger.debug("$roomName ($roomId), couldn't decode message: $message")
             return
         }
 
-        // TODO temporary conditionals until implemented
-        val isRoomData = false
-        val isLeaveRoom = false
-
-        if (isRoomData) {
-            TODO("isRoomData")
-            // this.onMessage(client, message[2]);
-        } else if (isLeaveRoom) {
-            client.removeAllListeners()
-            // only effectively close connection when "onLeave" is fulfilled
-            this._onLeave(client, WS_CLOSE_CONSENTED)
-            // TODO delay until after onLeave is fired
-            client.socket.close()
-        } else {
-            // TODO received string, convert to action:
-            val type = getActionTypeFromJson(message)
-            if (type != null) {
-                onMessage(client, message)
-            } else {
-                TODO ("Deal with non-Action style message")
+        when (unpacked.protocol) {
+            Protocol.ROOM_DATA -> this.onMessage(client, unpacked)
+            Protocol.LEAVE_ROOM -> {
+                client.removeAllListeners()
+                this._onLeave(client, WS_CLOSE_CONSENTED)
+                client.socket.close()
             }
+            else -> this.onMessage(client, unpacked)
         }
-
     }
 
     fun allowReconnection(client: Client, seconds: Long) {

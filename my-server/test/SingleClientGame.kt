@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.test.*
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.readBytes
+import org.apache.commons.codec.binary.Hex
 import java.nio.ByteBuffer
 
 /**
@@ -108,13 +109,18 @@ class SingleClientGame {
 
                     // Send pressed event
                     val byteArray = pack(Protocol.ROOM_DATA, SubProtocol.TOUCH_CARD, TouchCard(1))
+
+                    val pattern: Regex = "(\\S{2})".toRegex()
+//                    println()
+//                    println(Hex.encodeHexString(packedByteArray).replace(pattern, "$1 "))
+                    println("String hex: ${Hex.encodeHexString(byteArray).replace(pattern, "$1 ")}")
                     val clientMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
                     clientRoomOutgoing.send(clientMessage)
                     // Confirm state is updated accordingly
-
+//
                     val serverUpdate = (roomIncoming.receive() as Frame.Binary).readBytes()
                     val unpacked: Array<Any> = moshiPack.unpack(serverUpdate)
-                    println("Unpacked; $unpacked")
+                    println("Unpacked; ${unpacked.get(2)}")
 
                 }
             }

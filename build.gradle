@@ -200,7 +200,11 @@ project(":my-server") {
         compile project(":redux")
         compile project(":server")
         compile project(":network")
+        implementation("com.squareup.moshi:moshi:$moshi_version")
+        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
+        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
+        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
         testCompile "io.ktor:ktor-server-tests:$ktor_version"
     }
 }
@@ -250,6 +254,10 @@ project(":core") {
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
         implementation 'ir.doorbash:colyseus-java:1.2.3'
         implementation 'com.google.code.gson:gson:2.8.5'
+        implementation("com.squareup.moshi:moshi:$moshi_version")
+        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
+        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
+        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
 
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"

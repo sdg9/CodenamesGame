@@ -7,6 +7,8 @@ import com.gofficer.colyseus.server.matchmaker.RegisteredHandler
 import com.gofficer.colyseus.server.presence.LocalPresence
 import com.gofficer.colyseus.server.presence.Presence
 import com.gofficer.codenames.redux.actions.*
+import com.gofficer.colyseus.network.Protocol
+import com.gofficer.colyseus.network.unpackUnknown
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.channels.*
 import io.ktor.sessions.get
@@ -166,7 +168,7 @@ class Sever {
                     logger.debug("Receiveing binary frame")
 
                     val bytes = frame.readBytes()
-                    val protocolMessage = unpackProtocol(bytes)
+                    val protocolMessage = unpackUnknown(bytes)
 //                    val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
 //                    logger.debug("Received binary frame ${unpacked.toString()}")
 //                    val firstByte = unpacked[0] as? Double ?: throw Error("Unknown binary message format")
