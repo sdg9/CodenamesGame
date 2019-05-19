@@ -102,7 +102,6 @@ class Sever {
         val auth = socket.call.parameters["auth"]
         val options = socket.call.parameters["options"]
         val useTextOverBinary = socket.call.parameters["useTextOverBinary"] == "true"
-//        val useTextOverBinary = true
         logger.debug("UseTextOverBinary: $useTextOverBinary")
         val pingCount = 0
         val client = Client(
@@ -180,7 +179,6 @@ class Sever {
 
 //                    val message = unpackProtocol()
                     when (type) {
-//                        Protocol.JOIN_ROOM -> receiveMessageMatchMakingBinary(client, type, frame)
                         Protocol.JOIN_REQUEST, Protocol.JOIN_ROOM -> {
                             logger.debug("Join request/room")
                             val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
@@ -226,44 +224,11 @@ class Sever {
 
     }
 
-//    /**
-//     * A chat session is identified by a unique nonce ID. This nonce comes from a secure random source.
-//     */
-////    data class GameSession(val sessionId: String)
-//
-//    /**
-//     * We received a message. Let's process it.
-//     */
-//    private suspend fun receiveMessageMatchMakingText(client: Client, message: String) {
-//
-//        val action = parseActionJSON(message)
-////        val type = getActionTypeFromJson(message)
-//        // We are going to handle commands (text starting with '/') and normal messages
-//        when (action?.type) {
-//            ActionType.JOIN_REQUEST -> onJoinRequestText(client, action as JoinRequest)
-//            ActionType.USER_ID -> this
-//            ActionType.ROOM_LIST -> this
-//        }
-//    }
-
-
-    private suspend fun receiveMessageMatchMakingBinary(client: Client, type: Int, frame: Frame.Binary) {
-        when (type) {
-            Protocol.JOIN_REQUEST, Protocol.JOIN_ROOM -> {
-                val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
-                val roomName = unpacked[1] as String
-                onJoinRequest(client, roomName, null)
-            }
-//            ActionType.USER_ID -> this
-//            ActionType.ROOM_LIST -> this
-        }
-    }
-
     private suspend fun onJoinRequest(client: Client, roomName: String, joinOptions: ClientOptions?) {
         logger.debug("onJoinRequest (Binary): $roomName")
         if (!this.matchMaker.hasHandler(roomName) && !isValidId(roomName)) {
             // TODO make binary
-            client.send(JoinError("no available handler for $roomName"))
+//            client.send(JoinError("no available handler for $roomName"))
 //            client.socket.sendAction(JoinError("no available handler for $roomName"))
         } else {
             // TODO: confirm retry logic, colyseus tries 3x
@@ -271,29 +236,6 @@ class Sever {
             client.sendJoinRoom(joinRequest.roomId, joinRequest.processId)
         }
     }
-
-
-    private suspend fun onJoinRequestText(client: Client, action: JoinRequest) {
-        logger.debug("onJoinRequestText: $action")
-        val roomName = action.room
-        val joinOptions = action.joinOptions
-//        joinOptions.clientId = client.id
-
-        if (!this.matchMaker.hasHandler(roomName) && !isValidId(roomName)) {
-            client.send(JoinError("no available handler for $roomName"))
-//            client.socket.sendAction(JoinError("no available handler for $roomName"))
-        } else {
-            // TODO: confirm retry logic, colyseus tries 3x
-            val joinRequest = this.matchMaker.onJoinRoomRequest(client, roomName, joinOptions)
-//            client.send(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
-            client.sendJoinRoom(joinRequest.roomId, joinRequest.processId)
-//            client.socket.sendAction(JoinResponse(joinOptions?.requestId, joinRequest.roomId, joinRequest.processId))
-            // once done
-//            send[Protocol.JOIN_REQUEST](client, joinOptions.requestId, response.roomId, response.processId);
-            // or send error
-        }
-    }
-
 
     fun gracefullyShutdown() {
         this.matchMaker.gracefullyShutdown()

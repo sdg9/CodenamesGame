@@ -24,38 +24,12 @@ interface LocalAction : BaseAction
 
 data class ChangeScene(val screenName: String) : LocalAction
 
-enum class ActionType {
-    JOIN_REQUEST,
-    JOIN_RESPONSE,
-    JOIN_RESPONSE_CONFIRMATION,
-
-
-    JOIN_ERROR,
-    USER_ID,
-    USER_CONNECTED,
-    SOMETHING_ELSE,
-    ROOM_LIST,
-    PARSE_ERROR,
-
-    SET_STATE,
-
-    SETUP_GAME,
-
-    RESET_GAME,
-
-    SETUP_CARDS,
-
-    CARD_PRESSED
-}
-
 // TODO move somewhere logical (server and client need to be in sync)
 data class ClientOptions(
     var auth: String?,
     var requestId: Int?,
     var sessionId: String?
 )
-
-sealed class Action(val type: ActionType): BaseAction
 
 sealed class NetworkAction: BaseAction {
     var isFromServer: Boolean = false
@@ -71,18 +45,7 @@ class ResetGame : NetworkAction()
 
 class SetupGame : NetworkAction()
 
-
 data class SetState(val state: GameState): NetworkAction()
-//data class SetState(val state: GameState): Action(ActionType.SET_STATE)
-//data class UserHandshakeStep1()
-data class JoinError(val message: String): Action(ActionType.JOIN_ERROR)
-data class JoinRequest(val room: String, val joinOptions: ClientOptions?): Action(ActionType.JOIN_REQUEST)
-//data class JoinResponse(val requestId: Int?, val roomId: String, val processId: String?): Action(ActionType.JOIN_RESPONSE)
-//data class JoinResponseConfirmation(val roomId: String): Action(ActionType.JOIN_RESPONSE_CONFIRMATION)
-//data class UserId(val id: String, val pingCount: Int) :Action(ActionType.USER_ID)
-data class UserConnected(val id: String, val name : String ) : Action(ActionType.USER_CONNECTED)
-//data class SomethingElse(val name : String ) : Action(ActionType.SOMETHING_ELSE)
-
 
 // Data Flow:
 // Action -> ByteArray
