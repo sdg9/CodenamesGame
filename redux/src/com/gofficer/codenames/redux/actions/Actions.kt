@@ -1,10 +1,12 @@
 package com.gofficer.codenames.redux.actions
 
 
+import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.redux.models.Card
-import com.gofficer.colyseus.network.SubProtocol
+import com.gofficer.colyseus.network.*
 //import com.squareup.moshi.JsonReader
 import gofficer.codenames.redux.game.GameState
+import org.apache.commons.codec.binary.Hex
 
 /**
  * Generic Actions:
@@ -57,8 +59,8 @@ sealed class Action(val type: ActionType): BaseAction
 
 sealed class Type(val type: SubProtocol): BaseAction
 
-interface NetworkAction {
-    var isFromServer: Boolean
+sealed class NetworkAction: BaseAction {
+    var isFromServer: Boolean = false
 }
 
 sealed class NetworkProtocolAction(val type: Int) : BaseAction {
@@ -68,10 +70,11 @@ sealed class NetworkProtocolAction(val type: Int) : BaseAction {
 
 // GamePlay Action
 
-data class TouchCard(val id: Int): NetworkProtocolAction(SubProtocol.TOUCH_CARD)
+//data class TouchCard(val id: Int): NetworkProtocolAction(SubProtocol.TOUCH_CARD)
 
+data class TouchCard(val id: Int): NetworkAction()
 
-data class CardPressed(val id: Int, val word: String, override var isFromServer: Boolean = false): Action(ActionType.CARD_PRESSED), NetworkAction
+//data class CardPressed(val id: Int, val word: String, override var isFromServer: Boolean = false): Action(ActionType.CARD_PRESSED), NetworkAction
 
 
 //
@@ -92,6 +95,68 @@ data class JoinResponseConfirmation(val roomId: String): Action(ActionType.JOIN_
 data class UserId(val id: String, val pingCount: Int) :Action(ActionType.USER_ID)
 data class UserConnected(val id: String, val name : String ) : Action(ActionType.USER_CONNECTED)
 data class SomethingElse(val name : String ) : Action(ActionType.SOMETHING_ELSE)
+
+
+
+
+// Data Flow:
+// Action -> ByteArray
+// ByteArray -> Protocol Message -> Action
+
+fun networkBytesToProtocol(byteArray: ByteArray?): ProtocolMessage? {
+    if (byteArray == null) {
+        return null
+    }
+    return unpackUnknown(byteArray)
+}
+
+fun protocolToAction(protocolMessage: ProtocolMessage?) : NetworkAction? {
+        val subProtocol = protocolMessage?.subProtocol
+        val message = protocolMessage?.message
+        if(subProtocol == null || message == null) {
+            return null
+        }
+
+        return when (subProtocol) {
+            SubProtocol.TOUCH_CARD -> MoshiPack.unpack<TouchCard>(message)
+            else -> null
+        }
+}
+
+fun networkBytesToAction(byteArray: ByteArray?): NetworkAction? {
+    return protocolToAction(networkBytesToProtocol(byteArray))
+}
+
+fun actionToNetworkBytes(action: NetworkAction) : ByteArray? {
+    val protocol = Protocol.ROOM_DATA
+    return when (action) {
+        is TouchCard -> pack(protocol, SubProtocol.TOUCH_CARD, action)
+        else -> null
+    }
+}
+
+//
+//fun actionToProtocol(action: NetworkAction) : ByteArray? {
+//    val protocol = Protocol.ROOM_DATA
+//    return when (action) {
+//        is TouchCard -> pack(protocol, SubProtocol.TOUCH_CARD, action)
+//        else -> null
+//    }
+//}
+
+fun bytesToHexString(byteArray: ByteArray?): String {
+    val pattern: Regex = "(\\S{2})".toRegex()
+    return Hex.encodeHexString(byteArray).replace(pattern, "$1 ")
+}
+
+
+
+
+
+
+
+
+
 
 
 //fun getAdapterFromActionType(type: ActionType?): Class? {

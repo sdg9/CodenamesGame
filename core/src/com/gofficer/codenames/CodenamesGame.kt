@@ -311,7 +311,7 @@ val getNetworkActionMiddleware = { game: CodenamesGame ->
                 game.room?.send(action.type, action)
             }
         }
-        if (action is NetworkAction && !action.isFromServer) {
+        if (action is NetworkAction && !action?.isFromServer) {
             println("Dispatching remotely: $action")
             if (game.room == null) {
                 println("No connected game room to dispatch network action")

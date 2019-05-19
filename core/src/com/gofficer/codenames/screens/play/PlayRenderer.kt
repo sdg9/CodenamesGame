@@ -19,7 +19,7 @@ import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.utils.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.gofficer.codenames.assets.AssetPaths
-import com.gofficer.codenames.redux.actions.CardPressed
+//import com.gofficer.codenames.redux.actions.CardPressed
 import redux.api.Store
 import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.redux.actions.SetupGame

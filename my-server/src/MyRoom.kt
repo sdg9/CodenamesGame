@@ -9,7 +9,7 @@ import com.gofficer.codenames.redux.createCodeNamesStore
 import com.gofficer.codenames.redux.middleware.loggingMiddleware
 import com.gofficer.codenames.redux.middleware.setupGameMiddleware
 import com.gofficer.codenames.redux.middleware.validActionMiddleware
-import com.gofficer.codenames.redux.models.cardReduce
+//import com.gofficer.codenames.redux.models.cardReduce
 import com.gofficer.codenames.redux.reducers.reduceGameSetup
 import com.gofficer.colyseus.network.*
 import common.Room
@@ -20,6 +20,7 @@ import io.ktor.http.cio.websocket.WebSocketSession
 import org.apache.commons.codec.binary.Hex
 import org.slf4j.LoggerFactory
 import redux.api.Store
+import java.lang.Exception
 import java.nio.ByteBuffer
 import kotlin.reflect.jvm.jvmName
 
@@ -60,8 +61,8 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
     private fun createReduxStore() {
         store = createCodeNamesStore(initState,
             arrayOf(
-                reduceGameSetup,
-                cardReduce
+                reduceGameSetup
+//                cardReduce
             ),
             arrayOf(
                 loggingMiddleware,
@@ -91,9 +92,14 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
                 val pattern: Regex = "(\\S{2})".toRegex()
                 println()
                 println(Hex.encodeHexString(message).replace(pattern, "$1 "))
-//                val unpacked = MoshiPack.unpack<TouchCard>(message)
+                try {
+                    val unpacked = MoshiPack.unpack<TouchCard>(message)
 //
-//                logger.debug("Unpack touch card: $unpacked")
+                    logger.debug("Unpack touch card: $unpacked")
+                } catch (e: Exception) {
+                    logger.error(e.toString())
+                }
+
 //                store.dispatch(unpacked)
                 sendAllClients(protocolMessage)
             }

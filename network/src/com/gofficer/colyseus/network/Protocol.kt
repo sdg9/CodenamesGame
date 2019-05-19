@@ -6,7 +6,6 @@ class Protocol {
 
         const val WS_CLOSE_CONSENTED = 4000;
 
-
         // User-related (1~8)
         const val USER_ID = 1
 

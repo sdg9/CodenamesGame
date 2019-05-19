@@ -118,7 +118,7 @@ project(":redux") {
 //        implementation("com.squareup.moshi:moshi:$moshi_version")
 //        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
 //        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-//        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
+        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
 //        implementation "com.squareup.okio:okio:1.16.0"
         testCompile "io.ktor:ktor-server-tests:$ktor_version"
     }

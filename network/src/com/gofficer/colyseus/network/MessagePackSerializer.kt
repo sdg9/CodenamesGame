@@ -45,7 +45,6 @@ fun unpackUnknown(packed: Any): ProtocolMessage? {
  * [protocol, subprotocol, message]
  */
 fun unpackUnknown(packed: ByteArray): ProtocolMessage? {
-
     val unpacker = MessagePack.newDefaultUnpacker(packed)
     val format = unpacker.nextFormat
     if (format.valueType == ValueType.ARRAY) {

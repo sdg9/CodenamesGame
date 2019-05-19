@@ -6,6 +6,7 @@ import com.gofficer.colyseus.network.Protocol
 import com.gofficer.colyseus.network.SubProtocol
 import com.gofficer.colyseus.network.pack
 import com.gofficer.colyseus.myServer.test.*
+import com.gofficer.colyseus.network.unpackUnknown
 import com.squareup.moshi.Moshi
 import io.ktor.application.*
 import io.ktor.server.testing.*
@@ -120,8 +121,17 @@ class SingleClientGame {
                     // Confirm state is updated accordingly
 //
                     val serverUpdate = (roomIncoming.receive() as Frame.Binary).readBytes()
-                    val unpacked: Array<Any> = moshiPack.unpack(serverUpdate)
-                    println("Unpacked; ${unpacked.get(2)}")
+                    val unpacked = unpackUnknown(serverUpdate)
+
+                    println("Unpacked $unpacked")
+
+//                    val touchCard = moshi.un
+//                    val unpacked: Array<Any> = moshiPack.unpack(serverUpdate)
+//                    println("Unpacked; ${unpacked.get(2)}")
+
+//                    expect
+
+                    // TODO press card
 
                 }
             }
