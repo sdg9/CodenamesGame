@@ -66,6 +66,7 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
 //                getNavigationMiddleware(game)
             )
         )
+        logger.debug("Dispatching setup game")
         store.dispatch(SetupGame())
     }
 
@@ -81,48 +82,21 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
         }
 
         val deserializedAction = protocolToAction(protocolMessage)
-
+        store.dispatch(deserializedAction)
         when (deserializedAction) {
             is TouchCard -> {
                 deserializedAction.isFromServer = true
                 sendAllClients(deserializedAction)
             }
+//            is ResetGame -> {
+////                deserializedAction.isFromServer = true
+////                store.dispatch(deserializedAction)
+////                sendAllClients(deserializedAction)
+//            }
             else -> {
                 logger.debug("Unidentified action for subprotocol $subProtocol")
             }
         }
-
-//        when (subProtocol) {
-//            SubProtocol.TOUCH_CARD -> {
-//                logger.debug("Got touch card")
-//                val pattern: Regex = "(\\S{2})".toRegex()
-//                println()
-//                println(Hex.encodeHexString(message).replace(pattern, "$1 "))
-//                try {
-//                    val unpacked = MoshiPack.unpack<TouchCard>(message)
-////
-//                    logger.debug("Unpack touch card: $unpacked")
-//                } catch (e: Exception) {
-//                    logger.error(e.toString())
-//                }
-//
-////                store.dispatch(unpacked)
-//                sendAllClients(protocolMessage)
-//            }
-//            else -> {
-//                logger.debug("Custom protocol $subProtocol")
-//            }
-//        }
-//
-//        // TODO for now send back to show it's working
-//        val byteArray = pack(Protocol.ROOM_DATA, SubProtocol.TOUCH_CARD, TouchCard(18))
-//        val someMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
-//        clients.forEach {
-//////            it.send(action as String)
-////            it.socket.send(someMessage)
-//////            it.socket.send(pack(action))
-//////            it.socket.sendAction(action)
-//        }
     }
 
     private suspend fun sendAllClients(protocolMessage: ProtocolMessage) {
@@ -150,43 +124,7 @@ class MyRoom : Room<GameState>(listener = object : RoomListener {
     override fun onLeave(client: Client, consented: Boolean?) {
         logger.debug("Client ${client.id} left room $roomId")
     }
-
-//    override val state: MyRoomGameState = MyRoomGameState("test", 12, false)
 }
-
-
-//val syncWithClientMiddleware = { game: CodenamesGame ->
-//    Middleware  { store: Store<GameState>, next: Dispatcher, action: Any ->
-//        if (action is NetworkAction && !action.isFromServer && game.room != null) {
-//            println("Dispatching remotely: $action")
-//
-////            val gsonBuilder = GsonBuilder()
-////            gsonBuilder.registerTypeAdapter(action::class.java, MenuContentInterfaceAdapter())
-////            var gson = gsonBuilder.create()
-//
-////            var gson = Gson()
-////            var jsonString = gson.toJson(NetworkMessage(action::class.java.simpleName, action))
-//
-////            log.debug("Sending $jsonString")
-////            room?.send(action.toJson())
-//            game.room?.send(NetworkMessage(action::class.java.simpleName, action))
-//        }
-//        next.dispatch(action)
-//    }
-//}
-//fun messageHelper(protocolMessage: ProtocolMessage?) : Type? {
-//    val subProtocol = protocolMessage?.subProtocol
-//    val message = protocolMessage?.message
-//    if(subProtocol == null || message == null) {
-//        return null
-//    }
-//
-//    return when (subProtocol) {
-//        TestSubType.ITEM_1 -> moshiPack.unpack<SomeType>(message)
-//        TestSubType.ITEM_2 -> moshiPack.unpack<SomeOtherType>(message)
-//        else -> null
-//    }
-//}
 
 
 suspend inline fun WebSocketSession.sendProtocolMessage(protocolMessage: ProtocolMessage) {
