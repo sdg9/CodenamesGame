@@ -8,11 +8,13 @@ import com.gofficer.colyseus.network.unpackUnknown
 import org.apache.commons.codec.binary.Hex;
 import org.junit.Test
 import org.msgpack.jackson.dataformat.MessagePackFactory
-import kotlin.reflect.KClass
 
 
 /**
+ * 5/18/2019
  * Test to see what messagepack serialization approaches work best
+ *
+ * Trying it out to see what boilerplate code will look like
  */
 class SerializingTechniques {
 
@@ -86,7 +88,7 @@ fun messageHelperA(protocolMessage: ProtocolMessage?) : Type? {
 //            return moshiPack.unpack<SomeType>(message)
 //            return msgpackMapper.readValue(message, SubType.ONE.value)
 //            return msgpackMapper.readValue(message, SomeType::class.javaObjectType)
-            return msgpackMapper.readValue(message, SubType.ONE.type) as Type
+            return msgpackMapper.readValue(message, SubTypeA.ONE.type) as Type
         }
         SubTypeA.TWO.ordinal -> moshiPack.unpack<SomeOtherType>(message)
         else -> null
