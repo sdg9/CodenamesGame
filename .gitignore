@@ -112,6 +112,9 @@ gradle-app.setting
 /html/build/
 /ios/build/
 /ios-moe/build/
+/my-server/build/
+/redux/build/
+/network/build/
 
 ## OS Specific
 .DS_Store
