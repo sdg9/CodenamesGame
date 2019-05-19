@@ -3,8 +3,8 @@ import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.myServer.main
 import com.gofficer.codenames.redux.actions.ResetGame
 import com.gofficer.codenames.redux.actions.TouchCard
-import com.gofficer.codenames.redux.actions.actionToNetworkBytes
-import com.gofficer.codenames.redux.actions.networkBytesToAction
+import com.gofficer.codenames.redux.utils.actionToNetworkBytes
+import com.gofficer.codenames.redux.utils.networkBytesToAction
 import com.gofficer.colyseus.network.Protocol
 import com.gofficer.colyseus.network.SubProtocol
 import com.gofficer.colyseus.network.pack

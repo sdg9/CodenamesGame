@@ -7,6 +7,8 @@ import com.gofficer.codenames.redux.middleware.loggingMiddleware
 import com.gofficer.codenames.redux.middleware.setupGameMiddleware
 import com.gofficer.codenames.redux.middleware.validActionMiddleware
 import com.gofficer.codenames.redux.reducers.reduceGameSetup
+import com.gofficer.codenames.redux.utils.actionToNetworkBytes
+import com.gofficer.codenames.redux.utils.protocolToAction
 import com.gofficer.colyseus.network.*
 import common.Room
 import common.RoomListener

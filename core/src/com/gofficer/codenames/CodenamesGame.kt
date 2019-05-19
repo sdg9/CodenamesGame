@@ -15,6 +15,8 @@ import com.gofficer.codenames.redux.middleware.loggingMiddleware
 import com.gofficer.codenames.redux.middleware.setupGameMiddleware
 import com.gofficer.codenames.redux.middleware.validActionMiddleware
 import com.gofficer.codenames.redux.reducers.reduceGameSetup
+import com.gofficer.codenames.redux.utils.actionToNetworkBytes
+import com.gofficer.codenames.redux.utils.protocolToAction
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.PlayScreen
@@ -98,18 +100,6 @@ class CodenamesGame : Game() {
                 room = client?.join("public")
                 log.debug("Joined room: $room")
 
-                println("Client.onOpen();")
-                println("colyseus id: $id")
-
-//                room?.addPatchListener("players/:id", object : PatchListenerCallback() {
-//                    override fun callback(change: DataChange) {
-//                        log.debug("patchListener: $change")
-//                    }
-//                })
-//                room?.setDefaultPatchListener(object : FallbackPatchListenerCallback() {
-//                    override fun callback(patch: PatchObject) {
-//                    }
-//                })
                 room?.addListener(object : Room.Listener() {
 
                     override fun onStateChange(message: Any){
@@ -118,7 +108,6 @@ class CodenamesGame : Game() {
 
                         when (protocolMessage?.protocol) {
                             Protocol.ROOM_DATA -> {
-
                                 log.debug("onStateChange Room Data $message")
                             }
                             Protocol.ROOM_STATE -> {
@@ -133,9 +122,6 @@ class CodenamesGame : Game() {
 
 
                     override fun onMessage(protocolMessage: ProtocolMessage) {
-//                        log.debug("onMessage 1: $protocolMessage")
-
-//                        val protocolMessage = unpackUnknown(message)
                         if (protocolMessage == null) {
                             log.error("Cannot read protocol $protocolMessage")
                         }
@@ -157,8 +143,6 @@ class CodenamesGame : Game() {
                                     action.isFromServer = true
                                     store.dispatch(action)
                                 }
-
-//                                store.dispatch()
                             }
                             else -> {
                                 log.debug(protocolMessage?.protocol!!::class.simpleName)

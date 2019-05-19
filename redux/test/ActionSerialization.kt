@@ -1,8 +1,8 @@
 
 import com.gofficer.codenames.redux.actions.TouchCard
-import com.gofficer.codenames.redux.actions.actionToNetworkBytes
-import com.gofficer.codenames.redux.actions.bytesToHexString
-import com.gofficer.codenames.redux.actions.networkBytesToAction
+import com.gofficer.codenames.redux.utils.actionToNetworkBytes
+import com.gofficer.codenames.redux.utils.bytesToHexString
+import com.gofficer.codenames.redux.utils.networkBytesToAction
 import kotlin.test.*
 
 
