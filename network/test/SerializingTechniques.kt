@@ -25,7 +25,7 @@ class SerializingTechniques {
     fun appraoch1() {
         val protocol = 1
         val anyObj = "hello"
-        val packedByteArray = pack(protocol, SubType.ONE, SomeType("Hello", "Goodbye"))
+        val packedByteArray = pack(protocol, TestSubType.ITEM_1, SomeType("Hello", "Goodbye"))
 
         val pattern: Regex = "(\\S{2})".toRegex()
         println()
@@ -37,7 +37,7 @@ class SerializingTechniques {
         testHelper(message)
 
 
-        val packedByteArray2 = pack(protocol, SubType.TWO, SomeOtherType(1, "Ahoy"))
+        val packedByteArray2 = pack(protocol, TestSubType.ITEM_2, SomeOtherType(1, "Ahoy"))
         val unpacked2 = unpackUnknown(packedByteArray2)
         val message2 = messageHelper(unpacked2)
         testHelper(message2)
@@ -104,6 +104,19 @@ enum class SubType {
     TWO
 }
 
+
+class TestSubType {
+
+    companion object {
+
+        const val ITEM_1 = 1
+        const val ITEM_2 = 2
+
+        // TODO define sub protocols here, essentially number to redux action types
+
+    }
+}
+
 fun messageHelper(protocolMessage: ProtocolMessage?) : Type? {
     val subProtocol = protocolMessage?.subProtocol
     val message = protocolMessage?.message
@@ -112,8 +125,8 @@ fun messageHelper(protocolMessage: ProtocolMessage?) : Type? {
     }
 
     return when (subProtocol) {
-        SubType.ONE.ordinal -> moshiPack.unpack<SomeType>(message)
-        SubType.TWO.ordinal -> moshiPack.unpack<SomeOtherType>(message)
+        TestSubType.ITEM_1 -> moshiPack.unpack<SomeType>(message)
+        TestSubType.ITEM_2 -> moshiPack.unpack<SomeOtherType>(message)
         else -> null
     }
 }
