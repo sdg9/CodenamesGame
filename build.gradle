@@ -19,6 +19,7 @@ buildscript {
 allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
+    apply plugin: 'base'
 
     version = '1.0'
     ext {
@@ -111,45 +112,46 @@ project(":redux") {
     apply plugin: "kotlin"
 
     dependencies {
+        compile project(":network")
         implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
         implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
-        implementation("com.squareup.moshi:moshi:$moshi_version")
-        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
-        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
-        implementation "com.squareup.okio:okio:1.16.0"
+//        implementation("com.squareup.moshi:moshi:$moshi_version")
+//        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
+//        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
+//        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
+//        implementation "com.squareup.okio:okio:1.16.0"
         testCompile "io.ktor:ktor-server-tests:$ktor_version"
     }
 
 }
 
-/**
- * Game server core logic (not customized to codenames)
- */
-project(":server") {
-    apply plugin: "kotlin"
-
-    dependencies {
-        compile project(":redux")
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        compile "io.ktor:ktor-server-netty:$ktor_version"
-        compile "ch.qos.logback:logback-classic:$logback_version"
-        compile "io.ktor:ktor-server-core:$ktor_version"
-        compile "io.ktor:ktor-server-sessions:$ktor_version"
-        compile "io.ktor:ktor-websockets:$ktor_version"
-        compile "io.ktor:ktor-gson:$ktor_version"
-        implementation("com.squareup.moshi:moshi:$moshi_version")
-        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
-        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
-        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
-        compile 'org.redisson:redisson:3.10.7'
-        // https://mvnrepository.com/artifact/commons-codec/commons-codec
-        compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
-        testCompile "io.ktor:ktor-server-tests:$ktor_version"
-    }
-
-}
+///**
+// * Game server core logic (not customized to codenames)
+// */
+//project(":server") {
+//    apply plugin: "kotlin"
+//
+//    dependencies {
+//        compile project(":redux")
+//        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+//        compile "io.ktor:ktor-server-netty:$ktor_version"
+//        compile "ch.qos.logback:logback-classic:$logback_version"
+//        compile "io.ktor:ktor-server-core:$ktor_version"
+//        compile "io.ktor:ktor-server-sessions:$ktor_version"
+//        compile "io.ktor:ktor-websockets:$ktor_version"
+//        compile "io.ktor:ktor-gson:$ktor_version"
+//        implementation("com.squareup.moshi:moshi:$moshi_version")
+//        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
+//        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
+//        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
+//        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
+//        compile 'org.redisson:redisson:3.10.7'
+//        // https://mvnrepository.com/artifact/commons-codec/commons-codec
+//        compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
+//        testCompile "io.ktor:ktor-server-tests:$ktor_version"
+//    }
+//
+//}
 
 
 /**
@@ -271,4 +273,15 @@ project(":core") {
 
 tasks.eclipse.doLast {
     delete ".project"
+}
+
+clean.doFirst {
+//    delete "${rootDir}/build"
+    delete "${rootDir}/client/out"
+    delete "${rootDir}/core/out"
+    delete "${rootDir}/desktop/out"
+    delete "${rootDir}/my-server/out"
+    delete "${rootDir}/network/out"
+    delete "${rootDir}/redux/out"
+    delete "${rootDir}/server/out"
 }

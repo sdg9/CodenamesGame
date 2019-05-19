@@ -3,10 +3,8 @@ package com.gofficer.codenames.redux.actions
 
 import com.gofficer.codenames.redux.models.Card
 import com.gofficer.colyseus.network.SubProtocol
-import com.squareup.moshi.JsonReader
+//import com.squareup.moshi.JsonReader
 import gofficer.codenames.redux.game.GameState
-import okio.Buffer
-import java.lang.Exception
 
 /**
  * Generic Actions:
@@ -181,18 +179,18 @@ data class SomethingElse(val name : String ) : Action(ActionType.SOMETHING_ELSE)
 //
 //    return builder!!
 //}
-
-
-fun getAttributeFromActionJson(json: String, attribute: String): Any? {
-    val reader = JsonReader.of(Buffer().writeUtf8(json))
-    try {
-        val value = reader.readJsonValue() as Map<String, Object>
-        return value.get(attribute)
-    } catch (e: Exception) {
-        println("Error $e")
-    }
-    return null
-}
+//
+//
+//fun getAttributeFromActionJson(json: String, attribute: String): Any? {
+//    val reader = JsonReader.of(Buffer().writeUtf8(json))
+//    try {
+//        val value = reader.readJsonValue() as Map<String, Object>
+//        return value.get(attribute)
+//    } catch (e: Exception) {
+//        println("Error $e")
+//    }
+//    return null
+//}
 
 //inline fun <reified T> toJSON(message: T): String {
 //    val jsonAdapter = getMoshiBuilder().adapter(T::class.java)
