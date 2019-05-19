@@ -58,12 +58,17 @@ data class ClientOptions(
     var sessionId: String?
 )
 
-
 sealed class Action(val type: ActionType): BaseAction
 
 interface NetworkAction {
     var isFromServer: Boolean
 }
+
+
+// GamePlay Action
+
+data class TouchCard(val id: Int, override var isFromServer: Boolean = false): NetworkAction, BaseAction
+
 
 data class CardPressed(val id: Int, val word: String, override var isFromServer: Boolean = false): Action(ActionType.CARD_PRESSED), NetworkAction
 

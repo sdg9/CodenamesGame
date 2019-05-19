@@ -17,18 +17,18 @@ val reduceGameSetup = Reducer { state: GameState, action: Any ->
             )
 
         }
-        is ResetGame -> state.copy(
-            board = Board(),
-            lastPlayed = 0,
-            gameOver = false,
-            cards = listOf()
-        )
-        is SetState -> state.copy(
-            board = state.board,
-            lastPlayed = state.lastPlayed,
-            gameOver = state.gameOver,
-            cards = state.cards
-        )
+//        is ResetGame -> state.copy(
+//            board = Board(),
+//            lastPlayed = 0,
+//            gameOver = false,
+//            cards = listOf()
+//        )
+//        is SetState -> state.copy(
+//            board = state.board,
+//            lastPlayed = state.lastPlayed,
+//            gameOver = state.gameOver,
+//            cards = state.cards
+//        )
         else -> state
     }
 }

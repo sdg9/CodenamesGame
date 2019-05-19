@@ -2,6 +2,7 @@ package com.gofficer.colyseus.server
 
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.redux.actions.ClientOptions
+import com.gofficer.colyseus.network.ProtocolMessage
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.cio.websocket.WebSocketSession
 import io.ktor.http.cio.websocket.send
@@ -24,17 +25,17 @@ data class Client(
     val useTextOverBinary: Boolean = false
 //    var listener: ClientListner? = null
 ) {
-    var onMessageListener = mutableListOf<(message: String) -> Unit>()
+    var onMessageListener = mutableListOf<(DecryptProtocol) -> Unit>()
     var onCloseListener = mutableListOf<(code: Int) -> Unit>()
 
-    fun setOnMessageListener(handler: (message: String) -> Unit ) {
+    fun setOnMessageListener(handler: (DecryptProtocol) -> Unit ) {
         onMessageListener.add(handler)
     }
     fun setOnCloseListener(handler: (code: Int) -> Unit ) {
         onCloseListener.add(handler)
     }
     fun removeAllListeners() {
-        onMessageListener = mutableListOf<(message: String) -> Unit>()
+        onMessageListener = mutableListOf<(DecryptProtocol) -> Unit>()
         onCloseListener = mutableListOf<(code: Int) -> Unit>()
     }
 

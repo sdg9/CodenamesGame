@@ -17,8 +17,6 @@ class Connection internal constructor(
     private val listener: Listener?
 ) : WebSocketClient(uri, Draft_6455(), httpHeaders, connectTimeout) {
 
-
-
     private val _enqueuedCalls = mutableListOf<Any>()
     private val msgpackMapper: ObjectMapper
 

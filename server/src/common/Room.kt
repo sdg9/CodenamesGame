@@ -273,7 +273,7 @@ abstract class Room<T>(var presence: Presence? = null, var listener: RoomListene
         client.sendRoomState(this.store.state)
     }
 
-    private suspend fun _onMessage(client: Client, message: String) {
+    private suspend fun _onMessage(client: Client, message: Any) {
         logger.debug("Message $message from $client")
 
         if (message == null) {

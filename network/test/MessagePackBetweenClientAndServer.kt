@@ -1,7 +1,7 @@
 
 
 import com.daveanthonythomas.moshipack.MoshiPack
-import com.gofficer.colyseus.Protocol
+import com.gofficer.colyseus.network.Protocol
 import com.gofficer.colyseus.network.unpackUnknown
 import junit.framework.TestCase.*
 import okio.BufferedSource

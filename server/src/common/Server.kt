@@ -153,21 +153,44 @@ class Sever {
 
                 // Frames can be [Text], [Binary], [Ping], [Pong], [Close].
                 // We are only interested in textual messages, so we filter it.
-                if (frame is Frame.Text) {
-                    val message = frame.readText()
-                    logger.debug("Frame.Text: $message")
-                    receiveMessageMatchMakingText(client, message)
-
-                    // TODO look up clients in room, or room
-                    client.onMessageListener.forEach { it(message) }
-                    logger.debug("Client: $client")
-                }
+//                if (frame is Frame.Text) {
+//                    val message = frame.readText()
+//                    logger.debug("Frame.Text: $message")
+//                    receiveMessageMatchMakingText(client, message)
+//
+//                    // TODO look up clients in room, or room
+//                    client.onMessageListener.forEach { it(message) }
+//                    logger.debug("Client: $client")
+//                }
                 if (frame is Frame.Binary) {
-                    val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
-                    logger.debug("Received binary frame ${unpacked.toString()}")
-                    val firstByte = unpacked[0] as? Double ?: throw Error("Unknown binary message format")
-                    val type = firstByte.toInt()
-                    receiveMessageMatchMakingBinary(client, type, frame)
+                    logger.debug("Receiveing binary frame")
+
+                    val bytes = frame.readBytes()
+                    val protocolMessage = unpackProtocol(bytes)
+//                    val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
+//                    logger.debug("Received binary frame ${unpacked.toString()}")
+//                    val firstByte = unpacked[0] as? Double ?: throw Error("Unknown binary message format")
+                    if (protocolMessage == null || protocolMessage.protocol == null) {
+                        throw Error("Unknown binary message format")
+                    }
+                    val type = protocolMessage.protocol
+//                    val type = firstByte.toInt()
+
+//                    val message = unpackProtocol()
+                    when (type) {
+//                        Protocol.JOIN_ROOM -> receiveMessageMatchMakingBinary(client, type, frame)
+                        Protocol.JOIN_REQUEST, Protocol.JOIN_ROOM -> {
+                            logger.debug("Join request/room")
+                            val unpacked: List<Any> = moshiPack.unpack(frame.readBytes())
+                            val roomName = unpacked[1] as String
+                            onJoinRequest(client, roomName, null)
+                        }
+                        Protocol.ROOM_DATA -> {
+                            logger.debug("Room data receieved ")
+                            client.onMessageListener.forEach { it(protocolMessage) }
+//                            onMes
+                        }
+                    }
 //                    if (type == 10) {
 //                        logger.debug("Mathes 10")
 //                    } else {
@@ -201,25 +224,25 @@ class Sever {
 
     }
 
-    /**
-     * A chat session is identified by a unique nonce ID. This nonce comes from a secure random source.
-     */
-//    data class GameSession2(val sessionId: String)
-
-    /**
-     * We received a message. Let's process it.
-     */
-    private suspend fun receiveMessageMatchMakingText(client: Client, message: String) {
-
-        val action = parseActionJSON(message)
-//        val type = getActionTypeFromJson(message)
-        // We are going to handle commands (text starting with '/') and normal messages
-        when (action?.type) {
-            ActionType.JOIN_REQUEST -> onJoinRequestText(client, action as JoinRequest)
-            ActionType.USER_ID -> this
-            ActionType.ROOM_LIST -> this
-        }
-    }
+//    /**
+//     * A chat session is identified by a unique nonce ID. This nonce comes from a secure random source.
+//     */
+////    data class GameSession2(val sessionId: String)
+//
+//    /**
+//     * We received a message. Let's process it.
+//     */
+//    private suspend fun receiveMessageMatchMakingText(client: Client, message: String) {
+//
+//        val action = parseActionJSON(message)
+////        val type = getActionTypeFromJson(message)
+//        // We are going to handle commands (text starting with '/') and normal messages
+//        when (action?.type) {
+//            ActionType.JOIN_REQUEST -> onJoinRequestText(client, action as JoinRequest)
+//            ActionType.USER_ID -> this
+//            ActionType.ROOM_LIST -> this
+//        }
+//    }
 
 
     private suspend fun receiveMessageMatchMakingBinary(client: Client, type: Int, frame: Frame.Binary) {

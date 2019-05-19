@@ -1,6 +1,10 @@
 
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.myServer.main
+import com.gofficer.codenames.redux.actions.TouchCard
+import com.gofficer.colyseus.network.Protocol
+import com.gofficer.colyseus.network.SubProtocol
+import com.gofficer.colyseus.network.pack
 import com.squareup.moshi.Moshi
 import io.ktor.application.*
 import io.ktor.server.testing.*
@@ -8,6 +12,9 @@ import org.junit.Rule
 import org.junit.rules.Timeout
 import java.util.concurrent.TimeUnit
 import kotlin.test.*
+import io.ktor.http.cio.websocket.Frame
+import io.ktor.http.cio.websocket.readBytes
+import java.nio.ByteBuffer
 
 /**
  * Tests the [ChatApplication].
@@ -100,8 +107,14 @@ class SingleClientGame {
                     // By here game state is sent to client
 
                     // Send pressed event
-
+                    val byteArray = pack(Protocol.ROOM_DATA, SubProtocol.TOUCH_CARD, TouchCard(1))
+                    val clientMessage = Frame.Binary(true, ByteBuffer.wrap(byteArray))
+                    clientRoomOutgoing.send(clientMessage)
                     // Confirm state is updated accordingly
+
+                    val serverUpdate = (roomIncoming.receive() as Frame.Binary).readBytes()
+                    val unpacked: Array<Any> = moshiPack.unpack(serverUpdate)
+                    println("Unpacked; $unpacked")
 
                 }
             }

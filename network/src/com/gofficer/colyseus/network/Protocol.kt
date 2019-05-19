@@ -1,4 +1,4 @@
-package com.gofficer.colyseus
+package com.gofficer.colyseus.network
 
 class Protocol {
 

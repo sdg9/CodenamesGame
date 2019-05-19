@@ -4,6 +4,7 @@ package com.gofficer.colyseus.client
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.gofficer.colyseus.network.Protocol
 import org.msgpack.core.MessagePack
 import org.msgpack.jackson.dataformat.MessagePackFactory
 import org.msgpack.value.Value
