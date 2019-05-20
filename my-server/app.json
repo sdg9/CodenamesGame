@@ -1,0 +1,5 @@
+{
+  "name": "Start on Heroku: Kotlin",
+  "description": "A websocket game server for Codenames.",
+  "image": "heroku/java"
+}
