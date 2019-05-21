@@ -19,7 +19,7 @@ class PlayScreen(val game: CodenamesGame) : ScreenAdapter() {
 
     override fun show() {
         log.debug("show")
-        renderer = PlayRenderer(game.font24, assetManager, game.store)
+        renderer = PlayRenderer(game.font24, assetManager, game.store, game.client)
 
         if (game.client == null) {
             setupGame()

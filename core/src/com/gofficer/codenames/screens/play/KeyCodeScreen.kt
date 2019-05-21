@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.ScreenAdapter
 import com.gofficer.codenames.CodenamesGame
-import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.utils.logger
 
 class KeyCodeScreen(val game: CodenamesGame) : ScreenAdapter() {
@@ -20,18 +19,10 @@ class KeyCodeScreen(val game: CodenamesGame) : ScreenAdapter() {
     override fun show() {
         log.debug("show")
         renderer = KeyCodeRenderer(game.font24, assetManager, game.store)
-
-        if (game.client == null) {
-            setupGame()
-        }
-        game.store.subscribe {
-            log.debug("Update to store")
-        }
         renderer.show()
     }
 
     override fun render(delta: Float) {
-//        controller.update(delta)
         renderer.render(delta)
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
@@ -55,7 +46,4 @@ class KeyCodeScreen(val game: CodenamesGame) : ScreenAdapter() {
         renderer.dispose()
     }
 
-    private fun setupGame() {
-        game.store.dispatch(SetupGame())
-    }
 }

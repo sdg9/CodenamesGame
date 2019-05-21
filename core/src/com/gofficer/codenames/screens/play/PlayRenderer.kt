@@ -24,11 +24,16 @@ import redux.api.Store
 import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.redux.actions.TouchCard
+import com.gofficer.colyseus.client.Client
 import gofficer.codenames.redux.game.GameState
 
 
-class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
-                   private val store: Store<GameState>) : Disposable {
+class PlayRenderer(
+    private val myFont: BitmapFont,
+    private val assetManager: AssetManager,
+    private val store: Store<GameState>,
+    private val client: Client?
+) : Disposable {
 
     companion object {
         @JvmStatic
@@ -94,8 +99,9 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
             })
             table.add(makeButton("Quit Game") {
                 log.debug("Pressed quit game")
-                // TODO dispatch instead
                 store.dispatch(ChangeScene("MainMenu"))
+                // TODO dispatch disconnect
+                client?.close()
             })
             for (j in 0..4) {
                 table.row().pad(10f) // padding on all sides between cards

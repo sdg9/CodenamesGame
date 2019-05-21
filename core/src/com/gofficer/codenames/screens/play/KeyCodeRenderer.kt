@@ -114,6 +114,16 @@ class KeyCodeRenderer(private val myFont: BitmapFont, private val assetManager: 
         table.setFillParent(true)
         tableHeader.x = 100f
         tableHeader.y = GameConfig.WORLD_HEIGHT - 50
+
+        // TODO
+        // https://youtu.be/kDxerDYelLs?t=1613
+//        val scene = verticalGroup {
+//
+//        }
+        // State machine
+        // https://youtu.be/kDxerDYelLs?t=1826
+
+
         stage.addActor(tableHeader)
         stage.addActor(table)
     }
