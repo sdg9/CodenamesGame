@@ -8,19 +8,20 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.FitViewport
 
 import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.utils.Align
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.redux.actions.ChangeScene
-import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.codenames.utils.toInternalFile
+import ktx.scene2d.*
 
 
 class MainMenuScreen(private val game: CodenamesGame) : ScreenAdapter() {
@@ -32,15 +33,9 @@ class MainMenuScreen(private val game: CodenamesGame) : ScreenAdapter() {
 
     private var skin: Skin = Skin()
 
-    private lateinit var buttonPlayOnline: TextButton
-    private lateinit var buttonPlayLocal: TextButton
-    private lateinit var buttonExit: TextButton
-
     private val renderer: ShapeRenderer = ShapeRenderer()
 
-    private val camera = OrthographicCamera()
     private val uiCamera = OrthographicCamera()
-    private val viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
     private val uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
 
     private val stage: Stage = Stage(uiViewport)
@@ -90,61 +85,57 @@ class MainMenuScreen(private val game: CodenamesGame) : ScreenAdapter() {
         skin.addRegions(uiSkinAtlas)
         skin.add("default-font", game.font24)
         skin.load(AssetPaths.UI_SKIN_JSON.toInternalFile())
+
+        Scene2DSkin.defaultSkin = skin
     }
 
     private fun initButtons() {
-
-        buttonPlayOnline = makeButton(
-                "Play Online"
-        ) {
-            game.store.dispatch(ChangeScene("PlayOnline"))
-        }
-
-        buttonPlayLocal = makeButton(
-                "Play Local"
-        ) {
-            game.store.dispatch(ChangeScene("Play"))
-        }
-
-        buttonExit = makeButton(
-                "Exit"
-        ) { Gdx.app.exit() }
-
         val buttonWidth = GameConfig.HUD_WIDTH * .6f
-        val buttonHeight = GameConfig.HUD_HEIGHT / 10
-//
-//        stage.addActor(buttonPlayOnline)
-//        stage.addActor(buttonExit)
-//        val nameLabel = Label("Name:", skin)
-//        val nameText = TextField("", skin)
-//        val addressLabel = Label("Address:", skin)
-//        val addressText = TextField("", skin)
+        val buttonHeight = GameConfig.HUD_HEIGHT / 4
 
-        val table = Table()
-        table.add(buttonPlayOnline).width(buttonWidth).height(buttonHeight)
-        table.row().pad(10f)
-        table.add(buttonPlayLocal).width(buttonWidth).height(buttonHeight)
-        table.row()
-        table.add(buttonExit).width(buttonWidth).height(buttonHeight)
-        table.setFillParent(true)
-//        mainTable.add(buttonPlayOnline)
-//        mainTable.add(buttonExit)
-        stage.addActor(table)
-    }
-
-
-    private fun makeButton(name: String, onClick: () -> Unit): TextButton {
-        return TextButton(name, skin, "default").apply {
-            // TODO: figure out how to better deal with font, as-is this distorts bitmap
-//            label.setFontScale(1f)
-//            setSize(GameConfig.WORLD_WIDTH / 2, GameConfig.WORLD_HEIGHT / 5)
-//            setPosition(GameConfig.WORLD_CENTER_X, positionY, Align.center)
-//            addAction(sequence(alpha(0f), parallel(fadeIn(.5f), moveBy(0f, -20f, .5f, Interpolation.pow5Out))))
-            addListener(object : ClickListener() {
-                override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                    onClick()
+        var root = container {
+            setFillParent(true) // apparently same as setting size to width/height
+            align(Align.top)
+            padTop(30f)
+            verticalGroup {
+                space(8f)
+                textButton("Play Online") {
+                    // TODO why do none of these sizes work?
+                    setSize(100f, 100f)
+                    height = 100f
+                    width = 100f
+                    addListener(object : ClickListener() {
+                        override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                            game.store.dispatch(ChangeScene("PlayOnline"))
+                        }
+                    })
                 }
-            })
+                space(8f)
+                textButton("Play Local") {
+                    setSize(buttonWidth, buttonHeight)
+                    addListener(object : ClickListener() {
+                        override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                            game.store.dispatch(ChangeScene("Play"))
+                        }
+                    })
+                }
+                space(8f)
+                textButton("Exit") {
+                    setSize(buttonWidth, buttonHeight)
+                    addListener(object : ClickListener() {
+                        override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                            Gdx.app.exit()
+                        }
+                    })
+                }
+
+            }
+
         }
+
+        stage.addActor(root)
+        stage.isDebugAll = true
+        Gdx.input.inputProcessor = stage
     }
+
 }

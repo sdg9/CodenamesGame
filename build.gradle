@@ -264,6 +264,18 @@ project(":core") {
         implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
         implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
 
+//        implementation "io.github.libktx:ktx-ashley:$ktxVersion"
+//        implementation "io.github.libktx:ktx-graphics:$ktxVersion"
+//        implementation "io.github.libktx:ktx-scene2d:$ktxVersion"
+
+//        compile "com.kotcrab.vis:vis-ui:$visuiVersion"
+//        implementation "io.github.libktx:ktx-vis:$ktxVersion"
+        implementation "io.github.libktx:ktx-log:$ktxVersion"
+        implementation "io.github.libktx:ktx-ashley:$ktxVersion"
+        implementation "io.github.libktx:ktx-graphics:$ktxVersion"
+        implementation "io.github.libktx:ktx-actors:$ktxVersion"
+        implementation "io.github.libktx:ktx-scene2d:$ktxVersion"
+
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"
 
