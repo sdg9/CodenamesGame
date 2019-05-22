@@ -10,12 +10,15 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.screens.menu.MainMenuScreen
+import com.gofficer.codenames.screens.play.KeyCodeScreen
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
+import ktx.app.KtxScreen
+import ktx.assets.disposeSafely
 
 
-class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
+class LoadingScreen(private val game: CodenamesGame) : KtxScreen {
 
     companion object {
         @JvmStatic
@@ -29,19 +32,19 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
     }
 
     private val assetManager = game.assetManager
-    private lateinit var camera: OrthographicCamera
-    private lateinit var viewport: Viewport
-    private lateinit var renderer: ShapeRenderer
+    private var camera: OrthographicCamera = OrthographicCamera()
+    private var viewport: Viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
+    private var renderer: ShapeRenderer = ShapeRenderer()
     private var progress: Float = 0f
 
     override fun show() {
         log.debug("show")
-        camera = OrthographicCamera()
-        viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
-        renderer = ShapeRenderer()
-//        viewport.apply()
-
-//        renderer.projectionMatrix = camera.combined
+//        camera = OrthographicCamera()
+//        viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
+//        renderer = ShapeRenderer()
+////        viewport.apply()
+//
+////        renderer.projectionMatrix = camera.combined
 
         progress = 0f
 
@@ -78,7 +81,7 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
 
     override fun dispose() {
         log.debug("dispose")
-        renderer.dispose()
+        renderer.disposeSafely()
     }
 
     // == private functions ==
@@ -86,8 +89,15 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
         progress = MathUtils.lerp(progress, assetManager.progress, .1f)
         if (assetManager.update() && progress >= assetManager.progress - .001f) {
 
-            @Suppress("ConstantConditionIf")
-            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
+            // Add all screens once assets loaded
+            game.addScreen(PlayScreen(game))
+            game.addScreen(MainMenuScreen(game))
+            game.addScreen(SplashScreen(game))
+            game.addScreen(KeyCodeScreen(game))
+
+//            @Suppress("ConstantConditionIf")
+//            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
+            game.setScreen<MainMenuScreen>()
 //            game.screen = PlayScreen(game)
         }
     }

@@ -24,6 +24,7 @@ import redux.api.Store
 import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.redux.models.Card
 import gofficer.codenames.redux.game.GameState
+import ktx.assets.disposeSafely
 
 
 class KeyCodeRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
@@ -164,8 +165,8 @@ class KeyCodeRenderer(private val myFont: BitmapFont, private val assetManager: 
             it.remove()
         }
         subscription?.unsubscribe()
-        renderer.dispose()
-        batch.dispose()
+        renderer.disposeSafely()
+        batch.disposeSafely()
     }
 
     private fun initSkin() {

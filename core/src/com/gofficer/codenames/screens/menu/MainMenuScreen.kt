@@ -21,10 +21,11 @@ import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.codenames.utils.toInternalFile
+import ktx.app.KtxScreen
 import ktx.scene2d.*
 
 
-class MainMenuScreen(private val game: CodenamesGame) : ScreenAdapter() {
+class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
 
     companion object {
         @JvmStatic

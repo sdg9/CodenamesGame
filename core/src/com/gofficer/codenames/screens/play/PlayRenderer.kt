@@ -25,6 +25,7 @@ import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.redux.actions.TouchCard
 import gofficer.codenames.redux.game.GameState
+import ktx.assets.disposeSafely
 
 
 class PlayRenderer(private val myFont: BitmapFont, private val assetManager: AssetManager,
@@ -209,8 +210,10 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
             it.remove()
         }
         subscription?.unsubscribe()
-        renderer.dispose()
-        batch.dispose()
+        renderer.disposeSafely()
+//        renderer?.dispose()
+        batch.disposeSafely()
+//        batch.dispose()
     }
 
     private fun initSkin() {

@@ -270,11 +270,16 @@ project(":core") {
 
 //        compile "com.kotcrab.vis:vis-ui:$visuiVersion"
 //        implementation "io.github.libktx:ktx-vis:$ktxVersion"
-        implementation "io.github.libktx:ktx-log:$ktxVersion"
-        implementation "io.github.libktx:ktx-ashley:$ktxVersion"
-        implementation "io.github.libktx:ktx-graphics:$ktxVersion"
-        implementation "io.github.libktx:ktx-actors:$ktxVersion"
-        implementation "io.github.libktx:ktx-scene2d:$ktxVersion"
+        api "io.github.libktx:ktx-actors:$ktxVersion"
+        api "io.github.libktx:ktx-scene2d:$ktxVersion"
+
+        api "io.github.libktx:ktx-app:$ktxVersion"
+        api "io.github.libktx:ktx-ashley:$ktxVersion"
+        api "io.github.libktx:ktx-assets:$ktxVersion"
+        api "io.github.libktx:ktx-collections:$ktxVersion"
+        api "io.github.libktx:ktx-graphics:$ktxVersion"
+        api "io.github.libktx:ktx-inject:$ktxVersion"
+        api "io.github.libktx:ktx-log:$ktxVersion"
 
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"

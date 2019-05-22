@@ -6,8 +6,9 @@ import com.badlogic.gdx.ScreenAdapter
 import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.utils.logger
+import ktx.app.KtxScreen
 
-class KeyCodeScreen(val game: CodenamesGame) : ScreenAdapter() {
+class KeyCodeScreen(val game: CodenamesGame) : KtxScreen {
 
     companion object {
         @JvmStatic
@@ -15,11 +16,10 @@ class KeyCodeScreen(val game: CodenamesGame) : ScreenAdapter() {
     }
 
     private val assetManager = game.assetManager
-    private lateinit var renderer: KeyCodeRenderer
+    private var renderer: KeyCodeRenderer = KeyCodeRenderer(game.font24, assetManager, game.store)
 
     override fun show() {
         log.debug("show")
-        renderer = KeyCodeRenderer(game.font24, assetManager, game.store)
 
         if (game.client == null) {
             setupGame()

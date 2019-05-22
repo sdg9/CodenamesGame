@@ -18,6 +18,7 @@ import com.gofficer.codenames.redux.reducers.reduceGameSetup
 import com.gofficer.codenames.redux.utils.actionToNetworkBytes
 import com.gofficer.codenames.redux.utils.protocolToAction
 import com.gofficer.codenames.screens.loading.LoadingScreen
+import com.gofficer.codenames.screens.loading.SplashScreen
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.KeyCodeScreen
 import com.gofficer.codenames.screens.play.PlayScreen
@@ -29,13 +30,15 @@ import com.gofficer.colyseus.network.ProtocolMessage
 import com.gofficer.colyseus.network.unpackUnknown
 import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.redux.game.GameState
+import ktx.app.KtxGame
+import ktx.app.KtxScreen
 import redux.api.Store
 import redux.api.Dispatcher
 import redux.api.enhancer.Middleware
 import java.util.*
 
 
-class CodenamesGame : Game() {
+class CodenamesGame : KtxGame<KtxScreen>() {
 
     companion object {
         @JvmStatic
@@ -69,7 +72,14 @@ class CodenamesGame : Game() {
         game = this
 
         createReduxStore()
-        setScreen(LoadingScreen(game))
+//        setScreen(LoadingScreen(game))
+
+        addScreen(LoadingScreen(game))
+//        addScreen(PlayScreen(game))
+//        addScreen(MainMenuScreen(game))
+//        addScreen(SplashScreen(game))
+
+        setScreen<LoadingScreen>()
     }
 
     private fun createReduxStore() {
@@ -241,27 +251,32 @@ val getNavigationMiddleware = { game: CodenamesGame ->
                     println("Calling close on client")
                     game.room?.leave()
                     game.client?.close()
-                    game.screen = MainMenuScreen(game)
+//                    game.screen = MainMenuScreen(game)
+                    game.setScreen<MainMenuScreen>()
                 }
                 "PlayOnline" -> {
                     game.connectToServer {
                         Gdx.app.postRunnable {
                             println("Online play")
-                            game.screen = PlayScreen(game)
+//                            game.screen = PlayScreen(game)
+                            game.setScreen<PlayScreen>()
                         }
                     }
                 }
                 "PlayScreen" -> {
                     // Assumes game already open
-                    game.screen = PlayScreen(game)
+//                    game.screen = PlayScreen(game)
+                    game.setScreen<PlayScreen>()
                 }
                 "KeyCode" -> {
                     // Assumes game already open
-                    game.screen = KeyCodeScreen(game)
+//                    game.screen = KeyCodeScreen(game)
+                    game.setScreen<KeyCodeScreen>()
                 }
                 "Play" -> {
 //                    Gdx.app.postRunnable {
-                    game.screen = PlayScreen(game)
+//                    game.screen = PlayScreen(game)
+                    game.setScreen<PlayScreen>()
 //                    }
                 }
                 else -> null

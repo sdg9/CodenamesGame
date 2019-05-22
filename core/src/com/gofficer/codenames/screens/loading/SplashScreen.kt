@@ -17,8 +17,9 @@ import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.utils.logger
+import ktx.app.KtxScreen
 
-class SplashScreen(private val game: CodenamesGame) : ScreenAdapter() {
+class SplashScreen(private val game: CodenamesGame) : KtxScreen {
 
     companion object {
         @JvmStatic
@@ -36,7 +37,10 @@ class SplashScreen(private val game: CodenamesGame) : ScreenAdapter() {
         log.debug("show")
         Gdx.input.inputProcessor = stage
 
-        val transitionRunnable = Runnable { game.screen = MainMenuScreen(game) }
+        val transitionRunnable = Runnable {
+//            game.screen = MainMenuScreen(game)
+            game.setScreen<MainMenuScreen>()
+        }
 
 //        val splashTex = game.assets.get("img/splash.png", Texture::class.java)
 //        game.assets.load()
