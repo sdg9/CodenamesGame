@@ -1,11 +1,15 @@
 package com.gofficer.codenames
 
+import com.badlogic.ashley.core.*
+import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.*
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Logger
 import com.daveanthonythomas.moshipack.MoshiPack
 import com.gofficer.codenames.config.GameConfig
@@ -32,10 +36,27 @@ import com.gofficer.sampler.utils.toInternalFile
 import gofficer.codenames.redux.game.GameState
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
+import ktx.ashley.allOf
+import ktx.ashley.entity
+import ktx.ashley.exclude
+import ktx.ashley.mapperFor
+import ktx.log.info
+import org.w3c.dom.Text
 import redux.api.Store
 import redux.api.Dispatcher
 import redux.api.enhancer.Middleware
+import java.awt.TextComponent
 import java.util.*
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Rectangle
+import com.gofficer.codenames.utils.use
+import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.Input.Buttons
+import com.badlogic.ashley.core.ComponentMapper
+import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.graphics.OrthographicCamera
+
+
 
 
 class CodenamesGame : KtxGame<KtxScreen>() {
@@ -60,6 +81,8 @@ class CodenamesGame : KtxGame<KtxScreen>() {
     private var lerp = LERP_MAX
     private lateinit var game: CodenamesGame
 
+    val engine = Engine()
+
     private val moshiPack = MoshiPack()
 
     override fun create() {
@@ -80,6 +103,16 @@ class CodenamesGame : KtxGame<KtxScreen>() {
 //        addScreen(SplashScreen(game))
 
         setScreen<LoadingScreen>()
+
+        engine.addSystem(SomeSystem())
+
+//        createEntities()
+    }
+
+
+    override fun render() {
+        super.render()
+        engine.update(Gdx.graphics.deltaTime)
     }
 
     private fun createReduxStore() {
@@ -285,4 +318,74 @@ val getNavigationMiddleware = { game: CodenamesGame ->
             next.dispatch(action)
         }
     }
+}
+
+
+class Transform(var position: Vector2) : Component {
+}
+
+class TextureComponent(var texture: TextureRegion?) : Component {
+
+}
+
+class Revealable(var isRevealed: Boolean = false) : Component
+
+class Clickable(var bounds: Rectangle = Rectangle(0f, 0f, 100f, 100f)) : Component
+
+//class Texture: Component
+//class Transform: Component
+//class RigidBody: Component
+
+val transform  = mapperFor<Transform>()
+val texture  = mapperFor<TextureComponent>()
+val revealable = mapperFor<Revealable>()
+val clickable = mapperFor<Clickable>()
+val family1 = Family.all(Transform::class.java, TextureComponent::class.java).get()
+val family2 = allOf(Transform::class, TextureComponent::class)
+//var family = allOf(Texture::class, Transform::class).exclude(RigidBody::class)
+
+class RenderingSystem(val batch: SpriteBatch) : IteratingSystem(family2.get()) {
+
+    override fun processEntity(entity: Entity?, deltaTime: Float) {
+        val img = texture[entity].texture
+        val position = transform[entity].position
+        val isRevealed = revealable[entity]?.isRevealed
+//        info { "Entity being processed $entity $position"}
+
+        batch.use {
+            batch.color = if (isRevealed == true) Color.BLUE else Color.WHITE
+            batch.draw(img, position.x, position.y)
+            batch.color = Color.WHITE
+        }
+
+    }
+}
+
+class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allOf(Clickable::class, Transform::class).get()) {
+
+    override fun processEntity(entity: Entity?, deltaTime: Float) {
+        val bounds = clickable[entity].bounds
+        val position = transform[entity].position
+        bounds.x = position.x
+        bounds.y = position.y
+
+        if(Gdx.input.isButtonPressed(Buttons.LEFT)){
+            // touching
+
+            val clickPosition = camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
+            info { "Clicked: $clickPosition, but bounds: $bounds" }
+            if (bounds.contains(clickPosition.x, clickPosition.y)) {
+                info { "Touched $entity"}
+                revealable[entity]?.isRevealed = true
+            }
+        }
+
+    }
+}
+
+class SomeSystem : EntitySystem() {
+    override fun update(deltaTime: Float) {
+//        info { "T $deltaTime"}
+    }
+
 }

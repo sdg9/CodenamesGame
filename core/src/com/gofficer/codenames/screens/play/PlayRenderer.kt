@@ -1,5 +1,6 @@
 package com.gofficer.codenames.screens.play
 
+import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -73,7 +74,9 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
         showCards()
 
         Gdx.input.inputProcessor = stage
+
     }
+
 
     private fun showCards() {
         log.debug("Store update")

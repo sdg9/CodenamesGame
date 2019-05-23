@@ -252,6 +252,8 @@ project(":core") {
     dependencies {
         compile project(":redux")
         compile project(":client")
+
+        implementation "com.badlogicgames.ashley:ashley:1.7.3"
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
@@ -270,6 +272,7 @@ project(":core") {
 
 //        compile "com.kotcrab.vis:vis-ui:$visuiVersion"
 //        implementation "io.github.libktx:ktx-vis:$ktxVersion"
+
         api "io.github.libktx:ktx-actors:$ktxVersion"
         api "io.github.libktx:ktx-scene2d:$ktxVersion"
 
