@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.gofficer.codenames.*
@@ -17,6 +18,7 @@ import com.gofficer.codenames.systems.TouchSystem
 import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.utils.logger
 import ktx.app.KtxScreen
+import javax.naming.Name
 
 class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
@@ -33,6 +35,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
 
     private val batch = SpriteBatch()
+    private val font = BitmapFont()
 
     private var renderingSystem: RenderingSystem? = null
     private var touchSystem: TouchSystem? = null
@@ -42,7 +45,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
 //        batch.projectionMatrix = camera.combined
 
-        renderingSystem = RenderingSystem(batch)
+        renderingSystem = RenderingSystem(batch, font)
         touchSystem = TouchSystem(camera)
         animationSystem = FlipAnimatingSystem()
         game.engine.addSystem(renderingSystem)
@@ -62,23 +65,12 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
     }
 
     private fun createEntities() {
-
-//        game.engine.add {
-//            entity {
-//                with<Transform> {
-//                    position = Vector2(0f, 0f)
-//                }
-//                with<TextureComponent> {
-//                    texture = cardTexture
-//                }
-//            }
-//        }
-
         game.engine.addEntity(Entity().apply {
             add(TextureComponent(cardTexture))
             add(TransformComponent(Vector2(0f, 0f)))
             add(RevealableComponent())
             add(StateComponent())
+            add(NameComponent("Some name"))
             add(RectangleComponent(cardTexture!!.regionWidth.toFloat(), cardTexture!!.regionHeight.toFloat()))
             add(ClickableComponent())
         })

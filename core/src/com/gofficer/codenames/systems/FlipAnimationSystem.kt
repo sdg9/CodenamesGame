@@ -35,9 +35,7 @@ class FlipAnimatingSystem : IteratingSystem(allOf(
             myFlipAnimation.initialX = position.x
             myFlipAnimation.initialWidth = myRectangle.width
             info { "Initial width: ${myRectangle.width}"}
-
         }
-
 
         val totalTimeRemaining = animationDuration - myFlipAnimation.time
 

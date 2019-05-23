@@ -310,12 +310,3 @@ val getNavigationMiddleware = { game: CodenamesGame ->
         }
     }
 }
-
-//class Texture: Component
-//class Transform: Component
-////class RigidBody: Component
-//
-//val family1 = Family.all(Transform::class.java, TextureComponent::class.java).get()
-//val family2 = allOf(Transform::class, TextureComponent::class)
-////var family = allOf(Texture::class, Transform::class).exclude(RigidBody::class)
-//
