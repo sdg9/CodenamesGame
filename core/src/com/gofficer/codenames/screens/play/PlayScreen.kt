@@ -1,27 +1,22 @@
 package com.gofficer.codenames.screens.play
 
-import com.badlogic.ashley.core.Component
-import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector2
 import com.gofficer.codenames.*
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
+import com.gofficer.codenames.components.*
 import com.gofficer.codenames.redux.actions.SetupGame
+import com.gofficer.codenames.systems.FlipAnimatingSystem
+import com.gofficer.codenames.systems.RenderingSystem
+import com.gofficer.codenames.systems.TouchSystem
 import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.utils.logger
 import ktx.app.KtxScreen
-import ktx.ashley.add
-import ktx.ashley.entity
-import ktx.ashley.mapperFor
 
 class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
@@ -41,6 +36,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
     private var renderingSystem: RenderingSystem? = null
     private var touchSystem: TouchSystem? = null
+    private var animationSystem: FlipAnimatingSystem? = null
 
     override fun show() {
 
@@ -48,8 +44,10 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
         renderingSystem = RenderingSystem(batch)
         touchSystem = TouchSystem(camera)
+        animationSystem = FlipAnimatingSystem()
         game.engine.addSystem(renderingSystem)
         game.engine.addSystem(touchSystem)
+        game.engine.addSystem(animationSystem)
 
         log.debug("show")
 
@@ -78,9 +76,11 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
         game.engine.addEntity(Entity().apply {
             add(TextureComponent(cardTexture))
-            add(Transform(Vector2(0f, 0f)))
-            add(Revealable())
-            add(Clickable())
+            add(TransformComponent(Vector2(0f, 0f)))
+            add(RevealableComponent())
+            add(StateComponent())
+            add(RectangleComponent(cardTexture!!.regionWidth.toFloat(), cardTexture!!.regionHeight.toFloat()))
+            add(ClickableComponent())
         })
     }
 
@@ -109,6 +109,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
         game.engine.removeSystem(renderingSystem)
         game.engine.removeSystem(touchSystem)
+        game.engine.removeSystem(animationSystem)
         renderer.dispose()
     }
 
