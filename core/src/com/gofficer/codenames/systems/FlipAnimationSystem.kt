@@ -11,7 +11,7 @@ import ktx.log.info
 
 
 
-class FlipAnimatingSystem : IteratingSystem(allOf(
+class FlipAnimationSystem : IteratingSystem(allOf(
     FlipAnimationComponent::class,
     StateComponent::class,
     RectangleComponent::class

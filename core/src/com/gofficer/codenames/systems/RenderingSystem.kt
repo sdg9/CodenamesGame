@@ -17,7 +17,8 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
     TransformComponent::class,
     TextureComponent::class,
     RectangleComponent::class,
-    NameComponent::class
+    NameComponent::class,
+    TeamComponent::class
 ).get()) {
 
     private val transform  = mapperFor<TransformComponent>()
@@ -26,6 +27,7 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
     private val rectangle = mapperFor<RectangleComponent>()
     private val name = mapperFor<NameComponent>()
     private val animation = mapperFor<FlipAnimationComponent>()
+    private val teamMapper = mapperFor<TeamComponent>()
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val img = texture[entity].texture
@@ -33,6 +35,7 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
         val isRevealed = revealable[entity]?.isRevealed
         val myRectangle = rectangle[entity]
         val myName = name[entity].name
+        val teamColor = teamMapper[entity].teamColor
         val isAnimating: Boolean = entity?.has(animation) ?: false
 
         val layout = GlyphLayout(font, myName)
@@ -41,7 +44,7 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
         font.color = Color.BLACK
 
         batch.use {
-            batch.color = if (isRevealed == true) Color.BLUE else Color.WHITE
+            batch.color = if (isRevealed == true) teamColor else Color.WHITE
             batch.draw(img, position.x, position.y, myRectangle.width, myRectangle.height)
             if (!isAnimating) {
                 font.draw(batch, myName, fontX, fontY)

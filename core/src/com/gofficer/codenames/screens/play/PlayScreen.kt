@@ -3,6 +3,7 @@ package com.gofficer.codenames.screens.play
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -12,13 +13,12 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.components.*
 import com.gofficer.codenames.redux.actions.SetupGame
-import com.gofficer.codenames.systems.FlipAnimatingSystem
+import com.gofficer.codenames.systems.FlipAnimationSystem
 import com.gofficer.codenames.systems.RenderingSystem
 import com.gofficer.codenames.systems.TouchSystem
 import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.utils.logger
 import ktx.app.KtxScreen
-import javax.naming.Name
 
 class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
@@ -39,7 +39,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
     private var renderingSystem: RenderingSystem? = null
     private var touchSystem: TouchSystem? = null
-    private var animationSystem: FlipAnimatingSystem? = null
+    private var animationSystem: FlipAnimationSystem? = null
 
     override fun show() {
 
@@ -47,7 +47,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
         renderingSystem = RenderingSystem(batch, font)
         touchSystem = TouchSystem(camera)
-        animationSystem = FlipAnimatingSystem()
+        animationSystem = FlipAnimationSystem()
         game.engine.addSystem(renderingSystem)
         game.engine.addSystem(touchSystem)
         game.engine.addSystem(animationSystem)
@@ -65,13 +65,26 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
     }
 
     private fun createEntities() {
+        val scaleFactor = 0.8f
         game.engine.addEntity(Entity().apply {
             add(TextureComponent(cardTexture))
             add(TransformComponent(Vector2(0f, 0f)))
             add(RevealableComponent())
             add(StateComponent())
+            add(TeamComponent(Color.RED))
             add(NameComponent("Some name"))
-            add(RectangleComponent(cardTexture!!.regionWidth.toFloat(), cardTexture!!.regionHeight.toFloat()))
+            add(RectangleComponent(cardTexture!!.regionWidth.toFloat() * scaleFactor, cardTexture!!.regionHeight.toFloat() * scaleFactor))
+            add(ClickableComponent())
+        })
+
+        game.engine.addEntity(Entity().apply {
+            add(TextureComponent(cardTexture))
+            add(TransformComponent(Vector2(300f, 0f)))
+            add(RevealableComponent())
+            add(StateComponent())
+            add(TeamComponent(Color.RED))
+            add(NameComponent("Some other name"))
+            add(RectangleComponent(cardTexture!!.regionWidth.toFloat() * scaleFactor, cardTexture!!.regionHeight.toFloat() * scaleFactor))
             add(ClickableComponent())
         })
     }
