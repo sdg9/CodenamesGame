@@ -3,6 +3,7 @@ package com.gofficer.codenames
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Vector2
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
@@ -24,8 +25,18 @@ class World(val engine: Engine, assetManager: AssetManager) {
 //        createCard()
 //    }
 //
-//    private fun createCard(): Entity {
-//        return engine.createEntity().apply {
+    fun createCard(name: String, color: Color): Entity {
+        val scaleFactor = 0.8f
+        return engine.createEntity().apply {
+            add(TextureComponent(cardTexture))
+            add(TransformComponent(Vector2(0f, 0f)))
+            add(RevealableComponent())
+            add(StateComponent())
+            add(TeamComponent(color))
+            add(NameComponent(name))
+            add(RectangleComponent(cardTexture!!.regionWidth.toFloat() * scaleFactor, cardTexture!!.regionHeight.toFloat() * scaleFactor))
+            add(ClickableComponent(cardTexture!!.regionWidth.toFloat() * scaleFactor, cardTexture!!.regionHeight.toFloat() * scaleFactor))
+
 //            add(TextureComponent(cardTexture))
 //            add(TransformComponent(Vector2(0f, 0f)))
 //            add(RevealableComponent())
@@ -33,6 +44,6 @@ class World(val engine: Engine, assetManager: AssetManager) {
 //            add(NameComponent("Test"))
 //            add(RectangleComponent(cardTexture!!.regionWidth.toFloat(), cardTexture!!.regionHeight.toFloat()))
 //            add(ClickableComponent())
-//        }
-//    }
+        }
+    }
 }

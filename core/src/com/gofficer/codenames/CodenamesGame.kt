@@ -59,6 +59,7 @@ class CodenamesGame : KtxGame<KtxScreen>() {
     var room: Room? = null
     var client: Client? = null
     val assetManager = AssetManager()
+
     lateinit var font24: BitmapFont
     private val initState: GameState = GameState()
     internal lateinit var store: Store<GameState>
@@ -72,6 +73,8 @@ class CodenamesGame : KtxGame<KtxScreen>() {
     private lateinit var game: CodenamesGame
 
     val engine = Engine()
+
+//    val world = World(engine, assetManager)
 
     private val moshiPack = MoshiPack()
 

@@ -38,12 +38,12 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
     }
 
     // == properties ==
-    private val camera = OrthographicCamera()
+    val camera = OrthographicCamera()
     private val viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
-    private val uiCamera = OrthographicCamera()
+    val uiCamera = OrthographicCamera()
     private val uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
     private val renderer = ShapeRenderer()
-    private val batch = SpriteBatch()
+    val batch = SpriteBatch()
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
 
     private val uiSkinAtlas = assetManager[AssetDescriptors.UI_SKIN]
@@ -71,7 +71,7 @@ class PlayRenderer(private val myFont: BitmapFont, private val assetManager: Ass
                 showCards()
             }
         }
-        showCards()
+//        showCards()
 
         Gdx.input.inputProcessor = stage
 

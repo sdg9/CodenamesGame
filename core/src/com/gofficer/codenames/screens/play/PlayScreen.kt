@@ -4,14 +4,13 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Vector2
 import com.gofficer.codenames.*
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.components.*
+import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.systems.FlipAnimationSystem
 import com.gofficer.codenames.systems.RenderingSystem
@@ -27,14 +26,14 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
         private val log = logger<PlayScreen>()
     }
 
-    private val camera = OrthographicCamera()
+//    private val camera = OrthographicCamera()
     private val assetManager = game.assetManager
     private var renderer: PlayRenderer = PlayRenderer(game.font24, assetManager, game.store)
 
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
 
-    private val batch = SpriteBatch()
+//    private val batch = SpriteBatch()
     private val font = BitmapFont()
 
     private var renderingSystem: RenderingSystem? = null
@@ -45,8 +44,8 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
 //        batch.projectionMatrix = camera.combined
 
-        renderingSystem = RenderingSystem(batch, font)
-        touchSystem = TouchSystem(camera)
+        renderingSystem = RenderingSystem(renderer.batch, font)
+        touchSystem = TouchSystem(renderer.camera)
         animationSystem = FlipAnimationSystem()
         game.engine.addSystem(renderingSystem)
         game.engine.addSystem(touchSystem)
@@ -65,28 +64,14 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
     }
 
     private fun createEntities() {
-        val scaleFactor = 0.8f
-        game.engine.addEntity(Entity().apply {
-            add(TextureComponent(cardTexture))
-            add(TransformComponent(Vector2(0f, 0f)))
-            add(RevealableComponent())
-            add(StateComponent())
-            add(TeamComponent(Color.RED))
-            add(NameComponent("Some name"))
-            add(RectangleComponent(cardTexture!!.regionWidth.toFloat() * scaleFactor, cardTexture!!.regionHeight.toFloat() * scaleFactor))
-            add(ClickableComponent())
-        })
 
-        game.engine.addEntity(Entity().apply {
-            add(TextureComponent(cardTexture))
-            add(TransformComponent(Vector2(300f, 0f)))
-            add(RevealableComponent())
-            add(StateComponent())
-            add(TeamComponent(Color.RED))
-            add(NameComponent("Some other name"))
-            add(RectangleComponent(cardTexture!!.regionWidth.toFloat() * scaleFactor, cardTexture!!.regionHeight.toFloat() * scaleFactor))
-            add(ClickableComponent())
-        })
+        for (i in 0..4) {
+            for (j in 0..4) {
+//                val entity = createCard("Test $i", Color.BLUE, 0f + (i * GameConfig.WORLD_WIDTH / 5), GameConfig.WORLD_HEIGHT - (j * GameConfig.WORLD_HEIGHT / 5) - 200)
+                game.engine.addEntity(createCardAtCoordinate("Test $i:$j", Color.BLUE, i, j))
+            }
+        }
+//        game.engine.addEntity(createCard("Test 2", Color.RED, 200f, 0f))
     }
 
     override fun render(delta: Float) {
@@ -120,5 +105,40 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
     private fun setupGame() {
         game.store.dispatch(SetupGame())
+    }
+
+    val scaleFactor = 0.7f
+    fun createCardAtCoordinate(name: String, color: Color, row: Int, column: Int): Entity {
+
+        val width = cardTexture!!.regionWidth.toFloat() * scaleFactor
+        val height = cardTexture!!.regionHeight.toFloat() * scaleFactor
+
+        val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
+        val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
+
+        return createCard(name, color, x, y)
+    }
+
+    fun createCard(name: String, color: Color, x: Float, y: Float): Entity {
+        return game.engine.createEntity().apply {
+            add(TextureComponent(cardTexture))
+            add(TransformComponent(Vector2(x, y)))
+            add(RevealableComponent())
+            add(StateComponent())
+            add(TeamComponent(color))
+            add(NameComponent(name))
+            add(
+                RectangleComponent(
+                    cardTexture!!.regionWidth.toFloat() * scaleFactor,
+                    cardTexture!!.regionHeight.toFloat() * scaleFactor
+                )
+            )
+            add(
+                ClickableComponent(
+                    cardTexture!!.regionWidth.toFloat() * scaleFactor,
+                    cardTexture!!.regionHeight.toFloat() * scaleFactor
+                )
+            )
+        }
     }
 }
