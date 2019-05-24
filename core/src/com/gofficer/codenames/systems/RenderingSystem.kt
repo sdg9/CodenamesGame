@@ -37,6 +37,7 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
         val myName = name[entity].name
         val teamColor = teamMapper[entity].teamColor
         val isAnimating: Boolean = entity?.has(animation) ?: false
+        val suppressColor = animation[entity]?.suppressColor == true
 
         val layout = GlyphLayout(font, myName)
         val fontX = position.x + (myRectangle.width - layout.width) / 2
@@ -44,7 +45,7 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
         font.color = Color.BLACK
 
         batch.use {
-            batch.color = if (isRevealed == true) teamColor else Color.WHITE
+            batch.color = if (isRevealed == true && !suppressColor) teamColor else Color.WHITE
             batch.draw(img, position.x, position.y, myRectangle.width, myRectangle.height)
             if (!isAnimating) {
                 font.draw(batch, myName, fontX, fontY)

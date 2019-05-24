@@ -48,6 +48,7 @@ class FlipAnimationSystem : IteratingSystem(allOf(
             myRectangle.width = myFlipAnimation.initialWidth * (1 - flipAwayCompletion)
             position.x = getXForFlip(myFlipAnimation, myRectangle)
         } else if (isSecondHalf) {
+            myFlipAnimation.suppressColor = false
             val flipBackCompletion = (myFlipAnimation.time - (animationDuration / 2)) / (animationDuration / 2)
             // Increase width to initialWidth as flip completion increases
             myRectangle.width = myFlipAnimation.initialWidth * flipBackCompletion

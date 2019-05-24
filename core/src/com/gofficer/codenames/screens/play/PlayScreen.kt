@@ -22,18 +22,15 @@ import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.components.*
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.redux.actions.ChangeScene
-import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.systems.FlipAnimationSystem
 import com.gofficer.codenames.systems.RenderingSystem
 import com.gofficer.codenames.systems.TouchSystem
-import com.gofficer.codenames.utils.clearScreen
-import com.gofficer.codenames.utils.get
-import com.gofficer.codenames.utils.logger
-import com.gofficer.codenames.utils.toInternalFile
+import com.gofficer.codenames.utils.*
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 import ktx.log.debug
 import ktx.scene2d.*
+import java.util.ArrayList
 
 class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
@@ -92,8 +89,6 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
     }
 
     private fun initButtons() {
-        val buttonWidth = GameConfig.HUD_WIDTH * .6f
-        val buttonHeight = GameConfig.HUD_HEIGHT / 4
         var root = container {
             setFillParent(true) // apparently same as setting size to width/height
             align(Align.top)
@@ -102,7 +97,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
                 space(8f)
                 textButton("Rematch") {
                     // TODO why do none of these sizes work?
-                    setSize(100f, 100f)
+//                    setSize(100f, 100f)
                     height = 100f
                     width = 100f
                     addListener(object : ClickListener() {
@@ -113,7 +108,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
                 }
                 space(8f)
                 textButton("View Key") {
-                    setSize(100f, 100f)
+//                    setSize(100f, 100f)
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             game.store.dispatch(ChangeScene("Play"))
@@ -122,27 +117,28 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
                 }
                 space(8f)
                 textButton("Quit Game") {
-                    setSize(buttonWidth, buttonHeight)
+//                    setSize(buttonWidth, buttonHeight)
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             Gdx.app.exit()
                         }
                     })
                 }
-
             }
 
         }
 
         stage.addActor(root)
-        stage.isDebugAll = true
+//        stage.isDebugAll = true
         Gdx.input.inputProcessor = stage
     }
 
     private fun createEntities() {
+        val cards = getXUniqueCards(25)
         for (i in 0..4) {
             for (j in 0..4) {
-              game.engine.addEntity(createCardAtCoordinate("Test $i:$j", Color.BLUE, i, j))
+                val card = cards.get(i + j * 5)
+              game.engine.addEntity(createCardAtCoordinate(card.text, card.type, i, j))
             }
         }
     }
@@ -169,6 +165,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
     override fun hide() {
         log.debug("hide")
+        game.engine.removeAllEntities()
         dispose()
     }
 
@@ -216,4 +213,82 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
             )
         }
     }
+
+    private fun getRandomArbitrary(min: Int, max: Int): Int {
+        return Math.floor(Math.random() * (max - min)).toInt() + min
+    }
+
+    private fun getXUniqueCards(count: Int): List<ECSCard> {
+        println("Getting $count unique cards")
+        val cards = mutableListOf<ECSCard>()
+        var attempts = 0
+
+        val isBlueFirst = Math.random() > 0.5
+        val totalBlue = if (isBlueFirst) 9 else 8
+        val totalRed = if (!isBlueFirst) 9 else 8
+//        val types = mutableListOf<String>()
+        val types = mutableListOf<Color>()
+
+        for (i in 1..totalBlue) {
+            types.add(Color.BLUE)
+        }
+        for (i in 1..totalRed) {
+            types.add(Color.RED)
+        }
+        types.add(Color.BLACK);
+        while (types.size < 25) {
+            types.add(Color.BROWN)
+        }
+        val shuffledTypes = types.shuffled()
+
+        while (cards.size < count) {
+//        println("Adding more: ${cards.size}")
+            val random = getRandomArbitrary(0, vanillaWordList.size)
+//        println("Random: $random")
+            val exists = cards.any { it.text == vanillaWordList[random] }
+            if (!exists) {
+                cards.add(ECSCard(cards.size + 1, vanillaWordList.get(random), shuffledTypes.get(cards.size), false))
+            }
+            attempts += 1
+            if (attempts > 200) {
+                break
+            }
+        }
+        return cards
+    };
+}
+
+data class ECSCard(
+    val id: Int,
+    val text: String,
+    val type: Color,
+    val isRevealed: Boolean = false)
+
+fun List<ECSCard>.update(card: ECSCard): List<ECSCard> {
+    var index = -1
+    forEachIndexed { i, s ->
+        if (s.id == card.id) {
+            index = i
+            return@forEachIndexed
+        }
+    }
+
+    if (index != -1) {
+        val mutable = ArrayList(this)
+        mutable.removeAt(index)
+        mutable.add(index, card)
+        return mutable
+    }
+
+    return this
+}
+
+fun List<ECSCard>.getById(id: Int): ECSCard? {
+    forEach {
+        if (id == it.id) {
+            return it
+        }
+    }
+
+    return null
 }

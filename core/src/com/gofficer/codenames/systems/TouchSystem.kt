@@ -47,8 +47,12 @@ class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allO
 //            if (bounds.contains(clickPosition.x, clickPosition.y)) {
             if (bounds.contains(clickedX, clickedY)) {
                 info { "Touched $entity"}
-                revealable[entity]?.isRevealed = true
-                entity?.add(FlipAnimationComponent())
+
+                // Only apply if not already revealed
+                if (revealable[entity]?.isRevealed != true) {
+                    revealable[entity]?.isRevealed = true
+                    entity?.add(FlipAnimationComponent())
+                }
             }
         }
 
