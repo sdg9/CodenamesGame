@@ -15,15 +15,12 @@ import ktx.log.info
 
 class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allOf(ClickableComponent::class, TransformComponent::class).get()) {
 
-    private val transform  = mapperFor<TransformComponent>()
-    private val clickable = mapperFor<ClickableComponent>()
-    private val revealable = mapperFor<RevealableComponent>()
 //    private val rectangleMapper = mapperFor<RectangleComponent>()
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val myBounds = clickable[entity]
+        val myBounds = Mappers.clickable[entity]
 //        val rectangle = rectangleMapper[entity]
-        val position = transform[entity].position
+        val position = Mappers.transform[entity].position
 
         val bounds = Rectangle(position.x, position.y, myBounds.width, myBounds.height)
 //        bounds.x = position.x
@@ -49,8 +46,8 @@ class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allO
                 info { "Touched $entity"}
 
                 // Only apply if not already revealed
-                if (revealable[entity]?.isRevealed != true) {
-                    revealable[entity]?.isRevealed = true
+                if (Mappers.revealable[entity]?.isRevealed != true) {
+                    Mappers.revealable[entity]?.isRevealed = true
                     entity?.add(FlipAnimationComponent())
                 }
             }

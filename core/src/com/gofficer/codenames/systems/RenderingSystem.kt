@@ -21,23 +21,17 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
     TeamComponent::class
 ).get()) {
 
-    private val transform  = mapperFor<TransformComponent>()
-    private val texture = mapperFor<TextureComponent>()
-    private val revealable = mapperFor<RevealableComponent>()
-    private val rectangle = mapperFor<RectangleComponent>()
-    private val name = mapperFor<NameComponent>()
-    private val animation = mapperFor<FlipAnimationComponent>()
-    private val teamMapper = mapperFor<TeamComponent>()
+
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val img = texture[entity].texture
-        val position = transform[entity].position
-        val isRevealed = revealable[entity]?.isRevealed
-        val myRectangle = rectangle[entity]
-        val myName = name[entity].name
-        val teamColor = teamMapper[entity].teamColor
-        val isAnimating: Boolean = entity?.has(animation) ?: false
-        val suppressColor = animation[entity]?.suppressColor == true
+        val img = Mappers.texture[entity].texture
+        val position = Mappers.transform[entity].position
+        val isRevealed = Mappers.revealable[entity]?.isRevealed
+        val myRectangle = Mappers.rectangle[entity]
+        val myName = Mappers.name[entity].name
+        val teamColor = Mappers.teamMapper[entity].teamColor
+        val isAnimating: Boolean = entity?.has(Mappers.animation) ?: false
+        val suppressColor = Mappers.animation[entity]?.suppressColor == true
 
         val layout = GlyphLayout(font, myName)
         val fontX = position.x + (myRectangle.width - layout.width) / 2

@@ -17,16 +17,13 @@ class FlipAnimationSystem : IteratingSystem(allOf(
     RectangleComponent::class
 ).get()) {
 
-    private val transform  = mapperFor<TransformComponent>()
-    private val rectangle = mapperFor<RectangleComponent>()
-    private val flipAnimation =  mapperFor<FlipAnimationComponent>()
 
     private val animationDuration = 0.45f
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
-        val position = transform[entity].position
-        val myRectangle = rectangle[entity]
-        val myFlipAnimation = flipAnimation[entity]
+        val position = Mappers.transform[entity].position
+        val myRectangle = Mappers.rectangle[entity]
+        val myFlipAnimation = Mappers.flipAnimation[entity]
 
         myFlipAnimation.time += deltaTime
 
