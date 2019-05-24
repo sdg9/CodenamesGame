@@ -13,15 +13,22 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import com.esotericsoftware.kryonet.Client
+import com.esotericsoftware.kryonet.Connection
+import com.esotericsoftware.kryonet.Listener
+import com.esotericsoftware.kryonet.Server
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
+import com.gofficer.codenames.Network
 import com.gofficer.codenames.redux.actions.ChangeScene
+import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.codenames.utils.toInternalFile
 import ktx.app.KtxScreen
+import ktx.log.info
 import ktx.scene2d.*
 
 
@@ -100,26 +107,86 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
             padTop(30f)
             verticalGroup {
                 space(8f)
-                textButton("Play Online") {
-                    // TODO why do none of these sizes work?
-                    setSize(100f, 100f)
-                    height = 100f
-                    width = 100f
+                textButton("Host Game") {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            game.store.dispatch(ChangeScene("PlayOnline"))
+                            val server = Server()
+                            server.start()
+                            Network.register(server)
+                            server.bind(Network.PORT)
+
+                            server.addListener(object : Listener() {
+                                override fun received(connection: Connection, someObject: Any) {
+                                    info { "Connection: $connection"}
+                                    when (someObject) {
+                                        is SomeRequest -> info { "Got someRequest: ${someObject.text}"}
+                                    }
+//                                    if (`object` is SomeRequest) {
+//                                        val request = `object` as SomeRequest
+//                                        System.out.println(request.text)
+//
+//                                        val response = SomeResponse()
+//                                        response.text = "Thanks"
+//                                        connection.sendTCP(response)
+//                                    }
+                                }
+                            })
+
+                            game.setScreen<PlayScreen>()
                         }
                     })
                 }
                 space(8f)
-                textButton("Play Local") {
-                    setSize(buttonWidth, buttonHeight)
+                textButton("Connect to Server") {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            game.store.dispatch(ChangeScene("Play"))
+                            val client = Client()
+                            client.start()
+                            client.connect(5000, "127.0.0.1", Network.PORT)
+                            Network.register(client)
+
+                            val request = SomeRequest("Here is the request")
+                            client.sendTCP(request)
+
+                            game.setScreen<PlayScreen>()
+//                            server.bind(Network.PORT)
+//
+//                            server.addListener(object : Listener() {
+//                                override fun received(connection: Connection, `object`: Any) {
+//                                    info { "Connection: $connection"}
+////                                    if (`object` is SomeRequest) {
+////                                        val request = `object` as SomeRequest
+////                                        System.out.println(request.text)
+////
+////                                        val response = SomeResponse()
+////                                        response.text = "Thanks"
+////                                        connection.sendTCP(response)
+////                                    }
+//                                }
+//                            })
                         }
                     })
                 }
+//                textButton("Play Online") {
+//                    // TODO why do none of these sizes work?
+//                    setSize(100f, 100f)
+//                    height = 100f
+//                    width = 100f
+//                    addListener(object : ClickListener() {
+//                        override fun clicked(event: InputEvent?, x: Float, y: Float) {
+//                            game.store.dispatch(ChangeScene("PlayOnline"))
+//                        }
+//                    })
+//                }
+//                space(8f)
+//                textButton("Play Local") {
+//                    setSize(buttonWidth, buttonHeight)
+//                    addListener(object : ClickListener() {
+//                        override fun clicked(event: InputEvent?, x: Float, y: Float) {
+//                            game.store.dispatch(ChangeScene("Play"))
+//                        }
+//                    })
+//                }
                 space(8f)
                 textButton("Exit") {
                     setSize(buttonWidth, buttonHeight)
@@ -140,3 +207,15 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
     }
 
 }
+
+class SomeRequest(var text: String = "")
+//class SomeRequest {
+//    var text: String = ""
+//
+//    constructor() {
+//    }
+//
+//    constructor(text: String) {
+//        this.text = text
+//    }
+//}

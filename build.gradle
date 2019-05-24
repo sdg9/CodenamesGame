@@ -284,6 +284,7 @@ project(":core") {
         api "io.github.libktx:ktx-inject:$ktxVersion"
         api "io.github.libktx:ktx-log:$ktxVersion"
 
+        api "com.esotericsoftware:kryonet:2.22.0-RC1"
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"
 
