@@ -21,8 +21,6 @@ class RenderingSystem(val batch: SpriteBatch, val font: BitmapFont) : IteratingS
     TeamComponent::class
 ).get()) {
 
-
-
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val img = Mappers.texture[entity].texture
         val position = Mappers.transform[entity].position

@@ -16,7 +16,7 @@ class KeyCodeScreen(val game: CodenamesGame) : KtxScreen {
     }
 
     private val assetManager = game.assetManager
-    private var renderer: KeyCodeRenderer = KeyCodeRenderer(game.font24, assetManager, game.store)
+//    private var renderer: KeyCodeRenderer = KeyCodeRenderer(game.font24, assetManager, game.store)
 
     override fun show() {
         log.debug("show")
@@ -24,15 +24,15 @@ class KeyCodeScreen(val game: CodenamesGame) : KtxScreen {
         if (game.client == null) {
             setupGame()
         }
-        game.store.subscribe {
-            log.debug("Update to store")
-        }
-        renderer.show()
+//        game.store.subscribe {
+//            log.debug("Update to store")
+//        }
+//        renderer.show()
     }
 
     override fun render(delta: Float) {
 //        controller.update(delta)
-        renderer.render(delta)
+//        renderer.render(delta)
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
             hide()
@@ -42,7 +42,7 @@ class KeyCodeScreen(val game: CodenamesGame) : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         log.debug("resize")
-        renderer.resize(width, height)
+//        renderer.resize(width, height)
     }
 
     override fun hide() {
@@ -52,10 +52,10 @@ class KeyCodeScreen(val game: CodenamesGame) : KtxScreen {
 
     override fun dispose() {
         log.debug("dispose")
-        renderer.dispose()
+//        renderer.dispose()
     }
 
     private fun setupGame() {
-        game.store.dispatch(SetupGame())
+//        game.store.dispatch(SetupGame())
     }
 }

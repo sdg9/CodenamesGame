@@ -39,7 +39,7 @@ class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allO
             val clickedY = clickPosition.y
 //            val clickedX = Gdx.input.x.toFloat()
 //            val clickedY = Gdx.input.y.toFloat()
-            info { "Clicked $clickedX, $clickedY"}
+//            info { "Clicked $clickedX, $clickedY"}
 
 //            if (bounds.contains(clickPosition.x, clickPosition.y)) {
             if (bounds.contains(clickedX, clickedY)) {
@@ -49,6 +49,7 @@ class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allO
                 if (Mappers.revealable[entity]?.isRevealed != true) {
                     Mappers.revealable[entity]?.isRevealed = true
                     entity?.add(FlipAnimationComponent())
+                    entity?.add(NetworkComponent())
                 }
             }
         }

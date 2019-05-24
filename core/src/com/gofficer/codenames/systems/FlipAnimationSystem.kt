@@ -1,6 +1,7 @@
 package com.gofficer.codenames.systems
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
 import com.badlogic.gdx.math.Vector2
 import com.gofficer.codenames.components.*
@@ -9,14 +10,9 @@ import ktx.ashley.mapperFor
 import ktx.ashley.remove
 import ktx.log.info
 
+val flippableFamily: Family = allOf(FlipAnimationComponent::class, RectangleComponent::class).get()
 
-
-class FlipAnimationSystem : IteratingSystem(allOf(
-    FlipAnimationComponent::class,
-    StateComponent::class,
-    RectangleComponent::class
-).get()) {
-
+class FlipAnimationSystem : IteratingSystem(flippableFamily) {
 
     private val animationDuration = 0.45f
 

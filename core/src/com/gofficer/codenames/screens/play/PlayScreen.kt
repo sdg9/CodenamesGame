@@ -69,7 +69,15 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
         game.engine.addSystem(animationSystem)
 
         debug { "show" }
-        createEntities()
+        if (game.client == null) {
+            createEntities()
+        } else {
+            // TODO ask game to setup
+            game?.client?.sendTCP(Network.Client.RequestCardSetup())
+
+//            game.engine.addEntity()
+            // Wait on server to provide entities
+        }
 //        if (game.client == null) {
 //            setupGame()
 //        }
@@ -102,7 +110,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
                     width = 100f
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            game.store.dispatch(ChangeScene("PlayOnline"))
+//                            game.store.dispatch(ChangeScene("PlayOnline"))
                         }
                     })
                 }
@@ -111,7 +119,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 //                    setSize(100f, 100f)
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            game.store.dispatch(ChangeScene("Play"))
+//                            game.store.dispatch(ChangeScene("Play"))
                         }
                     })
                 }

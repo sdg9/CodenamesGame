@@ -3,7 +3,6 @@ package com.gofficer.codenames.screens.menu
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.InputEvent
@@ -14,21 +13,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.esotericsoftware.kryonet.Client
-import com.esotericsoftware.kryonet.Connection
-import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Server
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.Network
-import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.screens.play.PlayScreen
+import com.gofficer.codenames.systems.client.ClientNetworkEntitySystem
+import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.logger
 import com.gofficer.codenames.utils.toInternalFile
 import ktx.app.KtxScreen
-import ktx.log.info
 import ktx.scene2d.*
 
 
@@ -111,27 +108,11 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             val server = Server()
+                            game.server = server
                             server.start()
                             Network.register(server)
                             server.bind(Network.PORT)
-
-                            server.addListener(object : Listener() {
-                                override fun received(connection: Connection, someObject: Any) {
-                                    info { "Connection: $connection"}
-                                    when (someObject) {
-                                        is SomeRequest -> info { "Got someRequest: ${someObject.text}"}
-                                    }
-//                                    if (`object` is SomeRequest) {
-//                                        val request = `object` as SomeRequest
-//                                        System.out.println(request.text)
-//
-//                                        val response = SomeResponse()
-//                                        response.text = "Thanks"
-//                                        connection.sendTCP(response)
-//                                    }
-                                }
-                            })
-
+                            game.engine.addSystem(ServerNetworkEntitySystem(server))
                             game.setScreen<PlayScreen>()
                         }
                     })
@@ -141,10 +122,11 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             val client = Client()
+                            game.client = client
                             client.start()
                             client.connect(5000, "127.0.0.1", Network.PORT)
                             Network.register(client)
-
+                            game.engine.addSystem(ClientNetworkEntitySystem(client))
                             val request = SomeRequest("Here is the request")
                             client.sendTCP(request)
 

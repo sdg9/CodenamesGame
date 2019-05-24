@@ -19,5 +19,6 @@ class Mappers {
         val teamMapper = mapperFor<TeamComponent>()
 
         val clickable = mapperFor<ClickableComponent>()
+        val network = mapperFor<NetworkComponent>()
     }
 }
