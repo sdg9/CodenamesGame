@@ -30,6 +30,13 @@ class ClientNetworkEntitySystem(val client: Client) : IteratingSystem(allOf(Netw
                         info { "Got cards ${someObject.cards}"}
                         // TODO setup board
                         // Ideally: dispatch(SetupBoard, cards)
+                        // Consider making dispatch type event behavior work here
+                        // That is create an entity with a Dispatch component
+                        // Dispatch component has a type and action
+                        // Middleware System can process dispatch
+                        // Theoretically Reducer system could update game state? (or is this too much)
+                        // Then have last system remove any entity with dispatch on it
+                        // Also have another system remove any entity with removeable component (destroyed item) per recommendation from online chat
                     }
                     else -> info { "Client Received unknown action"}
                 }
