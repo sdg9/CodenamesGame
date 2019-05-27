@@ -7,7 +7,7 @@ import ktx.ashley.allOf
 import ktx.log.debug
 
 
-class RemoveSystem : IteratingSystem(allOf(RemoveComponent::class).get(), 100) {
+class RemoveSystem : IteratingSystem(allOf(RemoveComponent::class).get(), Priority.RemoveSystem) {
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         debug { "Removing $entity" }

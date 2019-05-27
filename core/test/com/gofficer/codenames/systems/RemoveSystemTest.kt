@@ -9,7 +9,7 @@ import org.junit.runner.RunWith
 
 
 /**
- * Tests the [SomeApplication].
+ * Tests the Removeable System.
  */
 @RunWith(GdxTestRunner::class)
 class RemoveSystemTest {

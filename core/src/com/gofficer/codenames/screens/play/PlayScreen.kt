@@ -70,7 +70,8 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
         debug { "show" }
         if (game.client == null) {
-            createEntities()
+//            createEntities()
+            dispatch(game.engine, CreateNewGame())
         } else {
             // TODO ask game to setup
             game?.client?.sendTCP(Network.Client.RequestCardSetup())
@@ -88,6 +89,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
         initSkin()
         initButtons()
     }
+
     private fun initSkin() {
         skin.addRegions(uiSkinAtlas)
         skin.add("default-font", game.font24)
@@ -116,7 +118,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
                 }
                 space(8f)
                 textButton("View Key") {
-//                    setSize(100f, 100f)
+                    //                    setSize(100f, 100f)
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
 //                            game.store.dispatch(ChangeScene("Play"))
@@ -125,7 +127,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
                 }
                 space(8f)
                 textButton("Quit Game") {
-//                    setSize(buttonWidth, buttonHeight)
+                    //                    setSize(buttonWidth, buttonHeight)
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             Gdx.app.exit()
@@ -139,16 +141,6 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
         stage.addActor(root)
 //        stage.isDebugAll = true
         Gdx.input.inputProcessor = stage
-    }
-
-    private fun createEntities() {
-        val cards = getXUniqueCards(25)
-        for (i in 0..4) {
-            for (j in 0..4) {
-                val card = cards.get(i + j * 5)
-              game.engine.addEntity(createCardAtCoordinate(card.text, card.type, i, j))
-            }
-        }
     }
 
     override fun render(delta: Float) {
@@ -188,7 +180,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
     }
 
     private val scaleFactor = 0.7f
-    private fun createCardAtCoordinate(name: String, color: Color, row: Int, column: Int): Entity {
+    private fun createCardAtCoordinate(name: String, color: Color, row: Int, column: Int, id: Int): Entity {
 
         val width = cardTexture!!.regionWidth.toFloat() * scaleFactor
         val height = cardTexture!!.regionHeight.toFloat() * scaleFactor
@@ -196,107 +188,48 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
         val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
         val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
 
-        return createCard(name, color, x, y)
-    }
+        return createCard(game.engine, name, color, x, y, id, cardTexture)
 
-    private fun createCard(name: String, color: Color, x: Float, y: Float): Entity {
-        return game.engine.createEntity().apply {
-            add(TextureComponent(cardTexture))
-            add(TransformComponent(Vector2(x, y)))
-            add(RevealableComponent())
-            add(StateComponent())
-            add(TeamComponent(color))
-            add(NameComponent(name))
-            add(
-                RectangleComponent(
-                    cardTexture!!.regionWidth.toFloat() * scaleFactor,
-                    cardTexture!!.regionHeight.toFloat() * scaleFactor
-                )
-            )
-            add(
-                ClickableComponent(
-                    cardTexture!!.regionWidth.toFloat() * scaleFactor,
-                    cardTexture!!.regionHeight.toFloat() * scaleFactor
-                )
-            )
-        }
     }
 
     private fun getRandomArbitrary(min: Int, max: Int): Int {
         return Math.floor(Math.random() * (max - min)).toInt() + min
     }
 
-    private fun getXUniqueCards(count: Int): List<ECSCard> {
-        println("Getting $count unique cards")
-        val cards = mutableListOf<ECSCard>()
-        var attempts = 0
 
-        val isBlueFirst = Math.random() > 0.5
-        val totalBlue = if (isBlueFirst) 9 else 8
-        val totalRed = if (!isBlueFirst) 9 else 8
-//        val types = mutableListOf<String>()
-        val types = mutableListOf<Color>()
+    data class ECSCard(
+        val id: Int,
+        val text: String,
+        val type: Color,
+        val isRevealed: Boolean = false
+    )
 
-        for (i in 1..totalBlue) {
-            types.add(Color.BLUE)
-        }
-        for (i in 1..totalRed) {
-            types.add(Color.RED)
-        }
-        types.add(Color.BLACK);
-        while (types.size < 25) {
-            types.add(Color.BROWN)
-        }
-        val shuffledTypes = types.shuffled()
-
-        while (cards.size < count) {
-//        println("Adding more: ${cards.size}")
-            val random = getRandomArbitrary(0, vanillaWordList.size)
-//        println("Random: $random")
-            val exists = cards.any { it.text == vanillaWordList[random] }
-            if (!exists) {
-                cards.add(ECSCard(cards.size + 1, vanillaWordList.get(random), shuffledTypes.get(cards.size), false))
-            }
-            attempts += 1
-            if (attempts > 200) {
-                break
+    fun List<ECSCard>.update(card: ECSCard): List<ECSCard> {
+        var index = -1
+        forEachIndexed { i, s ->
+            if (s.id == card.id) {
+                index = i
+                return@forEachIndexed
             }
         }
-        return cards
-    };
-}
 
-data class ECSCard(
-    val id: Int,
-    val text: String,
-    val type: Color,
-    val isRevealed: Boolean = false)
-
-fun List<ECSCard>.update(card: ECSCard): List<ECSCard> {
-    var index = -1
-    forEachIndexed { i, s ->
-        if (s.id == card.id) {
-            index = i
-            return@forEachIndexed
+        if (index != -1) {
+            val mutable = ArrayList(this)
+            mutable.removeAt(index)
+            mutable.add(index, card)
+            return mutable
         }
+
+        return this
     }
 
-    if (index != -1) {
-        val mutable = ArrayList(this)
-        mutable.removeAt(index)
-        mutable.add(index, card)
-        return mutable
-    }
-
-    return this
-}
-
-fun List<ECSCard>.getById(id: Int): ECSCard? {
-    forEach {
-        if (id == it.id) {
-            return it
+    fun List<ECSCard>.getById(id: Int): ECSCard? {
+        forEach {
+            if (id == it.id) {
+                return it
+            }
         }
-    }
 
-    return null
+        return null
+    }
 }

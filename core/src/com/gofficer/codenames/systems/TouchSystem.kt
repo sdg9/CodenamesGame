@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.gofficer.codenames.components.*
+import com.gofficer.codenames.dispatch
 import ktx.ashley.allOf
 import ktx.ashley.mapperFor
 import ktx.log.info
@@ -19,8 +20,8 @@ class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allO
 
     override fun processEntity(entity: Entity?, deltaTime: Float) {
         val myBounds = Mappers.clickable[entity]
-//        val rectangle = rectangleMapper[entity]
         val position = Mappers.transform[entity].position
+//        val car
 
         val bounds = Rectangle(position.x, position.y, myBounds.width, myBounds.height)
 //        bounds.x = position.x
@@ -47,10 +48,14 @@ class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allO
 
                 // Only apply if not already revealed
                 if (Mappers.revealable[entity]?.isRevealed != true) {
+                    // TODO if going pure dispatch, then biz logic should reside in dispatch system not here this just fires event
                     Mappers.revealable[entity]?.isRevealed = true
                     entity?.add(FlipAnimationComponent())
                     entity?.add(NetworkComponent())
-                    entity?.add(RemoveComponent())
+//                    entity?.add(RemoveComponent())
+
+                    // TODO give real id
+                    dispatch(engine, TouchCardAction(12))
                 }
             }
         }
