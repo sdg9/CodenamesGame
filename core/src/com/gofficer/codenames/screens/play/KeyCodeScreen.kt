@@ -2,9 +2,7 @@ package com.gofficer.codenames.screens.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.badlogic.gdx.ScreenAdapter
 import com.gofficer.codenames.CodenamesGame
-import com.gofficer.codenames.redux.actions.SetupGame
 import com.gofficer.codenames.utils.logger
 import ktx.app.KtxScreen
 

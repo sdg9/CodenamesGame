@@ -7,8 +7,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
@@ -21,7 +19,6 @@ import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.components.*
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.redux.actions.ChangeScene
 import com.gofficer.codenames.systems.FlipAnimationSystem
 import com.gofficer.codenames.systems.RenderingSystem
 import com.gofficer.codenames.systems.TouchSystem

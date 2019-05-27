@@ -15,9 +15,7 @@ import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.systems.DispatchSystem
 import com.gofficer.codenames.systems.RemoveSystem
 import com.gofficer.codenames.utils.logger
-import com.gofficer.colyseus.client.Room
 import com.gofficer.sampler.utils.toInternalFile
-import gofficer.codenames.redux.game.GameState
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 
@@ -28,12 +26,10 @@ class CodenamesGame : KtxGame<KtxScreen>() {
         private val log = logger<CodenamesGame>()
     }
 
-    var room: Room? = null
 //    var client: Client? = null
     val assetManager = AssetManager()
 
     lateinit var font24: BitmapFont
-    private val initState: GameState = GameState()
 
     private val LATENCY_MIN = 100f // ms
     private val LATENCY_MAX = 500f // ms
