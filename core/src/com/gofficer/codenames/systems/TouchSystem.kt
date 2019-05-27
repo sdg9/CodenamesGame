@@ -50,6 +50,7 @@ class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allO
                     Mappers.revealable[entity]?.isRevealed = true
                     entity?.add(FlipAnimationComponent())
                     entity?.add(NetworkComponent())
+                    entity?.add(RemoveComponent())
                 }
             }
         }

@@ -12,6 +12,7 @@ import com.daveanthonythomas.moshipack.MoshiPack
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Server
 import com.gofficer.codenames.screens.loading.LoadingScreen
+import com.gofficer.codenames.systems.RemoveSystem
 import com.gofficer.codenames.utils.logger
 import com.gofficer.colyseus.client.Room
 import com.gofficer.sampler.utils.toInternalFile
@@ -62,6 +63,7 @@ class CodenamesGame : KtxGame<KtxScreen>() {
         addScreen(LoadingScreen(game))
         setScreen<LoadingScreen>()
 
+        engine.addSystem(RemoveSystem())
 //        engine.addSystem(AnimatingSystem())
 //        engine.addSystem(SomeSystem())
 
