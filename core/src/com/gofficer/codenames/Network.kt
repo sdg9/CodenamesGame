@@ -10,6 +10,10 @@ import com.gofficer.codenames.components.*
 import com.gofficer.codenames.screens.menu.SomeRequest
 import com.gofficer.codenames.utils.registerClass
 
+/**
+ * A staple class of KryoNet examples, this class contains helper methods for registering classes for serialization as
+ * well as defines framework-level message types.
+ */
 object Network {
     const val PORT = 54553
     const val bufferObjectSize = 255032
