@@ -10,6 +10,11 @@ import ktx.ashley.allOf
 import ktx.ashley.remove
 import ktx.log.info
 import java.util.concurrent.ConcurrentLinkedQueue
+import com.esotericsoftware.kryonet.Connection
+import com.esotericsoftware.kryonet.FrameworkMessage
+import com.esotericsoftware.kryonet.Listener
+import com.esotericsoftware.kryonet.Server
+import com.gofficer.codenames.Network
 
 /**
  * An Artemis system class, this is responsible for managing the KryoNet Server, generic outbound and all inbound packet
@@ -17,15 +22,12 @@ import java.util.concurrent.ConcurrentLinkedQueue
  */
 class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServer: GameServer) : BaseSystem() {
 
-    inner class NetworkJob internal constructor(internal var connection: PlayerConnection,
-                                                internal var receivedObject: Any)
 
+    val serverKryo: Server
     private val netQueue = ConcurrentLinkedQueue<NetworkJob>()
 
-
-    override fun processSystem() {
-        processNetworkQueue()
-    }
+    inner class NetworkJob internal constructor(internal var connection: PlayerConnection,
+                                                internal var receivedObject: Any)
 
     private fun processNetworkQueue() {
         while (netQueue.peek() != null) {
@@ -37,6 +39,73 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
 
     }
 
+    internal class PlayerConnection : Connection() {
+        /**
+         * entityid of the player
+         */
+        var playerEntityId: Int = 0
+        var playerName: String = ""
+    }
+
+    //hack this needs fixed badly, none of this is thread safe for connect/disconnect
+    internal inner class ServerListener : Listener() {
+        //FIXME: do sanity checking (null etc) on both client, server
+        override fun received(c: Connection?, obj: Any?) {
+            val connection = c as PlayerConnection?
+            netQueue.add(NetworkJob(connection!!, obj!!))
+
+            //fixme, debug
+            c!!.setTimeout(999999999)
+            c.setKeepAliveTCP(9999999)
+        }
+
+        override fun connected(connection: Connection?) {
+            super.connected(connection)
+
+            //for more easily seeing which thread is which.
+            Thread.currentThread().name = "server thread (main)"
+        }
+
+        override fun idle(connection: Connection?) {
+            super.idle(connection)
+        }
+
+        override fun disconnected(c: Connection?) {
+            val connection = c as PlayerConnection?
+            connection?.let {
+                // Announce to everyone that someone (with a registered playerName) has left.
+                // TODO implement me
+//                val chatMessage = Network.Server.ChatMessage(
+//                    message = connection.playerName + " disconnected.",
+//                    sender = Chat.ChatSender.Server
+//                )
+
+                serverKryo.sendToAllTCP(chatMessage)
+            }
+        }
+    }
+
+
+    init {
+        serverKryo = object : Server(Network.bufferWriteSize, 2048) {
+            override fun newConnection(): Connection {
+                // By providing our own connection implementation, we can store per
+                // connection state without a connection ID to state look up.
+                return PlayerConnection()
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+    override fun processSystem() {
+        processNetworkQueue()
+    }
 }
 //class ServerNetworkSystem : IteratingSystem(allOf(NetworkComponent::class).get()) {
 //

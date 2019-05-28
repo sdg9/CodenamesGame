@@ -1,30 +1,11 @@
 package com.gofficer.codenames
 
 
-import com.artemis.Component
 import com.artemis.ComponentMapper
-import com.artemis.World
-import com.artemis.WorldConfigurationBuilder
-import com.artemis.managers.PlayerManager
 import com.artemis.managers.TagManager
-import com.artemis.systems.EntityProcessingSystem
-import com.artemis.utils.IntBag
-import com.artemis.utils.reflect.ClassReflection
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.files.FileHandle
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.PixmapIO
-import com.badlogic.gdx.graphics.g2d.TextureAtlas
-import com.badlogic.gdx.math.RandomXS128
-import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.math.Vector3
-import com.badlogic.gdx.utils.ScreenUtils
-import com.badlogic.gdx.utils.TimeUtils
 import com.gofficer.codenames.components.CardComponent
-import ktx.assets.file
+import ktx.log.debug
 
-@Suppress("NOTHING_TO_INLINE")
 
 /**
  * The main world, shared between both client and server, core to a lot of basic
@@ -40,15 +21,25 @@ import ktx.assets.file
  *          this is a local hosted server, (aka singleplayer, or self-hosting)
  */
 class GameWorld
-    (var client: OreClient?,
-     var server: OreServer?,
+    (var client: GameClient?,
+     var server: GameServer?,
      var worldInstanceType: GameWorld.WorldInstanceType) {
+
+    lateinit var artemisWorld: World
+
+
     fun init() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     fun process() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    fun shutdown() {
+        debug { "Shutting down" }
+        TODO("not implemented")
+//        artemisWorld?.dispose()
     }
 
 
