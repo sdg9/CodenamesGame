@@ -148,12 +148,17 @@ project(":core") {
 
         api "com.esotericsoftware:kryonet:2.22.0-RC1"
 
+        // jcommander for command line parsing
+        api "com.beust:jcommander:$jcommanderVersion"
+
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
         testCompile "org.mockito:mockito-all:1.9.+"
         testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
         testCompile "com.badlogicgames.gdx:gdx:$gdxVersion"
         testCompile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+
 //
 //        compile "junit:junit:4.12"
 //        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"

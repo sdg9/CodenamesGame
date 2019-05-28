@@ -73,9 +73,50 @@ object Network {
 
     object Client {
         class RequestCardSetup
+
+        class InitialClientData {
+
+            /**
+             * UUID of player associated with this name. used as a "password" of sorts.
+             * so that another cannot log on with the same name and impersonate without that info.
+             *
+             *
+             * Past this point, the server refers to players by id instead. Which is just session-persistent,
+             * whereas UUID is world persistent.
+             */
+            var playerUUID: String? = null
+            var playerName: String? = null
+
+            var versionMajor: Int = 0
+            var versionMinor: Int = 0
+            var versionRevision: Int = 0
+        }
     }
 
     object Shared {
 
+        class DisconnectReason {
+            lateinit var reason: Reason
+
+            enum class Reason {
+                VersionMismatch,
+                InvalidPlayerName
+            }
+        }
+    }
+}
+
+
+object NetworkHelper {
+    fun debugPacketFrequencies(receivedObject: Any,
+                               debugPacketFrequencyByType: MutableMap<String, Int>) {
+        val debugPacketTypeName = receivedObject.javaClass.toString()
+        val current = debugPacketFrequencyByType[debugPacketTypeName]
+
+        if (current != null) {
+            debugPacketFrequencyByType.put(debugPacketTypeName, current + 1)
+        } else {
+            debugPacketFrequencyByType.put(debugPacketTypeName, 1)
+        }
     }
 }

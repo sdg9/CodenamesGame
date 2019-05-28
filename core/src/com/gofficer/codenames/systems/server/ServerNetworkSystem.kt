@@ -15,6 +15,7 @@ import com.esotericsoftware.kryonet.FrameworkMessage
 import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Server
 import com.gofficer.codenames.Network
+import ktx.log.debug
 
 /**
  * An Artemis system class, this is responsible for managing the KryoNet Server, generic outbound and all inbound packet
@@ -73,6 +74,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
         override fun disconnected(c: Connection?) {
             val connection = c as PlayerConnection?
             connection?.let {
+                debug { "Player disconnected"}
                 // Announce to everyone that someone (with a registered playerName) has left.
                 // TODO implement me
 //                val chatMessage = Network.Server.ChatMessage(
@@ -80,11 +82,31 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
 //                    sender = Chat.ChatSender.Server
 //                )
 
-                serverKryo.sendToAllTCP(chatMessage)
+//                serverKryo.sendToAllTCP(chatMessage)
             }
         }
     }
 
+
+    /**
+     * Listener for notifying when a player has joined/disconnected,
+     * systems and such interested can subscribe.
+     */
+    interface NetworkServerConnectionListener {
+        /**
+         * note this does not indicate when a connection *actually*
+         * first happened, since we wouldn't have a player object,
+         * and it wouldn't be valid yet.
+
+         * @param playerEntityId
+         */
+        fun playerConnected(playerEntityId: Int) {
+
+        }
+
+        fun playerDisconnected(playerEntityId: Int) {
+        }
+    }
 
     init {
         serverKryo = object : Server(Network.bufferWriteSize, 2048) {
@@ -94,6 +116,20 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
                 return PlayerConnection()
             }
         }
+
+        serverKryo.start()
+
+
+        Network.register(serverKryo)
+
+
+        serverKryo.addListener(ServerListener())
+
+
+        serverKryo.bind(Network.PORT)
+
+        //notify the local client we've started hosting our server, so he can connect now.
+        gameWorld.server?.connectHostLatch?.countDown()
     }
 
 

@@ -5,6 +5,7 @@ import com.artemis.ComponentMapper
 import com.artemis.managers.TagManager
 import com.gofficer.codenames.components.CardComponent
 import ktx.log.debug
+import com.artemis.World
 
 
 /**
@@ -38,8 +39,7 @@ class GameWorld
 
     fun shutdown() {
         debug { "Shutting down" }
-        TODO("not implemented")
-//        artemisWorld?.dispose()
+        artemisWorld?.dispose()
     }
 
 

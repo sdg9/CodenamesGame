@@ -28,7 +28,7 @@ class GameServer() : Runnable {
 
         gameWorld.init()
 
-//        gameWorld.artemisWorld.inject(this, true)
+        gameWorld.artemisWorld.inject(this, true)
 
 
         // TODO Chat
