@@ -112,9 +112,6 @@ project(":core") {
     apply plugin: "kotlin"
 
     dependencies {
-        compile project(":redux")
-        compile project(":client")
-
         implementation "com.badlogicgames.ashley:ashley:1.7.3"
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
@@ -145,6 +142,8 @@ project(":core") {
         api "io.github.libktx:ktx-graphics:$ktxVersion"
         api "io.github.libktx:ktx-inject:$ktxVersion"
         api "io.github.libktx:ktx-log:$ktxVersion"
+
+        api "net.onedaybeard.artemis:artemis-odb:2.2.0"
 
         api "com.esotericsoftware:kryonet:2.22.0-RC1"
 
