@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.GameClient
 
 fun main(args: Array<String>) {

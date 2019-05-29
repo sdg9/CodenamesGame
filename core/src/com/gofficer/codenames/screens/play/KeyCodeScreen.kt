@@ -2,11 +2,11 @@ package com.gofficer.codenames.screens.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-import com.gofficer.codenames.CodenamesGame
+import com.gofficer.codenames.GameClient
 import com.gofficer.codenames.utils.logger
 import ktx.app.KtxScreen
 
-class KeyCodeScreen(val game: CodenamesGame) : KtxScreen {
+class KeyCodeScreen(val game: GameClient) : KtxScreen {
 
     companion object {
         @JvmStatic
@@ -18,10 +18,10 @@ class KeyCodeScreen(val game: CodenamesGame) : KtxScreen {
 
     override fun show() {
         log.debug("show")
-
-        if (game.client == null) {
-            setupGame()
-        }
+//
+//        if (game.client == null) {
+//            setupGame()
+//        }
 //        game.store.subscribe {
 //            log.debug("Update to store")
 //        }

@@ -1,6 +1,5 @@
 package com.gofficer.codenames.screens.play
 
-import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
@@ -17,26 +16,22 @@ import com.gofficer.codenames.*
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.assets.RegionNames
-import com.gofficer.codenames.components.*
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.systems.FlipAnimationSystem
-import com.gofficer.codenames.systems.RenderingSystem
-import com.gofficer.codenames.systems.TouchSystem
 import com.gofficer.codenames.utils.*
 import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
-import ktx.log.debug
 import ktx.scene2d.*
 import java.util.ArrayList
+import ktx.log.logger
 
-class PlayScreen(val game: CodenamesGame) : KtxScreen {
+class PlayScreen(val client: GameClient) : KtxScreen {
 
     companion object {
         @JvmStatic
         private val log = logger<PlayScreen>()
     }
 
-    private val assetManager = game.assetManager
+    private val assetManager = client.assetManager
 
     private val camera = OrthographicCamera()
     private val viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
@@ -52,30 +47,30 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
     private val stage: Stage = Stage(viewport)
     private val font = BitmapFont()
-
-    private var renderingSystem: RenderingSystem? = null
-    private var touchSystem: TouchSystem? = null
-    private var animationSystem: FlipAnimationSystem? = null
+//
+//    private var renderingSystem: RenderingSystem? = null
+//    private var touchSystem: TouchSystem? = null
+//    private var animationSystem: FlipAnimationSystem? = null
 
     override fun show() {
-        renderingSystem = RenderingSystem(batch, font)
-        touchSystem = TouchSystem(camera)
-        animationSystem = FlipAnimationSystem()
-        game.engine.addSystem(renderingSystem)
-        game.engine.addSystem(touchSystem)
-        game.engine.addSystem(animationSystem)
+//        renderingSystem = RenderingSystem(batch, font)
+//        touchSystem = TouchSystem(camera)
+//        animationSystem = FlipAnimationSystem()
+//        client.engine.addSystem(renderingSystem)
+//        client.engine.addSystem(touchSystem)
+//        client.engine.addSystem(animationSystem)
 
-        debug { "show" }
-        if (game.client == null) {
-//            createEntities()
-            dispatch(game.engine, CreateNewGame())
-        } else {
-            // TODO ask game to setup
-            game?.client?.sendTCP(Network.Client.RequestCardSetup())
-
-//            game.engine.addEntity()
-            // Wait on server to provide entities
-        }
+//        log.debug { "show" }
+//        if (game.client == null) {
+////            createEntities()
+//            dispatch(game.engine, CreateNewGame())
+//        } else {
+//            // TODO ask game to setup
+//            game?.client?.sendTCP(Network.Client.RequestCardSetup())
+//
+////            game.engine.addEntity()
+//            // Wait on server to provide entities
+//        }
 //        if (game.client == null) {
 //            setupGame()
 //        }
@@ -89,7 +84,7 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
 
     private fun initSkin() {
         skin.addRegions(uiSkinAtlas)
-        skin.add("default-font", game.font24)
+        skin.add("default-font", client.font24)
         skin.load(AssetPaths.UI_SKIN_JSON.toInternalFile())
 
         Scene2DSkin.defaultSkin = skin
@@ -155,39 +150,40 @@ class PlayScreen(val game: CodenamesGame) : KtxScreen {
     }
 
     override fun resize(width: Int, height: Int) {
-        log.debug("resize")
+        log.debug { "resize" }
         viewport.update(width, height, true)
         uiViewport.update(width, height, true)
     }
 
     override fun hide() {
-        log.debug("hide")
-        game.engine.removeAllEntities()
+        log.debug { "hide" }
+//        game.engine.removeAllEntities()
         dispose()
     }
 
     override fun dispose() {
-        log.debug("dispose")
+        log.debug { "dispose" }
 
-        game.engine.removeSystem(renderingSystem)
-        game.engine.removeSystem(touchSystem)
-        game.engine.removeSystem(animationSystem)
+//        game.engine.removeSystem(renderingSystem)
+//        game.engine.removeSystem(touchSystem)
+//        game.engine.removeSystem(animationSystem)
 
         batch.disposeSafely()
     }
 
     private val scaleFactor = 0.7f
-    private fun createCardAtCoordinate(name: String, color: Color, row: Int, column: Int, id: Int): Entity {
-
-        val width = cardTexture!!.regionWidth.toFloat() * scaleFactor
-        val height = cardTexture!!.regionHeight.toFloat() * scaleFactor
-
-        val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
-        val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
-
-        return createCard(game.engine, name, color, x, y, id, cardTexture)
-
-    }
+//    private fun createCardAtCoordinate(name: String, color: Color, row: Int, column: Int, id: Int): Entity {
+//
+//        val width = cardTexture!!.regionWidth.toFloat() * scaleFactor
+//        val height = cardTexture!!.regionHeight.toFloat() * scaleFactor
+//
+//        val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
+//        val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
+//
+////        return createCard(game.engine, name, color, x, y, id, cardTexture)
+//
+//        return null
+//    }
 
     private fun getRandomArbitrary(min: Int, max: Int): Int {
         return Math.floor(Math.random() * (max - min)).toInt() + min

@@ -102,6 +102,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
                     // Server communication after connection can go here, or in Listener#connected().
 
                     sendInitialClientData()
+                    networkStatusListeners.forEach { it.connected() }
                 } catch (ex: IOException) {
                     //fixme this is horrible..but i can't figure out how to rethrow it back to the calling thread
                     //throw new IOException("tesssst");
@@ -155,8 +156,31 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
     private fun receiveNetworkObject(receivedObject: Any) {
         when (receivedObject) {
             is Network.Shared.DisconnectReason -> debug { "Disconnect ${receivedObject.reason}"}
-            is Network.Server.PlayerSpawned -> receivePlayerSpawn(receivedObject)
+//            is Network.Server.PlayerSpawned -> receivePlayerSpawn(receivedObject)
             // TODO insert more types
+
+//            is Network.Shared.BlockRegion -> receiveBlockRegion(receivedObject)
+//            is Network.Shared.SparseBlockUpdate -> receiveSparseBlockUpdate(receivedObject)
+//
+//            is Network.Server.LoadedViewportMoved -> receiveLoadedViewportMoved(receivedObject)
+//            is Network.Server.SpawnInventoryItems ->
+//                receivePlayerSpawnInventoryItems(receivedObject)
+//
+//            is Network.Server.PlayerSpawned -> receivePlayerSpawn(receivedObject)
+//            //} else if (receivedObject instanceof Network.EntitySpawnFromServer) {
+//
+            is Network.Server.EntitySpawnMultiple -> receiveEntitySpawnMultiple(receivedObject)
+//            is Network.Server.EntityDestroyMultiple -> receiveMultipleEntityDestroy(receivedObject)
+//            is Network.Server.EntityKilled -> receiveEntityKilled(receivedObject)
+//            is Network.Server.EntityMoved -> receiveEntityMoved(receivedObject)
+//            is Network.Server.EntityHealthChanged -> receiveEntityHealthChanged(receivedObject)
+//
+//            is Network.Server.UpdateGeneratorControlPanelStats -> receiveUpdateGeneratorControlPanelStats(
+//                receivedObject)
+//
+//            is Network.Server.ChatMessage -> receiveChatMessage(receivedObject)
+//            is Network.Server.PlayerAirChanged -> receiveAirChanged(receivedObject)
+//            is Network.Server.DoorOpen -> receiveDoorOpen(receivedObject)
 
             is FrameworkMessage.Ping -> {
             }
@@ -177,32 +201,101 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
         networkStatusListeners.forEach { listener -> listener.disconnected(disconnectReason) }
     }
 
-    private fun receivePlayerSpawn(spawn: Network.Server.PlayerSpawned) {
-        //it is our main player (the client's player, aka us)
-        if (!connected) {
-            //fixme not ideal, calling into the client to do this????
-//            val player = oreWorld.client!!.createPlayer(spawn.playerName, clientKryo.id, true)
-//            val spriteComp = mSprite.get(player)
+    private fun receiveEntitySpawnMultiple(entitySpawn: Network.Server.EntitySpawnMultiple) {
+        // TODO continue here
+        log.debug { "I should spawn $entitySpawn" }
+//        //fixme this and hotbar code needs consolidation
+//        //logger.debug {"client receiveMultipleEntitySpawn", "entities: " + spawnFromServer.entitySpawn);
 //
-//            spriteComp.sprite.setPosition(spawn.pos.x, spawn.pos.y)
+//        //var debug = "receiveMultipleEntitySpawn [ "
+//        for (spawn in entitySpawn.entitySpawn) {
 //
-//            val playerSprite = mSprite.get(player)
-//            playerSprite.sprite.setRegion(oreWorld.atlas.findRegion("player-32x64"))
+//            val localEntityId = getWorld().create()
 //
-//            val aspectSubscriptionManager = getWorld().aspectSubscriptionManager
-//            val subscription = aspectSubscriptionManager.get(allOf())
-//            subscription.addSubscriptionListener(ClientEntitySubscriptionListener())
+//            // debug += " networkid: " + spawn.id + " localid: " + e
 //
-//            val cAir = mAir.get(player)
-//            oreWorld.client!!.hud.airChanged(cAir, cAir.air)
+//            for (c in spawn.components) {
+//                val entityEdit = getWorld().edit(localEntityId)
+//                entityEdit.add(c)
+//            }
+//
+//            //fixme id..see above.
+//            val cSprite = mSprite.create(localEntityId).apply {
+//                textureName = spawn.textureName
+//                sprite.setSize(spawn.size.x, spawn.size.y)
+//                sprite.setPosition(spawn.pos.x, spawn.pos.y)
+//            }
+//
+//            val cGenerator = mGenerator.opt(localEntityId)?.let {
+//                //recreate this on our end. since it is transient
+//                it.fuelSources = GeneratorInventory(GeneratorInventory.MAX_SLOTS, world)
+//            }
+//
+//            require(cSprite.textureName != null)
+//
+//            val textureRegion: TextureRegion?
+//            if (mBlock.has(localEntityId)) {
+//                textureRegion = tileRenderSystem.blockAtlas.findRegion(cSprite.textureName)
+//            } else {
+//                textureRegion = oreWorld.atlas.findRegion(cSprite.textureName)
+//            }
+//
+//            require(textureRegion != null) {
+//                "texture region is null on receiving entity spawn and reverse lookup of texture for" +
+//                        " this entity, texturename: ${cSprite.textureName} category: ${cSprite.category}"
+//            }
+//
+//            cSprite.sprite.setRegion(textureRegion)
+//
+//            //keep our networkid -> localid mappings up to date
+//            //since the client and server can never agree on which id to make an
+//            //entity as, so we must handshake after the fact
+//            val result1 = networkIdForEntityId.put(localEntityId, spawn.id)
+//            val result2 = entityForNetworkId.put(spawn.id, localEntityId)
+//
+//            if (result1 != null) {
+//                assert(false) {
+//                    """put failed for spawning, into entity bidirectional map, value already existed id: $localEntityId
+//                    networkid: ${spawn.id}"""
+//                }
+//            }
+//
+//            require(result2 == null) { "put failed for spawning, into entity bidirectional map, value already existed" }
+//
+//            require(entityForNetworkId.size == networkIdForEntityId.size) {
+//                "spawn, network id and entity id maps are out of sync(size mismatch)"
+//            }
+//        }
 
-            connected = true
-
-            //notify we connected
-            networkStatusListeners.forEach { it.connected() }
-        } else {
-            //FIXME cover other players joining case
-            //       throw RuntimeException("fixme, other players joining not yet implemented")
-        }
+        //logger.debug {"networkclientsystem", debug)
     }
+
+//    private fun receivePlayerSpawn(spawn: Network.Server.PlayerSpawned) {
+//        //it is our main player (the client's player, aka us)
+//        if (!connected) {
+//            //fixme not ideal, calling into the client to do this????
+////            val player = oreWorld.client!!.createPlayer(spawn.playerName, clientKryo.id, true)
+////            val spriteComp = mSprite.get(player)
+////
+////            spriteComp.sprite.setPosition(spawn.pos.x, spawn.pos.y)
+////
+////            val playerSprite = mSprite.get(player)
+////            playerSprite.sprite.setRegion(oreWorld.atlas.findRegion("player-32x64"))
+////
+////            val aspectSubscriptionManager = getWorld().aspectSubscriptionManager
+////            val subscription = aspectSubscriptionManager.get(allOf())
+////            subscription.addSubscriptionListener(ClientEntitySubscriptionListener())
+////
+////            val cAir = mAir.get(player)
+////            oreWorld.client!!.hud.airChanged(cAir, cAir.air)
+//
+//            connected = true
+//
+//            //notify we connected
+//            networkStatusListeners.forEach { it.connected() }
+//        } else {
+//            //FIXME cover other players joining case
+//            //       throw RuntimeException("fixme, other players joining not yet implemented")
+//        }
+//    }
 }

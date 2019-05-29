@@ -112,7 +112,7 @@ project(":core") {
     apply plugin: "kotlin"
 
     dependencies {
-        implementation "com.badlogicgames.ashley:ashley:1.7.3"
+//        implementation "com.badlogicgames.ashley:ashley:1.7.3"
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
@@ -136,7 +136,7 @@ project(":core") {
         api "io.github.libktx:ktx-scene2d:$ktxVersion"
 
         api "io.github.libktx:ktx-app:$ktxVersion"
-        api "io.github.libktx:ktx-ashley:$ktxVersion"
+//        api "io.github.libktx:ktx-ashley:$ktxVersion"
         api "io.github.libktx:ktx-assets:$ktxVersion"
         api "io.github.libktx:ktx-collections:$ktxVersion"
         api "io.github.libktx:ktx-graphics:$ktxVersion"
@@ -150,6 +150,8 @@ project(":core") {
 
         // jcommander for command line parsing
         api "com.beust:jcommander:$jcommanderVersion"
+        // Artemis-odb bonus functionality (systems, events, components).
+        compile "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
 
 
         testCompile group: 'junit', name: 'junit', version: '4.12'

@@ -1,15 +1,18 @@
 package com.gofficer.codenames
 
-import com.badlogic.ashley.core.Component
-import com.badlogic.ashley.core.Entity
-import com.badlogic.ashley.signals.Signal
+import com.artemis.Component
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.SnapshotArray
 import com.esotericsoftware.kryo.Kryo
+import com.esotericsoftware.kryo.serializers.DefaultSerializers
 import com.esotericsoftware.kryonet.EndPoint
 import com.gofficer.codenames.components.*
 import com.gofficer.codenames.screens.menu.SomeRequest
 import com.gofficer.codenames.utils.registerClass
+import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * A staple class of KryoNet examples, this class contains helper methods for registering classes for serialization as
@@ -33,8 +36,26 @@ object Network {
     }
 
     private fun registerShared(kryo: Kryo) {
-        kryo.registerClass<ArrayList<*>>()
-        kryo.registerClass<SomeRequest>()
+        kryo.registerClass<Color>()
+
+        kryo.registerClass<Shared.DisconnectReason>()
+        kryo.registerClass<Shared.DisconnectReason.Reason>()
+        //modular components. some components are too fucking huge and stupid to serialize automatically (like Sprite),
+        //so we split up only what we need.
+
+        // primitives/builtin
+        kryo.registerClass<ByteArray>()
+        kryo.registerClass<IntArray>()
+
+//        kryo.register(ArrayList::class.java)
+        kryo.registerClass<ArrayList<Any>>()
+
+        kryo.registerClass<kotlin.Array<Any>>()
+        kryo.registerClass<kotlin.Array<Any>>()
+        kryo.registerClass<Vector2>()
+        kryo.registerClass<IntArray>()
+        kryo.registerClass<Rectangle>()
+        kryo.register(EnumSet::class.java, DefaultSerializers.EnumSetSerializer())
     }
 
     private fun registerComponents(kryo: Kryo) {
@@ -43,23 +64,29 @@ object Network {
 //        kryo.registerClass<Signal<*>>()
 //        kryo.registerClass<Entity>()
         kryo.registerClass<Component>()
-        kryo.registerClass<ClickableComponent>()
-        kryo.registerClass<FlipAnimationComponent>()
-        kryo.registerClass<NameComponent>()
-        kryo.registerClass<RectangleComponent>()
-        kryo.registerClass<RevealableComponent>()
-        kryo.registerClass<StateComponent>()
-        kryo.registerClass<TeamComponent>()
+//        kryo.registerClass<ClickableComponent>()
+//        kryo.registerClass<FlipAnimationComponent>()
+//        kryo.registerClass<NameComponent>()
+//        kryo.registerClass<RectangleComponent>()
+//        kryo.registerClass<RevealableComponent>()
+//        kryo.registerClass<StateComponent>()
+//        kryo.registerClass<TeamComponent>()
+        kryo.registerClass<CardComponent>()
         kryo.registerClass<TextureComponent>()
         kryo.registerClass<TransformComponent>()
-        kryo.registerClass<NetworkComponent>()
+//        kryo.registerClass<NetworkComponent>()
     }
 
     private fun registerServer(kryo: Kryo) {
+        kryo.registerClass<Server.EntityDestroyMultiple>()
+        kryo.registerClass<Server.EntitySpawnMultiple>()
         kryo.registerClass<Server.CardPressed>()
         kryo.registerClass<Server.Card>()
         kryo.registerClass<Server.Cards>()
         kryo.registerClass<Server.PlayerSpawned>()
+
+        kryo.registerClass<Server.SpawnCards>()
+        kryo.registerClass<Server.EntitySpawn>()
     }
 
     private fun registerClient(kryo: Kryo) {
@@ -81,6 +108,39 @@ object Network {
             var pos: Vector2 = Vector2()
             //we don't need a size packet for player. we know how big one will be, always.
         )
+
+        /**
+         * Sends the client a list of cards to spawn
+         */
+        class SpawnCards {
+            var entitiesToSpawn = mutableListOf<EntitySpawn>()
+        }
+
+        class EntitySpawn {
+            var size: Vector2 = Vector2()
+            var pos: Vector2 = Vector2()
+
+            var textureName: String = ""
+
+            var id: Int = 0
+
+            var components = listOf<Component>()
+        }
+
+        class EntitySpawnMultiple {
+            var entitySpawn = mutableListOf<EntitySpawn>()
+        }
+        /**
+         * Tells client to destroy certain entities that it shouldn't have
+         * spawned anymore (outside of players region). The entities
+         * probably still exist in the world on the server, as well
+         * as possibly on other clients.
+         *
+         * @see EntityKilled
+         */
+        class EntityDestroyMultiple {
+            lateinit var entitiesToDestroy: List<Int>
+        }
     }
 
     object Client {

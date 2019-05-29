@@ -17,7 +17,6 @@ import com.esotericsoftware.kryonet.Server
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.CodenamesGame
 import com.gofficer.codenames.GameClient
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
@@ -112,7 +111,9 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
                             client.startClientHostedServerAndJoin(object : ClientNetworkSystem.NetworkClientListener {
                                 override fun connected() {
                                     log.debug { "Connected" }
-                                    client.setScreen<PlayScreen>()
+                                    Gdx.app.postRunnable {
+                                        client.setScreen<PlayScreen>()
+                                    }
                                 }
                             })
                         }

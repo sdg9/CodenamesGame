@@ -8,7 +8,9 @@ import ktx.log.debug
 import com.artemis.World
 import com.artemis.WorldConfigurationBuilder
 import com.artemis.managers.PlayerManager
+import com.badlogic.gdx.assets.AssetManager
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
+import com.gofficer.codenames.systems.SpatialSystem
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
 import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
 import com.gofficer.codenames.systems.server.ServerNetworkSystem
@@ -35,6 +37,7 @@ class GameWorld
 
     lateinit var artemisWorld: World
 
+    var worldGenerator: WorldGenerator? = null
 
     fun init() {
         if (worldInstanceType == WorldInstanceType.Client || worldInstanceType == WorldInstanceType.ClientHostingServer) {
@@ -63,6 +66,10 @@ class GameWorld
     private lateinit var tagManager: TagManager
 
     private lateinit var mCard: ComponentMapper<CardComponent>
+
+
+    lateinit var entityFactory: EntityFactory
+
 
     /**
      * who owns/is running this exact world instance. If it is the server, or a client.
@@ -124,13 +131,13 @@ class GameWorld
         artemisWorld.inject(this, true)
 
 
-//        entityFactory = OreEntityFactory(this)
+        entityFactory = EntityFactory(this)
     }
 
     fun initServer() {
         artemisWorld = World(WorldConfigurationBuilder()
             .with(TagManager())
-//            .with(SpatialSystem(this))
+            .with(SpatialSystem(this))
             .with(PlayerManager())
 //            .with(AISystem(this))
 //            .with(MovementSystem(this))
@@ -151,14 +158,21 @@ class GameWorld
         //inject the mappers into the world, before we start doing things
         artemisWorld.gameInject(this)
 
-//        entityFactory = OreEntityFactory(this)
+        // TODO initial card generations
 
+        entityFactory = EntityFactory(this)
 
+        worldGenerator = WorldGenerator(this)
+
+        worldGenerator!!.generateGame()
+        // TODO make starting works
         //severe: obviously...we don't want to do this right after..we can't save the world while we're still generating it
 //        if (OreSettings.saveLoadWorld) {
 //            worldIO.saveWorld()
 //        }
     }
+
+
 }
 
 
