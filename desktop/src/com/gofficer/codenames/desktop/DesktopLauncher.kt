@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
+import com.gofficer.codenames.GameClient
 
 fun main(args: Array<String>) {
 //    val config = LwjglApplicationConfiguration()
@@ -27,6 +28,7 @@ fun main(args: Array<String>) {
         x = (1920 - GameConfig.WIDTH) / 2
         y = (1080 - GameConfig.HEIGHT) / 2
     }
-    LwjglApplication(CodenamesGame(), config).logLevel = Application.LOG_DEBUG
+//    LwjglApplication(CodenamesGame(), config).logLevel = Application.LOG_DEBUG
+    LwjglApplication(GameClient(), config).logLevel = Application.LOG_DEBUG
 //    LwjglApplication(CodenamesGame())
 }

@@ -1,16 +1,23 @@
 package com.gofficer.codenames
 
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.utils.Logger
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.gofficer.codenames.config.GameConfig
+import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
-import com.gofficer.sampler.samples.OrthographicCameraSample
-import ktx.app.KtxApplicationAdapter
-import ktx.app.KtxInputAdapter
+import com.gofficer.sampler.utils.toInternalFile
+import ktx.app.KtxGame
+import ktx.app.KtxScreen
+import ktx.log.debug
+import ktx.log.logger
 import java.io.IOException
 import kotlin.concurrent.thread
 
@@ -19,12 +26,15 @@ import kotlin.concurrent.thread
  * pairmap that it uses to create and track entities sent from the server. Whenever a message comes in from the server
  * that has a component referencing an unknown Entity, the Entity is created and added to the world automatically.
  */
-class GameClient : KtxApplicationAdapter, KtxInputAdapter {
+class GameClient : KtxGame<KtxScreen>() {
+
 
     var world: GameWorld? = null
 
     private lateinit var clientNetworkSystem: ClientNetworkSystem
 
+    val assetManager = AssetManager()
+    lateinit var font24: BitmapFont
 
     lateinit private var multiplexer: InputMultiplexer
     var server: GameServer? = null
@@ -39,11 +49,15 @@ class GameClient : KtxApplicationAdapter, KtxInputAdapter {
         if (GameSettings.networkLog) {
 //            Log.set(Log.LEVEL_DEBUG)
         }
+        Gdx.app.logLevel = Application.LOG_DEBUG
+        assetManager.logger.level = Logger.DEBUG
+
+        initFonts()
 
         Thread.currentThread().name = "client render thread (GL)"
 
 //        dragAndDrop = DragAndDrop()
-        viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
+//        viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
 
         //load before stage
 //        VisUI.load(oreSkin)
@@ -52,13 +66,16 @@ class GameClient : KtxApplicationAdapter, KtxInputAdapter {
 //            hideAll()
 //        }
 
-        stage = Stage(viewport)
+//        stage = Stage(viewport)
 //        rootTable = VisTable()
 //        rootTable.setFillParent(true)
 //        stage.addActor(rootTable)
 
-        multiplexer = InputMultiplexer(stage, this)
-        Gdx.input.inputProcessor = multiplexer
+//        multiplexer = InputMultiplexer(stage, this)
+//        Gdx.input.inputProcessor = multiplexer
+
+        addScreen(LoadingScreen(this))
+        setScreen<LoadingScreen>()
 
 //        //fixme: this really needs to be stripped out of the client, put in a proper
 //        //system or something
@@ -76,28 +93,28 @@ class GameClient : KtxApplicationAdapter, KtxInputAdapter {
 //        chat.addListener(chatDialog)
 //
 //        hud = Hud(this, stage, rootTable)
-        loadingScreen = LoadingScreen(this, stage, rootTable)
+//        loadingScreen = LoadingScreen(this, stage, rootTable)
+//
+//        sidebar = Sidebar(stage, this)
+//
+//        inGameState = State(type = GuiState.LoadingScreen,
+//            enter = {
+//                rootTable.add(chatDialog.container)
+//                    .expand().bottom().left()
+//                    .padBottom(5f).size(400f, 200f)
+//            },
+//            exit = { rootTable.clear() })
+//
+//        loadingScreenState = State(type = GuiState.LoadingScreen,
+//            enter = {
+//                /*severe hack*/
+//                rootTable.clear()
+//                rootTable.add(loadingScreen).fill().expand()
+//            },
+//            exit = { rootTable.clear() })
+//        guiStates.push(loadingScreenState)
 
-        sidebar = Sidebar(stage, this)
-
-        inGameState = State(type = GuiState.LoadingScreen,
-            enter = {
-                rootTable.add(chatDialog.container)
-                    .expand().bottom().left()
-                    .padBottom(5f).size(400f, 200f)
-            },
-            exit = { rootTable.clear() })
-
-        loadingScreenState = State(type = GuiState.LoadingScreen,
-            enter = {
-                /*severe hack*/
-                rootTable.clear()
-                rootTable.add(loadingScreen).fill().expand()
-            },
-            exit = { rootTable.clear() })
-        guiStates.push(loadingScreenState)
-
-        startClientHostedServerAndJoin()
+//        startClientHostedServerAndJoin()
     }
 
 
@@ -112,7 +129,7 @@ class GameClient : KtxApplicationAdapter, KtxInputAdapter {
     /**
      * immediately hops into hosting and joining its own local server
      */
-    private fun startClientHostedServerAndJoin() {
+    fun startClientHostedServerAndJoin(listener: ClientNetworkSystem.NetworkClientListener?) {
 
         server = GameServer()
         serverThread = thread(name = "main server thread") { server!!.run() }
@@ -129,7 +146,10 @@ class GameClient : KtxApplicationAdapter, KtxInputAdapter {
         world!!.init()
         world!!.artemisWorld.inject(this)
 
-        clientNetworkSystem.addListener(NetworkConnectListener(this))
+        if (listener != null) {
+            log.debug { "Adding listener "}
+            clientNetworkSystem.addListener(listener)
+        }
 
         try {
             clientNetworkSystem.connect("127.0.0.1", Network.PORT)
@@ -143,19 +163,34 @@ class GameClient : KtxApplicationAdapter, KtxInputAdapter {
         //showFailToConnectDialog();
     }
 
-    private class NetworkConnectListener(private val client: GameClient) : ClientNetworkSystem.NetworkClientListener {
+//    private class NetworkConnectListener(private val client: GameClient) : ClientNetworkSystem.NetworkClientListener {
+//
+//        override fun connected() {
+//            //todo surely there's some first-time connection stuff we must do?
+//        }
+//
+//        override fun disconnected(disconnectReason: Network.Shared.DisconnectReason) {
+//            //todo show gui, say we've disconnected
+//        }
+//
+//    }
 
-        override fun connected() {
-            //todo surely there's some first-time connection stuff we must do?
-        }
 
-        override fun disconnected(disconnectReason: Network.Shared.DisconnectReason) {
-            //todo show gui, say we've disconnected
-        }
+    private fun initFonts() {
+        val generator = FreeTypeFontGenerator("fonts/Arcon.ttf".toInternalFile())
+        val params = FreeTypeFontGenerator.FreeTypeFontParameter()
 
+        params.size = 24
+        params.color = Color.BLACK
+        font24 = generator.generateFont(params)
     }
 
+
     companion object {
+
+
+        val log = logger<GameClient>()
+
         val VERSION_MAJOR = 0
         val VERSION_MINOR = 1
         val VERSION_REVISION = 1

@@ -8,6 +8,7 @@ import com.esotericsoftware.kryonet.FrameworkMessage
 import com.esotericsoftware.kryonet.Listener
 import com.gofficer.codenames.*
 import ktx.log.debug
+import ktx.log.logger
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -18,13 +19,16 @@ import java.util.concurrent.ConcurrentLinkedQueue
  */
 class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 
+    companion object {
+        val log = logger<ClientNetworkSystem>()
+    }
 
     lateinit var clientKryo: Client
     private val networkStatusListeners = Array<NetworkClientListener>(5)
 
     private val netQueue = ConcurrentLinkedQueue<Any>()
 
-
+    var connected: Boolean = false
     /**
      * keeps a tally of each packet type received and their frequency
      */
@@ -54,7 +58,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 
         override fun connected(connection: Connection?) {
             connection!!.setTimeout(999999999)
-            debug { "our client connected!" }
+            log.debug { "our client connected!" }
         }
 
         //FIXME: do sanity checking (null etc) on both client, server
@@ -93,7 +97,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
         object : Thread("kryonet connection client thread") {
             override fun run() {
                 try {
-                    debug { "client attempting to connect to server" }
+                    log.debug { "client attempting to connect to server" }
                     clientKryo.connect(99999999 /*fixme, debug*/, ip, port)
                     // Server communication after connection can go here, or in Listener#connected().
 
@@ -144,13 +148,14 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
         }
 
         if (GameSettings.debugPacketTypeStatistics) {
-            debug { "--- packet type stats $debugPacketFrequencyByType" }
+            log.debug { "--- packet type stats $debugPacketFrequencyByType" }
         }
     }
 
     private fun receiveNetworkObject(receivedObject: Any) {
         when (receivedObject) {
             is Network.Shared.DisconnectReason -> debug { "Disconnect ${receivedObject.reason}"}
+            is Network.Server.PlayerSpawned -> receivePlayerSpawn(receivedObject)
             // TODO insert more types
 
             is FrameworkMessage.Ping -> {
@@ -163,9 +168,41 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
                         Object: ${receivedObject.toString()}"""
                 }
             } else {
-                debug { "Unmatched object $receivedObject"}
+                log.debug { "Unmatched object $receivedObject"}
             }
         }
     }
 
+    private fun receiveDisconnectReason(disconnectReason: Network.Shared.DisconnectReason) {
+        networkStatusListeners.forEach { listener -> listener.disconnected(disconnectReason) }
+    }
+
+    private fun receivePlayerSpawn(spawn: Network.Server.PlayerSpawned) {
+        //it is our main player (the client's player, aka us)
+        if (!connected) {
+            //fixme not ideal, calling into the client to do this????
+//            val player = oreWorld.client!!.createPlayer(spawn.playerName, clientKryo.id, true)
+//            val spriteComp = mSprite.get(player)
+//
+//            spriteComp.sprite.setPosition(spawn.pos.x, spawn.pos.y)
+//
+//            val playerSprite = mSprite.get(player)
+//            playerSprite.sprite.setRegion(oreWorld.atlas.findRegion("player-32x64"))
+//
+//            val aspectSubscriptionManager = getWorld().aspectSubscriptionManager
+//            val subscription = aspectSubscriptionManager.get(allOf())
+//            subscription.addSubscriptionListener(ClientEntitySubscriptionListener())
+//
+//            val cAir = mAir.get(player)
+//            oreWorld.client!!.hud.airChanged(cAir, cAir.air)
+
+            connected = true
+
+            //notify we connected
+            networkStatusListeners.forEach { it.connected() }
+        } else {
+            //FIXME cover other players joining case
+            //       throw RuntimeException("fixme, other players joining not yet implemented")
+        }
+    }
 }

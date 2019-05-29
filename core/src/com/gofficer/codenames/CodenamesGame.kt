@@ -26,6 +26,8 @@ class CodenamesGame : KtxGame<KtxScreen>() {
         private val log = logger<CodenamesGame>()
     }
 
+
+    var world: GameWorld? = null
 //    var client: Client? = null
     val assetManager = AssetManager()
 
@@ -57,7 +59,7 @@ class CodenamesGame : KtxGame<KtxScreen>() {
 
         game = this
 
-        addScreen(LoadingScreen(game))
+//        addScreen(LoadingScreen(game))
         setScreen<LoadingScreen>()
 
         engine.addSystem(DispatchSystem(game))
@@ -70,8 +72,37 @@ class CodenamesGame : KtxGame<KtxScreen>() {
 
 
     override fun render() {
-        super.render()
-        engine.update(Gdx.graphics.deltaTime)
+//        super.render()
+//        engine.update(Gdx.graphics.deltaTime)
+
+        if (world != null) {
+            //severe gotta be a better solution w/ coroutines
+            //it's our hosted server, but it's still trying to generate the world...keep waiting
+            if (server != null) {
+//                val worldGenJob = server!!.gameW.worldGenJob
+//                if (worldGenJob.isActive) {
+//                    val progress = worldGenJob.poll()
+//                    if (progress != null) {
+//                        loadingScreen.progressReceived(progress, worldGenJob)
+//                        println("CLIENT RECEIVED worldgen PROGRESS: $progress")
+//                    }
+//                } else if (worldGenJob.isCompleted) {
+//                    //severe this gets run everytime after it gets completed, trashing my framerate ;-)
+//                    //need a better solution..
+//                    if (guiStates.peek() != inGameState) {
+//                        loadingScreen.progressComplete()
+//                        guiStates.pop()
+//                        guiStates.push(inGameState)
+//                    }
+//                }
+            }
+//            if (server != null && server!!.oreWorld.worldGenerator!!.finished) {
+
+            //           } else {
+            //we're just a dumb client
+            world!!.process()
+            //          }
+        }
     }
 
     override fun dispose() {

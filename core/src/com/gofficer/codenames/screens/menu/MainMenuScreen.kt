@@ -18,22 +18,24 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
-import com.gofficer.codenames.Network
+import com.gofficer.codenames.GameClient
 import com.gofficer.codenames.screens.play.PlayScreen
-import com.gofficer.codenames.systems.client.ClientNetworkEntitySystem
-import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
+import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
+import com.gofficer.codenames.systems.client.ClientNetworkSystem
 import com.gofficer.codenames.utils.clearScreen
-import com.gofficer.codenames.utils.logger
 import com.gofficer.codenames.utils.toInternalFile
 import ktx.app.KtxScreen
+import ktx.log.debug
+import ktx.log.logger
 import ktx.scene2d.*
 
 
-class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
+class MainMenuScreen(private val client: GameClient) : KtxScreen {
 
     companion object {
         @JvmStatic
-        private val log = logger<MainMenuScreen>()
+//        private val log = logger<MainMenuScreen>()
+        val log = logger<GameLoopSystemInvocationStrategy>()
     }
 
     private var skin: Skin = Skin()
@@ -45,11 +47,11 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
 
     private val stage: Stage = Stage(uiViewport)
 
-    private val uiSkinAtlas = game.assetManager[AssetDescriptors.UI_SKIN]
+    private val uiSkinAtlas = client.assetManager[AssetDescriptors.UI_SKIN]
 
 
     override fun show() {
-        log.debug("show")
+        log.debug { "show" }
         Gdx.input.inputProcessor = stage
         stage.clear()
 
@@ -88,7 +90,7 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
 
     private fun initSkin() {
         skin.addRegions(uiSkinAtlas)
-        skin.add("default-font", game.font24)
+        skin.add("default-font", client.font24)
         skin.load(AssetPaths.UI_SKIN_JSON.toInternalFile())
 
         Scene2DSkin.defaultSkin = skin
@@ -107,13 +109,12 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
                 textButton("Host Game") {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            val server = Server()
-                            game.server = server
-                            server.start()
-                            Network.register(server)
-                            server.bind(Network.PORT)
-                            game.engine.addSystem(ServerNetworkEntitySystem(server))
-                            game.setScreen<PlayScreen>()
+                            client.startClientHostedServerAndJoin(object : ClientNetworkSystem.NetworkClientListener {
+                                override fun connected() {
+                                    log.debug { "Connected" }
+                                    client.setScreen<PlayScreen>()
+                                }
+                            })
                         }
                     })
                 }
@@ -122,15 +123,15 @@ class MainMenuScreen(private val game: CodenamesGame) : KtxScreen {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             val client = Client()
-                            game.client = client
-                            client.start()
-                            client.connect(5000, "127.0.0.1", Network.PORT)
-                            Network.register(client)
-                            game.engine.addSystem(ClientNetworkEntitySystem(client))
-                            val request = SomeRequest("Here is the request")
-                            client.sendTCP(request)
-
-                            game.setScreen<PlayScreen>()
+//                            client.client = client
+//                            client.start()
+//                            client.connect(5000, "127.0.0.1", Network.PORT)
+//                            Network.register(client)
+//                            client.engine.addSystem(ClientNetworkEntitySystem(client))
+//                            val request = SomeRequest("Here is the request")
+//                            client.sendTCP(request)
+//
+//                            client.setScreen<PlayScreen>()
 //                            server.bind(Network.PORT)
 //
 //                            server.addListener(object : Listener() {

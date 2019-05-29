@@ -3,6 +3,7 @@ package com.gofficer.codenames
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.signals.Signal
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.SnapshotArray
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryonet.EndPoint
@@ -15,6 +16,7 @@ import com.gofficer.codenames.utils.registerClass
  * well as defines framework-level message types.
  */
 object Network {
+
     const val PORT = 54553
     const val bufferObjectSize = 255032
     const val bufferWriteSize = 250536
@@ -57,10 +59,12 @@ object Network {
         kryo.registerClass<Server.CardPressed>()
         kryo.registerClass<Server.Card>()
         kryo.registerClass<Server.Cards>()
+        kryo.registerClass<Server.PlayerSpawned>()
     }
 
     private fun registerClient(kryo: Kryo) {
         kryo.registerClass<Client.RequestCardSetup>()
+        kryo.registerClass<Client.InitialClientData>()
     }
 
     object Server {
@@ -69,6 +73,14 @@ object Network {
         class Card(var name: String = "", var x: Float = 0f, var y: Float = 0f, var isRevealed: Boolean = false)
 
         class Cards(var cards: List<Card> = listOf())
+
+        class PlayerSpawned(
+            // session local id, to be displayed
+            var connectionId: Int = 0,
+            var playerName: String = "",
+            var pos: Vector2 = Vector2()
+            //we don't need a size packet for player. we know how big one will be, always.
+        )
     }
 
     object Client {

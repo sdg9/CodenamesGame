@@ -6,6 +6,13 @@ import com.artemis.managers.TagManager
 import com.gofficer.codenames.components.CardComponent
 import ktx.log.debug
 import com.artemis.World
+import com.artemis.WorldConfigurationBuilder
+import com.artemis.managers.PlayerManager
+import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
+import com.gofficer.codenames.systems.client.ClientNetworkSystem
+import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
+import com.gofficer.codenames.systems.server.ServerNetworkSystem
+import com.gofficer.codenames.utils.gameInject
 
 
 /**
@@ -30,11 +37,21 @@ class GameWorld
 
 
     fun init() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (worldInstanceType == WorldInstanceType.Client || worldInstanceType == WorldInstanceType.ClientHostingServer) {
+            initClient()
+        } else if (isServer) {
+            initServer()
+        }
     }
 
+    /**
+     * main world processing,
+     * will handle all logic/render processing,
+     * as it delegates this to the ECS, which handles
+     * ordering and so on.
+     */
     fun process() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        artemisWorld.process()
     }
 
     fun shutdown() {
@@ -65,6 +82,83 @@ class GameWorld
     val isClient = worldInstanceType == WorldInstanceType.Client ||
             worldInstanceType == WorldInstanceType.ClientHostingServer
 
+
+    fun initClient() {
+//        initCamera()
+
+//        atlas = TextureAtlas(file("packed/entities.atlas"))
+
+        //note although it may look like it.. order between render and logic ones..actually doesn't matter, their base
+        // class dictates this. order between ones of the same type, does though.
+        artemisWorld = World(
+            WorldConfigurationBuilder().register(
+                GameLoopSystemInvocationStrategy(msPerLogicTick = 25,
+            isServer = false)
+            )
+            .with(TagManager())
+            .with(PlayerManager())
+//            .with(MovementSystem(this))
+//            .with(SoundSystem(this))
+            .with(ClientNetworkSystem(this))
+//            .with(InputSystem(camera, this))
+//            .with(EntityOverlaySystem(this))
+//            .with(PlayerSystem(this))
+//            .with(GameTickSystem(this))
+//            .with(ClientBlockDiggingSystem(this, client!!))
+//            .with(BackgroundRenderSystem(oreWorld = this, camera = client!!.viewport.camera))
+//            .with(TileRenderSystem(camera = camera,
+//                fullscreenCamera = client!!.viewport.camera,
+//                oreWorld = this))
+//            .with(SpriteRenderSystem(camera = camera,
+//                oreWorld = this))
+//            .with(LiquidRenderSystem(camera = camera, oreWorld = this))
+//            .with(DebugTextRenderSystem(camera, this))
+//            .with(PowerOverlayRenderSystem(oreWorld = this,
+//                fullscreenCamera = client!!.viewport.camera,
+//                stage = client!!.stage))
+//            .with(TileTransitionSystem(camera, this))
+            .build())
+        //b.dependsOn(WorldConfigurationBuilder.Priority.LOWEST + 1000,ProfilerSystem.class);
+
+        //inject the mappers into the world, before we start doing things
+        artemisWorld.inject(this, true)
+
+
+//        entityFactory = OreEntityFactory(this)
+    }
+
+    fun initServer() {
+        artemisWorld = World(WorldConfigurationBuilder()
+            .with(TagManager())
+//            .with(SpatialSystem(this))
+            .with(PlayerManager())
+//            .with(AISystem(this))
+//            .with(MovementSystem(this))
+//            .with(ServerPowerSystem(this))
+//            .with(GameTickSystem(this))
+//            .with(DroppedItemPickupSystem(this))
+//            .with(GrassBlockSystem(this))
+            .with(ServerNetworkEntitySystem(server!!))
+//            .with(ServerBlockDiggingSystem(this))
+//            .with(PlayerSystem(this))
+//            .with(ExplosiveSystem(this))
+//            .with(AirSystem(this))
+            .with(ServerNetworkSystem(this, server!!))
+//            .with(TileLightingSystem(this))
+//            .with(LiquidSimulationSystem(this))
+            .register(GameLoopSystemInvocationStrategy(msPerLogicTick = 25, isServer = true))
+            .build())
+        //inject the mappers into the world, before we start doing things
+        artemisWorld.gameInject(this)
+
+//        entityFactory = OreEntityFactory(this)
+
+
+        //severe: obviously...we don't want to do this right after..we can't save the world while we're still generating it
+//        if (OreSettings.saveLoadWorld) {
+//            worldIO.saveWorld()
+//        }
+    }
 }
 
 

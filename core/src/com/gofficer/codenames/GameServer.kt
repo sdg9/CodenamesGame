@@ -20,8 +20,6 @@ class GameServer() : Runnable {
     lateinit var gameWorld: GameWorld
 
     override fun run() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-
         Thread.currentThread().name = "server thread (main)"
 
         gameWorld = GameWorld(client = null, server = this, worldInstanceType = GameWorld.WorldInstanceType.Server)

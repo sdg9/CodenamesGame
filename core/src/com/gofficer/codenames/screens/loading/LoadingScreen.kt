@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.CodenamesGame
+import com.gofficer.codenames.GameClient
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.KeyCodeScreen
 import com.gofficer.codenames.screens.play.PlayScreen
@@ -18,7 +19,7 @@ import ktx.app.KtxScreen
 import ktx.assets.disposeSafely
 
 
-class LoadingScreen(private val game: CodenamesGame) : KtxScreen {
+class LoadingScreen(private val client: GameClient) : KtxScreen {
 
     companion object {
         @JvmStatic
@@ -31,7 +32,7 @@ class LoadingScreen(private val game: CodenamesGame) : KtxScreen {
 
     }
 
-    private val assetManager = game.assetManager
+    private val assetManager = client.assetManager
     private var camera: OrthographicCamera = OrthographicCamera()
     private var viewport: Viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
     private var renderer: ShapeRenderer = ShapeRenderer()
@@ -90,14 +91,14 @@ class LoadingScreen(private val game: CodenamesGame) : KtxScreen {
         if (assetManager.update() && progress >= assetManager.progress - .001f) {
 
             // Add all screens once assets loaded
-            game.addScreen(PlayScreen(game))
-            game.addScreen(MainMenuScreen(game))
-            game.addScreen(SplashScreen(game))
-            game.addScreen(KeyCodeScreen(game))
+//            client.addScreen(PlayScreen(client))
+            client.addScreen(MainMenuScreen(client))
+//            client.addScreen(SplashScreen(client))
+//            client.addScreen(KeyCodeScreen(client))
 
 //            @Suppress("ConstantConditionIf")
 //            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
-            game.setScreen<MainMenuScreen>()
+            client.setScreen<MainMenuScreen>()
 //            game.screen = PlayScreen(game)
         }
     }

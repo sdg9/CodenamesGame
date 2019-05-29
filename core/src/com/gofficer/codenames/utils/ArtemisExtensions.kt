@@ -24,7 +24,7 @@ SOFTWARE.
 
 @file:Suppress("NOTHING_TO_INLINE")
 
-package com.ore.infinium.util
+package com.gofficer.codenames.utils
 
 import com.artemis.*
 import com.artemis.managers.TagManager
@@ -45,10 +45,9 @@ inline fun isInvalidEntity(entityId: Int) = entityId == INVALID_ENTITY_ID
 
 typealias OreEntityId = Int
 
-fun World.inject(obj: Any) {
+fun World.gameInject(obj: Any) {
     this.inject(obj)
 }
-
 
 inline fun <reified T : BaseSystem> World.system() =
         getSystem(T::class.java)!!

@@ -3,8 +3,6 @@ package com.gofficer.codenames.systems.server
 import com.artemis.BaseSystem
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.systems.IteratingSystem
-import com.gofficer.codenames.GameServer
-import com.gofficer.codenames.GameWorld
 import com.gofficer.codenames.components.NetworkComponent
 import ktx.ashley.allOf
 import ktx.ashley.remove
@@ -14,8 +12,10 @@ import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.FrameworkMessage
 import com.esotericsoftware.kryonet.Listener
 import com.esotericsoftware.kryonet.Server
-import com.gofficer.codenames.Network
+import com.gofficer.codenames.*
+import com.gofficer.codenames.systems.client.ClientNetworkSystem
 import ktx.log.debug
+import ktx.log.logger
 
 /**
  * An Artemis system class, this is responsible for managing the KryoNet Server, generic outbound and all inbound packet
@@ -23,6 +23,18 @@ import ktx.log.debug
  */
 class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServer: GameServer) : BaseSystem() {
 
+
+    companion object {
+        val log = logger<ServerNetworkSystem>()
+    }
+
+    /**
+     * keeps a tally of each packet type received and their frequency
+     */
+    private val debugPacketFrequencyByType = mutableMapOf<String, Int>()
+    var packetsPerSecondTimer = GameTimer().apply { start() }
+    var packetsReceivedPerSecond = 0
+    var packetsReceivedPerSecondLast = 0
 
     val serverKryo: Server
     private val netQueue = ConcurrentLinkedQueue<NetworkJob>()
@@ -34,10 +46,60 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
         while (netQueue.peek() != null) {
             val job: NetworkJob = netQueue.poll()
 
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            NetworkHelper.debugPacketFrequencies(job.receivedObject, debugPacketFrequencyByType)
 
+
+            receiveNetworkObject(job, job.receivedObject)
+
+            packetsPerSecondTimer.resetIfExpired(1000) {
+                packetsReceivedPerSecondLast = packetsReceivedPerSecond
+                packetsReceivedPerSecond = 0
+            }
+
+            packetsReceivedPerSecond += 1
+
+            if (GameSettings.debugPacketTypeStatistics) {
+                log.debug { "--- packet type stats $debugPacketFrequencyByType" }
+            }
         }
 
+    }
+
+    private fun receiveNetworkObject(job: NetworkJob, receivedObject: Any) {
+        when (receivedObject) {
+            is Network.Client.InitialClientData -> {
+                log.debug { "Received initial client data "}
+            }
+//            is Network.Client.PlayerMove -> receivePlayerMove(job, receivedObject)
+//            is Network.Client.ChatMessage -> receiveChatMessage(job, receivedObject)
+//            is Network.Client.MoveInventoryItem -> receiveMoveInventoryItem(job, receivedObject)
+//
+//            is Network.Client.OpenDeviceControlPanel -> receiveOpenDeviceControlPanel(job, receivedObject)
+//            is Network.Client.CloseDeviceControlPanel -> receiveCloseDeviceControlPanel(job, receivedObject)
+//            is Network.Client.DoorOpen -> receiveDoorOpen(job, receivedObject)
+//            is Network.Client.DeviceToggle -> receiveDeviceToggle(job, receivedObject)
+//
+//            is Network.Client.BlockDigBegin -> receiveBlockDigBegin(job, receivedObject)
+//            is Network.Client.BlockDigFinish -> receiveBlockDigFinish(job, receivedObject)
+//            is Network.Client.BlockPlace -> receiveBlockPlace(job, receivedObject)
+//
+//            is Network.Client.PlayerEquipHotbarIndex -> receivePlayerEquipHotbarIndex(job, receivedObject)
+//            is Network.Client.InventoryDropItem -> receiveInventoryDropItem(job, receivedObject)
+//            is Network.Client.PlayerEquippedItemAttack -> receivePlayerEquippedItemAttack(job, receivedObject)
+//            is Network.Client.ItemPlace -> receiveItemPlace(job, receivedObject)
+
+
+            is FrameworkMessage.Ping -> if (receivedObject.isReply) {
+
+            }
+            else -> if (receivedObject !is FrameworkMessage.KeepAlive) {
+                assert(false) {
+                    """Server network system, object was received but there's no
+                        method calls to handle it, please add them.
+                        Object: $receivedObject"""
+                }
+            }
+        }
     }
 
     internal class PlayerConnection : Connection() {
@@ -74,7 +136,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
         override fun disconnected(c: Connection?) {
             val connection = c as PlayerConnection?
             connection?.let {
-                debug { "Player disconnected"}
+                log.debug { "Player disconnected"}
                 // Announce to everyone that someone (with a registered playerName) has left.
                 // TODO implement me
 //                val chatMessage = Network.Server.ChatMessage(
