@@ -29,6 +29,7 @@ class CardRenderSystem(private val gameWorld: GameWorld, private val camera: Cam
     private val mTransform by mapper<TransformComponent>()
     private lateinit var mTextureRenderable: ComponentMapper<TextureRenderableComponent>
     private lateinit var mPosition: ComponentMapper<PositionComponent>
+    private val mRevealed by mapper<RevealedComponent>()
 
 //    val backgroundAtlas: TextureAtlas = TextureAtlas(file("packed/backgrounds.atlas"))
 
@@ -70,8 +71,11 @@ class CardRenderSystem(private val gameWorld: GameWorld, private val camera: Cam
         val fontY = cPositon.y + (150f - layout.height) / 3
 //        val fontX = cTransform.x + (myRectangle.width - layout.width) / 2
 //        val fontY = cTransform.y + (myRectangle.height - layout.height) / 3
+        val isRevealed = mRevealed.has(entityId)
         batch.use {
-            batch.color = cCard.cardColor
+//            batch.color = cCard.cardColor
+//            batch.color = if (isRevealed == true && !suppressColor) cCard.cardColor else Color.WHITE
+            batch.color = if (isRevealed == true) cCard.cardColor else Color.WHITE
             batch.draw(cTextureRenderable.textureRegion, cPositon.x, cPositon.y, 150f, 100f)
             font.draw(batch, cCard.cardName, fontX, fontY)
 //            batch.color = if (isRevealed == true && !suppressColor) teamColor else Color.WHITE
