@@ -109,6 +109,7 @@ class GameLoopSystemInvocationStrategy
     private fun processProfileSystem(systemAndProfiler: SystemAndProfiler) =
             systemAndProfiler.apply {
                 profiler.start()
+//                log.debug { "Process system $system" }
                 system.process()
                 profiler.stop()
 
@@ -119,12 +120,14 @@ class GameLoopSystemInvocationStrategy
         //convert from nanos to millis then to seconds, to get fractional second dt
         world.setDelta(TimeUtils.nanosToMillis(nsPerTick) / 1000.0f)
 
+        log.debug { "Adding systems $systems" }
         addSystems(systems)
     }
 
     override fun process() {
         if (!isServer) {
-            //    frameProfiler.start()
+            log.debug { "Not server processing" }
+//            //    frameProfiler.start()
         }
 
         val newTimeNs = System.nanoTime()

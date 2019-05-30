@@ -1,6 +1,7 @@
 package com.gofficer.codenames.systems.server
 
 import com.artemis.Aspect
+import com.artemis.annotations.Wire
 import com.artemis.systems.IteratingSystem
 import com.artemis.utils.IntBag
 import com.gofficer.codenames.GameServer
@@ -28,6 +29,7 @@ import ktx.log.logger
  * commands
 
  */
+@Wire(failOnNull = false)
 class ServerNetworkEntitySystem(
     val gameServer: GameServer
 ) : IteratingSystem(Aspect.all()) {

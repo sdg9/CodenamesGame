@@ -1,6 +1,7 @@
 package com.gofficer.codenames.systems.client
 
 import com.artemis.BaseSystem
+import com.artemis.annotations.Wire
 import com.badlogic.gdx.utils.Array
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Connection
@@ -17,6 +18,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 /**
  * Handles the network side of things, for the client
  */
+@Wire
 class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 
     companion object {
@@ -63,6 +65,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 
         //FIXME: do sanity checking (null etc) on both client, server
         override fun received(connection: Connection?, dataObject: Any?) {
+//            log.debug { "ClientListener received object"}
             netQueue.add(dataObject)
         }
 
@@ -87,8 +90,10 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
         val lagMaxMs = GameSettings.lagMaxMs
         if (lagMinMs == 0 && lagMaxMs == 0) {
             //network latency debug switches unset, regular connection.
+            log.debug { "Adding client listener" }
             clientKryo.addListener(ClientListener())
         } else {
+            log.debug { "Adding client listener with lag details" }
             clientKryo.addListener(Listener.LagListener(lagMinMs, lagMaxMs, ClientListener()))
         }
 
@@ -128,9 +133,18 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
         clientKryo.sendTCP(initialClientData)
     }
 
+
+    var pingTimer = GameTimer()
+
     override fun processSystem() {
+
+//        log.debug { "Process System Tick" }
         processNetworkQueue()
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+        if (pingTimer.resetIfExpired(1000)) {
+            clientKryo.updateReturnTripTime()
+            val time = clientKryo.returnTripTime
+        }
     }
 
     private fun processNetworkQueue() {
@@ -154,6 +168,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
     }
 
     private fun receiveNetworkObject(receivedObject: Any) {
+//        log.debug { "Received network object" }
         when (receivedObject) {
             is Network.Shared.DisconnectReason -> debug { "Disconnect ${receivedObject.reason}"}
 //            is Network.Server.PlayerSpawned -> receivePlayerSpawn(receivedObject)
@@ -208,17 +223,18 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 //        //logger.debug {"client receiveMultipleEntitySpawn", "entities: " + spawnFromServer.entitySpawn);
 //
 //        //var debug = "receiveMultipleEntitySpawn [ "
-//        for (spawn in entitySpawn.entitySpawn) {
-//
-//            val localEntityId = getWorld().create()
-//
-//            // debug += " networkid: " + spawn.id + " localid: " + e
-//
-//            for (c in spawn.components) {
-//                val entityEdit = getWorld().edit(localEntityId)
-//                entityEdit.add(c)
-//            }
-//
+        for (spawn in entitySpawn.entitySpawn) {
+
+            val localEntityId = getWorld().create()
+
+            log.debug { "Spawn: ${spawn.id} at ${spawn.pos}"}
+            // debug += " networkid: " + spawn.id + " localid: " + e
+
+            for (c in spawn.components) {
+                val entityEdit = getWorld().edit(localEntityId)
+                entityEdit.add(c)
+            }
+
 //            //fixme id..see above.
 //            val cSprite = mSprite.create(localEntityId).apply {
 //                textureName = spawn.textureName
@@ -265,7 +281,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 //            require(entityForNetworkId.size == networkIdForEntityId.size) {
 //                "spawn, network id and entity id maps are out of sync(size mismatch)"
 //            }
-//        }
+        }
 
         //logger.debug {"networkclientsystem", debug)
     }

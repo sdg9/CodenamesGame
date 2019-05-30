@@ -117,8 +117,23 @@ class GameClient : KtxGame<KtxScreen>() {
 //        startClientHostedServerAndJoin()
     }
 
-
-
+    override fun render() {
+        super.render()
+        if (world != null) {
+            //severe gotta be a better solution w/ coroutines
+            //it's our hosted server, but it's still trying to generate the world...keep waiting
+            if (server != null) {
+                //severe this gets run everytime after it gets completed, trashing my framerate ;-)
+                //need a better solution..
+//                if (guiStates.peek() != inGameState) {
+//                    loadingScreen.progressComplete()
+//                    guiStates.pop()
+//                    guiStates.push(inGameState)
+//                }
+            }
+            world!!.process()
+        }
+    }
 
 
 
@@ -131,7 +146,9 @@ class GameClient : KtxGame<KtxScreen>() {
      */
     fun startClientHostedServerAndJoin(listener: ClientNetworkSystem.NetworkClientListener?) {
 
+        log.debug { "Initializing game server" }
         server = GameServer()
+        log.debug { "Running game server in new thread" }
         serverThread = thread(name = "main server thread") { server!!.run() }
 
         try {
@@ -143,11 +160,12 @@ class GameClient : KtxGame<KtxScreen>() {
         }
 
         world = GameWorld(this, server, GameWorld.WorldInstanceType.ClientHostingServer)
+        log.debug { "Initializing client hosted server client "}
         world!!.init()
         world!!.artemisWorld.inject(this)
 
         if (listener != null) {
-            log.debug { "Adding listener "}
+            log.debug { "Adding client listener "}
             clientNetworkSystem.addListener(listener)
         }
 

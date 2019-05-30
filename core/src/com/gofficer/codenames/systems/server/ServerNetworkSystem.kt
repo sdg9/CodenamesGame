@@ -2,6 +2,7 @@ package com.gofficer.codenames.systems.server
 
 import com.artemis.BaseSystem
 import com.artemis.Component
+import com.artemis.annotations.Wire
 import com.artemis.utils.Bag
 import com.badlogic.gdx.utils.Array
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -20,6 +21,7 @@ import ktx.log.logger
  * An Artemis system class, this is responsible for managing the KryoNet Server, generic outbound and all inbound packet
  * communication. It processes every loop.
  */
+@Wire
 class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServer: GameServer) : BaseSystem() {
 
 
@@ -77,6 +79,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
     }
 
     private fun receiveNetworkObject(job: NetworkJob, receivedObject: Any) {
+//        log.debug { "Received network object" }
         when (receivedObject) {
             is Network.Client.InitialClientData -> {
                 log.debug { "Received initial client data ${receivedObject.playerUUID} "}
@@ -127,7 +130,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
         //FIXME: do sanity checking (null etc) on both client, server
         override fun received(c: Connection?, obj: Any?) {
             val connection = c as PlayerConnection?
-            log.debug{ "Adding item to net queue" }
+//            log.debug{ "Adding item to net queue" }
             netQueue.add(NetworkJob(connection!!, obj!!))
 
             //fixme, debug
@@ -269,6 +272,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
      * @param connectionPlayerId
      */
     fun sendSpawnMultipleEntities(entitiesToSpawn: List<Int>, connectionPlayerId: Int) {
+
         assert(entitiesToSpawn.isNotEmpty()) { "server told to spawn 0 entities, this is impossible" }
 
         val spawnMultiple = Network.Server.EntitySpawnMultiple()
@@ -316,6 +320,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
         //            "sending spawn multiple for ${spawnMultiple.entitySpawn!!.size} entities")
         log.debug { "Sending TCP to $connectionPlayerId" }
         serverKryo.sendToTCP(connectionPlayerId, spawnMultiple)
+//        serverKryo.sendToAllTCP(spawnMultiple)
     }
 
     /**
