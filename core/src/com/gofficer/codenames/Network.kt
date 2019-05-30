@@ -74,6 +74,8 @@ object Network {
         kryo.registerClass<CardComponent>()
         kryo.registerClass<TextureComponent>()
         kryo.registerClass<TransformComponent>()
+        kryo.registerClass<PositionComponent>()
+        kryo.registerClass<TextureReferenceComponent>()
 //        kryo.registerClass<NetworkComponent>()
     }
 

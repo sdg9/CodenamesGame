@@ -69,16 +69,22 @@ class WorldGenerator(private val world: GameWorld) {
             }
         }
 
-        for (i in 0..4) {
-            for (j in 0..4) {
-                val id = i + j * 5
+        // TODO fix to use dynamic width
+        val width = 150f
+        val height = 100f
+        for (row in 0..4) {
+            for (column in 0..4) {
+                val id = row + column * 5
                 val card = cards[id]
                 val color = types[id]
-                // TODO consider passing row & col instead of x & y, let client resolve x/y
 //            engine.addEntity(createCardAtCoordinate(engine, card.text, card.type, i, j, id, cardTexture))
 //                    val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
 //                val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
-                world.entityFactory.createCard(card, color, 0f, 0f)
+                val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
+                val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
+
+
+                world.entityFactory.createCard(card, color, x, y)
             }
         }
     }

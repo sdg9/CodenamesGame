@@ -16,6 +16,7 @@ import com.gofficer.codenames.systems.SpatialSystem
 import com.gofficer.codenames.systems.TestSystem
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
 import com.gofficer.codenames.systems.client.CardRenderSystem
+import com.gofficer.codenames.systems.client.TextureResolverSystem
 import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
 import com.gofficer.codenames.systems.server.ServerNetworkSystem
 import com.gofficer.codenames.utils.gameInject
@@ -99,6 +100,7 @@ class GameWorld
             .with(
                 TagManager(),
                 TestSystem(),
+                TextureResolverSystem(this),
                 ClientNetworkSystem(this),
                 CardRenderSystem(gameWorld = this, camera = camera)
             ).build())

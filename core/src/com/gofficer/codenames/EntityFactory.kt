@@ -15,9 +15,10 @@ class EntityFactory(val gameWorld: GameWorld) {
     }
 
     private lateinit var mTransform: ComponentMapper<TransformComponent>
-    private lateinit var mTexture: ComponentMapper<TextureComponent>
+    private lateinit var mTextureReference: ComponentMapper<TextureReferenceComponent>
     private lateinit var mCard: ComponentMapper<CardComponent>
     private lateinit var mPlayer: ComponentMapper<PlayerComponent>
+    private lateinit var mPosition: ComponentMapper<PositionComponent>
 
     val artemisWorld = gameWorld.artemisWorld
 
@@ -30,15 +31,25 @@ class EntityFactory(val gameWorld: GameWorld) {
 
         log.debug { "Generating Card $name" }
         val entity = artemisWorld.create()
-        val cTransform = mTransform.create(entity)
-        cTransform.velocity = Vector2(x, y)
 
-//        val cTexture = mTexture.create(entity)
-//        cTexture.texture = cardTexture
+        mTransform.create(entity).apply {
+            velocity = Vector2(x, y)
+        }
 
-        val cCard = mCard.create(entity)
-        cCard.cardName = name
-        cCard.cardColor = color
+        mCard.create(entity).apply {
+            cardName = name
+            cardColor = color
+        }
+
+        mPosition.create(entity).apply {
+            this.x = x
+            this.y = y
+        }
+
+        mTextureReference.create(entity).apply {
+            path = "TODO"
+        }
+
 
         return entity
 //
