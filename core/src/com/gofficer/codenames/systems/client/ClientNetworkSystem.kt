@@ -2,12 +2,18 @@ package com.gofficer.codenames.systems.client
 
 import com.artemis.BaseSystem
 import com.artemis.annotations.Wire
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.FrameworkMessage
 import com.esotericsoftware.kryonet.Listener
 import com.gofficer.codenames.*
+import com.gofficer.codenames.components.CardComponent
+import com.gofficer.codenames.components.TextureComponent
+import com.gofficer.codenames.components.TransformComponent
+import com.gofficer.codenames.utils.mapper
 import ktx.log.debug
 import ktx.log.logger
 import java.io.IOException
@@ -19,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
  * Handles the network side of things, for the client
  */
 @Wire
-class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
+class ClientNetworkSystem(private val gameWorld: GameWorld) : BaseSystem() {
 
     companion object {
         val log = logger<ClientNetworkSystem>()
@@ -31,6 +37,11 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
     private val netQueue = ConcurrentLinkedQueue<Any>()
 
     var connected: Boolean = false
+
+    private val mTexture by mapper<TextureComponent>()
+    private val mCard by mapper<CardComponent>()
+    private val mTransform by mapper<TransformComponent>()
+
     /**
      * keeps a tally of each packet type received and their frequency
      */
@@ -227,7 +238,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 
             val localEntityId = getWorld().create()
 
-            log.debug { "Spawn: ${spawn.id} at ${spawn.pos}"}
+            log.debug { "Spawn: ${spawn.id} at ${spawn.pos} for local entity id $localEntityId"}
             // debug += " networkid: " + spawn.id + " localid: " + e
 
             for (c in spawn.components) {
@@ -235,6 +246,18 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
                 entityEdit.add(c)
             }
 
+            mTexture.create(localEntityId).apply {
+                texture = gameWorld?.client?.cardTexture
+            }
+
+            mTransform.create(localEntityId).apply {
+                velocity = Vector2(0f, 0f)
+            }
+
+            mCard.create(localEntityId).apply {
+                cardName = "test"
+                cardColor = Color.BLUE
+            }
 //            //fixme id..see above.
 //            val cSprite = mSprite.create(localEntityId).apply {
 //                textureName = spawn.textureName
@@ -253,7 +276,7 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 //            if (mBlock.has(localEntityId)) {
 //                textureRegion = tileRenderSystem.blockAtlas.findRegion(cSprite.textureName)
 //            } else {
-//                textureRegion = oreWorld.atlas.findRegion(cSprite.textureName)
+//                textureRegion = gameWorld.atlas.findRegion(cSprite.textureName)
 //            }
 //
 //            require(textureRegion != null) {
@@ -290,20 +313,20 @@ class ClientNetworkSystem(private val oreWorld: GameWorld) : BaseSystem() {
 //        //it is our main player (the client's player, aka us)
 //        if (!connected) {
 //            //fixme not ideal, calling into the client to do this????
-////            val player = oreWorld.client!!.createPlayer(spawn.playerName, clientKryo.id, true)
+////            val player = gameWorld.client!!.createPlayer(spawn.playerName, clientKryo.id, true)
 ////            val spriteComp = mSprite.get(player)
 ////
 ////            spriteComp.sprite.setPosition(spawn.pos.x, spawn.pos.y)
 ////
 ////            val playerSprite = mSprite.get(player)
-////            playerSprite.sprite.setRegion(oreWorld.atlas.findRegion("player-32x64"))
+////            playerSprite.sprite.setRegion(gameWorld.atlas.findRegion("player-32x64"))
 ////
 ////            val aspectSubscriptionManager = getWorld().aspectSubscriptionManager
 ////            val subscription = aspectSubscriptionManager.get(allOf())
 ////            subscription.addSubscriptionListener(ClientEntitySubscriptionListener())
 ////
 ////            val cAir = mAir.get(player)
-////            oreWorld.client!!.hud.airChanged(cAir, cAir.air)
+////            gameWorld.client!!.hud.airChanged(cAir, cAir.air)
 //
 //            connected = true
 //

@@ -7,12 +7,17 @@ import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Logger
 import com.badlogic.gdx.utils.viewport.FitViewport
+import com.gofficer.codenames.assets.AssetDescriptors
+import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
+import com.gofficer.codenames.utils.get
 import com.gofficer.sampler.utils.toInternalFile
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -34,6 +39,9 @@ class GameClient : KtxGame<KtxScreen>() {
     private lateinit var clientNetworkSystem: ClientNetworkSystem
 
     val assetManager = AssetManager()
+    private var gameplayAtlas :TextureAtlas? = null
+    var cardTexture : TextureRegion? = null
+
     lateinit var font24: BitmapFont
 
     lateinit private var multiplexer: InputMultiplexer
@@ -145,6 +153,10 @@ class GameClient : KtxGame<KtxScreen>() {
      * immediately hops into hosting and joining its own local server
      */
     fun startClientHostedServerAndJoin(listener: ClientNetworkSystem.NetworkClientListener?) {
+
+        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
+        cardTexture = gameplayAtlas!![RegionNames.CARD]
+
 
         log.debug { "Initializing game server" }
         server = GameServer()

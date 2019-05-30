@@ -6,13 +6,16 @@ import com.artemis.managers.TagManager
 import com.gofficer.codenames.components.CardComponent
 import ktx.log.debug
 import com.artemis.World
-import com.artemis.WorldConfiguration
 import com.artemis.WorldConfigurationBuilder
 import com.artemis.managers.PlayerManager
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
 import com.gofficer.codenames.systems.SpatialSystem
 import com.gofficer.codenames.systems.TestSystem
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
+import com.gofficer.codenames.systems.client.CardRenderSystem
 import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
 import com.gofficer.codenames.systems.server.ServerNetworkSystem
 import com.gofficer.codenames.utils.gameInject
@@ -52,6 +55,11 @@ class GameWorld
 
     lateinit var entityFactory: EntityFactory
 
+    lateinit var camera: OrthographicCamera
+    lateinit var viewport: FitViewport
+    lateinit var uiCamera: OrthographicCamera
+    lateinit var uiViewport: FitViewport
+
     fun init() {
         if (worldInstanceType == WorldInstanceType.Client || worldInstanceType == WorldInstanceType.ClientHostingServer) {
             initClient()
@@ -80,7 +88,7 @@ class GameWorld
 
 
     fun initClient() {
-//        initCamera()
+        initCamera()
 
         log.debug { "Init client" }
 //        atlas = TextureAtlas(file("packed/entities.atlas"))
@@ -91,7 +99,8 @@ class GameWorld
             .with(
                 TagManager(),
                 TestSystem(),
-                ClientNetworkSystem(this)
+                ClientNetworkSystem(this),
+                CardRenderSystem(gameWorld = this, camera = camera)
             ).build())
 
 //            WorldConfigurationBuilder().register(
@@ -129,6 +138,14 @@ class GameWorld
         artemisWorld.inject(this, true)
 
         entityFactory = EntityFactory(this)
+    }
+
+    private fun initCamera() {
+        camera = OrthographicCamera()
+        viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
+        uiCamera = OrthographicCamera()
+        uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
+
     }
 
     fun initServer() {
