@@ -246,18 +246,20 @@ class ClientNetworkSystem(private val gameWorld: GameWorld) : BaseSystem() {
                 entityEdit.add(c)
             }
 
+            // TODO alter to figure out how to pass texture, or id/value indicating texture, via server
             mTexture.create(localEntityId).apply {
                 texture = gameWorld?.client?.cardTexture
             }
 
-            mTransform.create(localEntityId).apply {
-                velocity = Vector2(0f, 0f)
-            }
+            // TODO Transform and card (and future) can be handled with entity Edit
+//            mTransform.create(localEntityId).apply {
+//                velocity = Vector2(0f, 0f)
+//            }
 
-            mCard.create(localEntityId).apply {
-                cardName = "test"
-                cardColor = Color.BLUE
-            }
+//            mCard.create(localEntityId).apply {
+//                cardName = "test"
+//                cardColor = Color.BLUE
+//            }
 //            //fixme id..see above.
 //            val cSprite = mSprite.create(localEntityId).apply {
 //                textureName = spawn.textureName
