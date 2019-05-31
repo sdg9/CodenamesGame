@@ -33,10 +33,10 @@ class PlayScreen(val client: GameClient) : KtxScreen {
 
     private val assetManager = client.assetManager
 
-    private val camera = OrthographicCamera()
-    private val viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
-    private val uiCamera = OrthographicCamera()
-    private val uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
+//    private val camera = OrthographicCamera()
+//    private val viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
+//    private val uiCamera = OrthographicCamera()
+//    private val uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
     val batch = SpriteBatch()
 
     private val uiSkinAtlas = assetManager[AssetDescriptors.UI_SKIN]
@@ -45,7 +45,7 @@ class PlayScreen(val client: GameClient) : KtxScreen {
     private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     private val cardTexture = gameplayAtlas[RegionNames.CARD]
 
-    private val stage: Stage = Stage(viewport)
+//    private val stage: Stage = Stage(viewport)
     private val font = BitmapFont()
 //
 //    private var renderingSystem: RenderingSystem? = null
@@ -77,7 +77,7 @@ class PlayScreen(val client: GameClient) : KtxScreen {
 //        game.store.subscribe {
 //            log.debug("Update to store")
 //        }
-        stage.clear()
+//        stage.clear()
         initSkin()
         initButtons()
     }
@@ -130,18 +130,18 @@ class PlayScreen(val client: GameClient) : KtxScreen {
 
         }
 
-        stage.addActor(root)
+//        stage.addActor(root)
 //        stage.isDebugAll = true
-        Gdx.input.inputProcessor = stage
+//        Gdx.input.inputProcessor = stage
     }
 
     override fun render(delta: Float) {
         clearScreen()
-        viewport.apply()
-        batch.projectionMatrix = camera.combined
+//        viewport.apply()
+//        batch.projectionMatrix = camera.combined
 
 //        stage.act(delta)
-        stage.draw()
+//        stage.draw()
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
             hide()
@@ -151,8 +151,8 @@ class PlayScreen(val client: GameClient) : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         log.debug { "resize" }
-        viewport.update(width, height, true)
-        uiViewport.update(width, height, true)
+//        viewport.update(width, height, true)
+//        uiViewport.update(width, height, true)
     }
 
     override fun hide() {

@@ -14,10 +14,7 @@ import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
 import com.gofficer.codenames.systems.SpatialSystem
 import com.gofficer.codenames.systems.TestSystem
-import com.gofficer.codenames.systems.client.ClientNetworkSystem
-import com.gofficer.codenames.systems.client.CardRenderSystem
-import com.gofficer.codenames.systems.client.TextureResolverSystem
-import com.gofficer.codenames.systems.client.TouchSystem
+import com.gofficer.codenames.systems.client.*
 import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
 import com.gofficer.codenames.systems.server.ServerNetworkSystem
 import com.gofficer.codenames.utils.gameInject
@@ -57,10 +54,10 @@ class GameWorld
 
     lateinit var entityFactory: EntityFactory
 
-    lateinit var camera: OrthographicCamera
-    lateinit var viewport: FitViewport
-    lateinit var uiCamera: OrthographicCamera
-    lateinit var uiViewport: FitViewport
+//    lateinit var camera: OrthographicCamera
+//    lateinit var viewport: FitViewport
+//    lateinit var uiCamera: OrthographicCamera
+//    lateinit var uiViewport: FitViewport
 
     fun init() {
         if (worldInstanceType == WorldInstanceType.Client || worldInstanceType == WorldInstanceType.ClientHostingServer) {
@@ -90,21 +87,29 @@ class GameWorld
 
 
     fun initClient() {
-        initCamera()
+//        initCamera()
 
         log.debug { "Init client" }
 //        atlas = TextureAtlas(file("packed/entities.atlas"))
 
         //note although it may look like it.. order between render and logic ones..actually doesn't matter, their base
         // class dictates this. order between ones of the same type, does though.
+        // TODO look up alternative systems that may be helpful
+        // https://github.com/DaanVanYperen/artemis-odb-contrib/blob/f57d6b4cfd1520383a06e7cee38ccef8361ffd4e/contrib-jam/src/main/java/net/mostlyoriginal/api/system/graphics/RenderBatchingSystem.java
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
                 TagManager(),
                 TestSystem(),
+                CameraSystem(),
+                MouseCursorSystem(),
+                KeyboardInputSystem(),
+                TouchSystem(),
+//                MouseClickSystem(),
+                ClearScreenSystem(),
                 TextureResolverSystem(this),
-                TouchSystem(this, uiCamera),
                 ClientNetworkSystem(this),
-                CardRenderSystem(gameWorld = this, camera = camera)
+                CardRenderSystem(gameWorld = this)
+//                TouchSystem(this)
             ).build())
 
 //            WorldConfigurationBuilder().register(
@@ -142,15 +147,18 @@ class GameWorld
         artemisWorld.inject(this, true)
 
         entityFactory = EntityFactory(this)
+
+        val e = artemisWorld.createEntity()
+        artemisWorld.getSystem(TagManager::class.java).register("cursor", e)
     }
 
-    private fun initCamera() {
-        camera = OrthographicCamera()
-        viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
-        uiCamera = OrthographicCamera()
-        uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
-
-    }
+//    private fun initCamera() {
+//        camera = OrthographicCamera()
+//        viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
+//        uiCamera = OrthographicCamera()
+//        uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
+//
+//    }
 
     fun initServer() {
 

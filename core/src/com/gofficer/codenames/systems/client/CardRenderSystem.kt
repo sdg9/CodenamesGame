@@ -20,7 +20,7 @@ import com.gofficer.codenames.utils.use
 
 @Wire
 @All(TextureRenderableComponent::class, PositionComponent::class)
-class CardRenderSystem(private val gameWorld: GameWorld, private val camera: Camera) : IteratingSystem() , RenderSystemMarker {
+class CardRenderSystem(private val gameWorld: GameWorld) : IteratingSystem() , RenderSystemMarker {
 
 
     private val font = BitmapFont()
@@ -71,6 +71,8 @@ class CardRenderSystem(private val gameWorld: GameWorld, private val camera: Cam
         val fontY = cPositon.y + (150f - layout.height) / 3
 //        val fontX = cTransform.x + (myRectangle.width - layout.width) / 2
 //        val fontY = cTransform.y + (myRectangle.height - layout.height) / 3
+//        clearScreen()
+//        batch.projectionMatrix = camera.combined
         val isRevealed = mRevealed.has(entityId)
         batch.use {
 //            batch.color = cCard.cardColor

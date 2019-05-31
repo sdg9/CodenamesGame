@@ -1,5 +1,6 @@
 package com.gofficer.codenames.systems.client
 
+import com.artemis.BaseSystem
 import com.artemis.ComponentMapper
 import com.artemis.annotations.All
 import com.artemis.annotations.Wire
@@ -20,19 +21,17 @@ import com.gofficer.codenames.utils.mapper
 //import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
+import com.badlogic.gdx.utils.viewport.Viewport
 import ktx.log.logger
 
-//import com.badlogic.gdx.math.Vector3
-//import com.gofficer.codenames.components.*
-////import com.gofficer.codenames.dispatch
-//import ktx.ashley.allOf
-//import ktx.ashley.mapperFor
-//import ktx.log.info
-//
 @Wire
 @All(TextureRenderableComponent::class, PositionComponent::class)
-class TouchSystem(private val gameWorld: GameWorld, private val camera: Camera) : IteratingSystem() ,
-    RenderSystemMarker {
+class TouchSystem : BaseSystem() {
+
+    val cameraSystem: CameraSystem? = null
+
+    private val aimAtTmp = Vector3()
+
 
     companion object {
         val log = logger<TouchSystem>()
@@ -40,121 +39,20 @@ class TouchSystem(private val gameWorld: GameWorld, private val camera: Camera) 
     private lateinit var mPosition: ComponentMapper<PositionComponent>
     private val mRevealed by mapper<RevealedComponent>()
 
-    override fun process(entityId: Int) {
+    override fun processSystem() {
+//        val isTouched = Gdx.input.isTouched
+        val justTouched = Gdx.input.justTouched()
+        if (justTouched) {
+            val x = Gdx.input.x.toFloat()
+            val y = Gdx.input.y.toFloat()
 
-        val isRevealed = mRevealed.has(entityId)
-        val position = mPosition.get(entityId)
-        // TODO make dynamic
-        val bounds = Rectangle(position.x, position.y, 150f, 100f)
+            aimAtTmp.set(x, y, 0f)
 
-        if (Gdx.input.justTouched()) {
-            val clickPosition = camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
-//            val clickPosition = camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
-            val clickedX = clickPosition.x
-            val clickedY = clickPosition.y
-//            val clickedX = Gdx.input.x.toFloat()
-//            val clickedY = Gdx.input.y.toFloat()
+            val unproject: Vector3 = cameraSystem!!.camera.unproject(aimAtTmp)
 
-            log.info { "Touch detected $clickedX, $clickedY"}
-            if (bounds.contains(clickedX, clickedY)) {
-                log.info { "Touched entity $entityId"}
-                if (!isRevealed) {
-                    //TODO
-                    log.info { "Tell server entity is touched"}
-                }
-            }
+            log.debug{ "Screen space touched $x, $y"}
+//            val clickPosition = cameraSystem!!.camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
+            log.debug{ "World space touched ${unproject.x}, ${unproject.y}"}
         }
-        //        val myBounds = Mappers.clickable[entity]
-//        val position = Mappers.transform[entity].position
-////        val car
-//
-//        val bounds = Rectangle(position.x, position.y, myBounds.width, myBounds.height)
-////        bounds.x = position.x
-////        bounds.y = position.y
-////        info { "Clicked at x: $" }
-//
-//        if (Gdx.input.justTouched()) {
-////        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-//            // touched
-//
-//            val clickPosition = camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
-////            info { "Clicked x: ${Gdx.input.x.toFloat()}, y: ${Gdx.input.y.toFloat()}" }
-////            info { "Clicked: $clickPosition, but bounds: $bounds" }
-//
-//            val clickedX = clickPosition.x
-//            val clickedY = clickPosition.y
-////            val clickedX = Gdx.input.x.toFloat()
-////            val clickedY = Gdx.input.y.toFloat()
-////            info { "Clicked $clickedX, $clickedY"}
-//
-////            if (bounds.contains(clickPosition.x, clickPosition.y)) {
-//            if (bounds.contains(clickedX, clickedY)) {
-//                info { "Touched $entity"}
-//
-//                // Only apply if not already revealed
-//                if (Mappers.revealable[entity]?.isRevealed != true) {
-//                    // TODO if going pure dispatch, then biz logic should reside in dispatch system not here this just fires event
-//                    Mappers.revealable[entity]?.isRevealed = true
-//                    entity?.add(FlipAnimationComponent())
-//                    entity?.add(NetworkComponent())
-////                    entity?.add(RemoveComponent())
-//
-//                    // TODO give real id
-//                    dispatch(engine, TouchCardAction(12))
-//                }
-//            }
-//        }
-//
     }
-
-
 }
-//
-//class TouchSystem(private val camera: OrthographicCamera) : IteratingSystem(allOf(ClickableComponent::class, TransformComponent::class).get()) {
-//
-////    private val rectangleMapper = mapperFor<RectangleComponent>()
-//
-//    override fun processEntity(entity: Entity?, deltaTime: Float) {
-//        val myBounds = Mappers.clickable[entity]
-//        val position = Mappers.transform[entity].position
-////        val car
-//
-//        val bounds = Rectangle(position.x, position.y, myBounds.width, myBounds.height)
-////        bounds.x = position.x
-////        bounds.y = position.y
-////        info { "Clicked at x: $" }
-//
-//        if (Gdx.input.justTouched()) {
-////        if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
-//            // touched
-//
-//            val clickPosition = camera.unproject(Vector3(Gdx.input.x.toFloat(), Gdx.input.y.toFloat(), 0f))
-////            info { "Clicked x: ${Gdx.input.x.toFloat()}, y: ${Gdx.input.y.toFloat()}" }
-////            info { "Clicked: $clickPosition, but bounds: $bounds" }
-//
-//            val clickedX = clickPosition.x
-//            val clickedY = clickPosition.y
-////            val clickedX = Gdx.input.x.toFloat()
-////            val clickedY = Gdx.input.y.toFloat()
-////            info { "Clicked $clickedX, $clickedY"}
-//
-////            if (bounds.contains(clickPosition.x, clickPosition.y)) {
-//            if (bounds.contains(clickedX, clickedY)) {
-//                info { "Touched $entity"}
-//
-//                // Only apply if not already revealed
-//                if (Mappers.revealable[entity]?.isRevealed != true) {
-//                    // TODO if going pure dispatch, then biz logic should reside in dispatch system not here this just fires event
-//                    Mappers.revealable[entity]?.isRevealed = true
-//                    entity?.add(FlipAnimationComponent())
-//                    entity?.add(NetworkComponent())
-////                    entity?.add(RemoveComponent())
-//
-//                    // TODO give real id
-//                    dispatch(engine, TouchCardAction(12))
-//                }
-//            }
-//        }
-//
-//    }
-//}
