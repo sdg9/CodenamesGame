@@ -9,8 +9,10 @@ import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.serializers.DefaultSerializers
 import com.esotericsoftware.kryonet.EndPoint
 import com.gofficer.codenames.components.*
+import com.gofficer.codenames.network.notification.EntityUpdate
 import com.gofficer.codenames.screens.menu.SomeRequest
 import com.gofficer.codenames.utils.registerClass
+import net.mostlyoriginal.api.network.marshal.common.MarshalDictionary
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -36,6 +38,13 @@ object Network {
 
     }
 
+    class NetworkDictionary : MarshalDictionary(
+        Color::class.java,
+        Shared.DisconnectReason::class.java
+    ) {
+
+    }
+
     private fun registerShared(kryo: Kryo) {
         kryo.registerClass<Color>()
 
@@ -57,6 +66,8 @@ object Network {
         kryo.registerClass<IntArray>()
         kryo.registerClass<Rectangle>()
         kryo.register(EnumSet::class.java, DefaultSerializers.EnumSetSerializer())
+
+        kryo.registerClass<EntityUpdate>()
     }
 
     private fun registerComponents(kryo: Kryo) {

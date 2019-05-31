@@ -152,11 +152,9 @@ project(":core") {
         api "com.beust:jcommander:$jcommanderVersion"
         // Artemis-odb bonus functionality (systems, events, components).
         api "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
-        api "net.mostlyoriginal.artemis-odb:contrib-components:$artemisContribVersion"
-        api "net.mostlyoriginal.artemis-odb:contrib-components:$artemisContribVersion"
-        api "net.mostlyoriginal.artemis-odb:contrib-components-libgdx:$artemisContribVersion"
         api "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
         api "net.mostlyoriginal.artemis-odb:contrib-jam:$artemisContribVersion"
+        api "net.mostlyoriginal.artemis-odb:contrib-network:$artemisContribVersion"
 
 
         testCompile group: 'junit', name: 'junit', version: '4.12'
