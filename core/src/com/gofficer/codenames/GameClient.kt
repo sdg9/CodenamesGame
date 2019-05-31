@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.screens.loading.LoadingScreen
-import com.gofficer.codenames.systems.client.ClientNetworkSystem
+import com.gofficer.codenames.systems.client.clientNetworkSystem
 import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import com.gofficer.codenames.utils.get
 import com.gofficer.sampler.utils.toInternalFile
@@ -23,7 +23,6 @@ import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.log.logger
 import net.mostlyoriginal.api.network.marshal.common.MarshalObserver
-import java.io.IOException
 import kotlin.concurrent.thread
 
 /**
@@ -38,7 +37,11 @@ class GameClient : KtxGame<KtxScreen>() {
 //
 //    private lateinit var ClientNetworkSystemOld: ClientNetworkSystemOld
 //
-    private lateinit var clientNetworkSystem: ClientNetworkSystem
+    private lateinit var clientNetworkSystem: clientNetworkSystem
+
+    fun sendToAll(obj: Any) {
+        clientNetworkSystem.kryonetClient.sendToAll(obj)
+    }
 
     val assetManager = AssetManager()
     private var gameplayAtlas :TextureAtlas? = null
@@ -52,6 +55,9 @@ class GameClient : KtxGame<KtxScreen>() {
     lateinit var stage: Stage
 
     lateinit var viewport: FitViewport
+
+
+
 
     override fun create() {
         // for debugging kryonet
@@ -178,11 +184,12 @@ class GameClient : KtxGame<KtxScreen>() {
         world!!.artemisWorld.inject(this)
 
 
-        if (listener != null) {
-            log.debug { "Adding client listener "}
-            clientNetworkSystem.kryonetClient.setListener(listener)
-//            clientNetworkSystem.addListener(listener)
-        }
+//        if (listener != null) {
+//            log.debug { "Adding client listener "}
+//            clientNetworkSystem.kryonetClient.add
+//            clientNetworkSystem.kryonetClient.setListener(listener)
+////            clientNetworkSystem.addListener(listener)
+//        }
 
         clientNetworkSystem.kryonetClient.start()
 ////

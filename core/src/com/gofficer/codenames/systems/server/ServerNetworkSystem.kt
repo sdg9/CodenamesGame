@@ -1,7 +1,9 @@
 package com.gofficer.codenames.systems.server
 
 import com.gofficer.codenames.GameServer
+import com.gofficer.codenames.GameWorld
 import com.gofficer.codenames.Network
+import com.gofficer.codenames.NetworkDictionary
 import com.gofficer.codenames.network.interfaces.INotification
 import com.gofficer.codenames.network.interfaces.INotificationProcessor
 import com.gofficer.codenames.network.interfaces.IRequest
@@ -17,12 +19,13 @@ import java.util.concurrent.ConcurrentLinkedDeque
 class ServerNetworkSystem @JvmOverloads constructor(
 
 
+    private val gameWorld: GameWorld,
     private val gameServer: GameServer,
     private val strategy: MarshalStrategy,
-    private val requestProcessor: IRequestProcessor = ServerRequestProcessor(gameServer),
-    private val notificationProcessor: INotificationProcessor = ServerNotificationProcessor(gameServer)
+    private val requestProcessor: IRequestProcessor = ServerRequestProcessor(gameWorld),
+    private val notificationProcessor: INotificationProcessor = ServerNotificationProcessor(gameWorld)
 ) :
-    MarshalSystem(Network.NetworkDictionary(), strategy) {
+    MarshalSystem(NetworkDictionary(), strategy) {
     private val netQueue = ConcurrentLinkedDeque<NetworkJob>()
 
     companion object {

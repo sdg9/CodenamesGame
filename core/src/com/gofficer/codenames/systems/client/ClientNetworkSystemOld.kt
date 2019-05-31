@@ -1,13 +1,11 @@
 package com.gofficer.codenames.systems.client
 
 import com.artemis.annotations.Wire
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Array
 import com.esotericsoftware.kryonet.Client
 import com.esotericsoftware.kryonet.Connection
 import com.esotericsoftware.kryonet.FrameworkMessage
 import com.esotericsoftware.kryonet.Listener
-import com.esotericsoftware.minlog.Log
 import com.gofficer.codenames.*
 import com.gofficer.codenames.components.CardComponent
 import com.gofficer.codenames.components.RevealedComponent
@@ -15,9 +13,7 @@ import com.gofficer.codenames.components.TextureComponent
 import com.gofficer.codenames.components.TransformComponent
 import com.gofficer.codenames.network.client.ClientResponseProcessor
 import com.gofficer.codenames.network.client.GameNotificationProcessor
-import com.gofficer.codenames.network.interfaces.INotification
 import com.gofficer.codenames.network.interfaces.INotificationProcessor
-import com.gofficer.codenames.network.interfaces.IResponse
 import com.gofficer.codenames.network.interfaces.IResponseProcessor
 import com.gofficer.codenames.utils.mapper
 import ktx.log.debug
@@ -33,15 +29,15 @@ import net.mostlyoriginal.api.network.system.MarshalSystem
  * Handles the network side of things, for the client
  */
 @Wire
-class ClientNetworkSystemOld(private val gameWorld: GameWorld) : MarshalSystem(Network.NetworkDictionary(), KryonetClientMarshalStrategy("127.0.0.1", Network.PORT)) {
+class ClientNetworkSystemOld(private val gameWorld: GameWorld) : MarshalSystem(NetworkDictionary(), KryonetClientMarshalStrategy("127.0.0.1", Network.PORT)) {
 
     companion object {
         val log = logger<ClientNetworkSystemOld>()
     }
 
 
-    var responseProcessor: IResponseProcessor = ClientResponseProcessor()
-    var notificationProcessor: INotificationProcessor = GameNotificationProcessor()
+    var responseProcessor: IResponseProcessor = ClientResponseProcessor(gameWorld)
+    var notificationProcessor: INotificationProcessor = GameNotificationProcessor(gameWorld)
 
     lateinit var clientKryo: Client
     private val networkStatusListeners = Array<NetworkClientListener>(5)

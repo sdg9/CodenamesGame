@@ -1,11 +1,12 @@
 package com.gofficer.codenames.network.server
 
 import com.gofficer.codenames.GameServer
+import com.gofficer.codenames.GameWorld
 import com.gofficer.codenames.network.interfaces.DefaultNotificationProcessor
 import com.gofficer.codenames.network.notification.EntityUpdate
 import ktx.log.logger
 
-class ServerNotificationProcessor(val server: GameServer) : DefaultNotificationProcessor() {
+class ServerNotificationProcessor(val world: GameWorld) : DefaultNotificationProcessor() {
 
     companion object {
         val log = logger<ServerNotificationProcessor>()

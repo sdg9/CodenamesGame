@@ -9,8 +9,9 @@ import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.serializers.DefaultSerializers
 import com.esotericsoftware.kryonet.EndPoint
 import com.gofficer.codenames.components.*
+import com.gofficer.codenames.network.interfaces.IRequest
+import com.gofficer.codenames.network.interfaces.IRequestProcessor
 import com.gofficer.codenames.network.notification.EntityUpdate
-import com.gofficer.codenames.screens.menu.SomeRequest
 import com.gofficer.codenames.utils.registerClass
 import net.mostlyoriginal.api.network.marshal.common.MarshalDictionary
 import java.util.*
@@ -39,7 +40,7 @@ object Network {
         registerComponents(kryo)
 
     }
-    class NetworkDictionary : MarshalDictionary() {
+    class NetworkDictionaryOld : MarshalDictionary() {
         init {
             registerAll(
                 // Game Requests
@@ -57,6 +58,13 @@ object Network {
                 Component::class.java,
                 Array<Component>::class.java,
                 Class::class.java,
+//                KlassArray::class.java,
+//                Array<KlassArray>
+//                Array<Class<Any>>::class.java,
+//                java.lang.Class[]::class.java,
+//                Array<Class<Any>>::class.java,
+//                Array<Class<*>>::class.java,
+                Array<String>::class.java,
                 Array<Any>::class.java,
                 Map::class.java,
                 Optional::class.java,
@@ -79,6 +87,7 @@ object Network {
                 Shared.DisconnectReason.Reason::class.java,
 
                 EntityUpdate::class.java,
+//                EntityUpdate.EntityUpdateBuilder::class.java,
                 Shared.Player::class.java,
 
                 // Components
@@ -89,7 +98,9 @@ object Network {
                 TextureReferenceComponent::class.java,
                 RevealedComponent::class.java,
                 Server.EntitySpawnMultiple::class.java,
-                Server.CardPressed::class.java
+                Server.CardPressed::class.java,
+
+                Client.JoinRoomRequest::class.java
             )
         }
 
@@ -279,6 +290,14 @@ object Network {
          * (Card flip)
          */
         class EntityTouch(var entityId: Int = 0)
+
+
+        class JoinRoomRequest: IRequest {
+            override fun accept(processor: IRequestProcessor, connectionId: Int) {
+                processor.processRequest(this, connectionId)
+            }
+
+        }
     }
 
     object Shared {

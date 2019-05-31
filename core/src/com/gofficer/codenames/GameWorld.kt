@@ -7,13 +7,9 @@ import com.gofficer.codenames.components.CardComponent
 import ktx.log.debug
 import com.artemis.World
 import com.artemis.WorldConfigurationBuilder
-import com.artemis.managers.PlayerManager
 import com.gofficer.codenames.network.server.ServerNotificationProcessor
 import com.gofficer.codenames.network.server.ServerRequestProcessor
-import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
-import com.gofficer.codenames.systems.RemoveSystem
-import com.gofficer.codenames.systems.SpatialSystem
-import com.gofficer.codenames.systems.TestSystem
+import com.gofficer.codenames.systems.*
 import com.gofficer.codenames.systems.client.*
 import com.gofficer.codenames.systems.server.*
 import com.gofficer.codenames.utils.gameInject
@@ -45,6 +41,8 @@ class GameWorld
     }
 
     lateinit var artemisWorld: World
+//    lateinit var networkManager: NetworkManager
+//    lateinit var worldManager: WorldManager
 
     var worldGenerator: WorldGenerator? = null
 
@@ -98,7 +96,7 @@ class GameWorld
         // https://github.com/DaanVanYperen/artemis-odb-contrib/blob/f57d6b4cfd1520383a06e7cee38ccef8361ffd4e/contrib-jam/src/main/java/net/mostlyoriginal/api/system/graphics/RenderBatchingSystem.java
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
-                ClientNetworkSystem("127.0.0.1", Network.PORT),
+                clientNetworkSystem(this, "127.0.0.1", Network.PORT),
                 EventSystem(),
                 TagManager(),
                 TestSystem(),
@@ -106,6 +104,7 @@ class GameWorld
                 MouseCursorSystem(),
                 KeyboardInputSystem(),
                 TouchSystem(),
+                SharedWorldManager(this),
                 // TODO temp disable
 //                CardPressedSystem(),
 //                MouseClickSystem(),
@@ -174,11 +173,12 @@ class GameWorld
 //                TagManager(),
 //                SpatialSystem(this),
 //                PlayerManager(),
-                ServerNetworkSystem(server!!, strategy, ServerRequestProcessor(server!!), ServerNotificationProcessor(server!!)),
+                ServerNetworkSystem(this, server!!, strategy, ServerRequestProcessor(this), ServerNotificationProcessor(this)),
                 NetworkManager(server!!, strategy),
+                SharedWorldManager(this),
 
 
-                WorldManager(server!!)
+                WorldManager(this, server!!)
 //                ServerNetworkEntitySystemOld(server!!),
 //                ServerNetworkSystemOld(this, server!!),
 //                RemoveSystem()

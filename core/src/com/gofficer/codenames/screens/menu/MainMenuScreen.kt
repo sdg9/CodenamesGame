@@ -16,6 +16,7 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.GameClient
+import com.gofficer.codenames.Network
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
 import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
@@ -107,24 +108,27 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             // TODO respond to listener
-//                            client.startClientHostedServerAndJoin(null)
-//                            client.setScreen<PlayScreen>()
-                            client.startClientHostedServerAndJoin(object : MarshalObserver {
-                                override fun disconnected(connectionId: Int) {
-
-                                }
-
-                                override fun received(connectionId: Int, `object`: Any?) {
-
-                                }
-
-                                override fun connected(connectionId: Int) {
-                                    log.debug { "Connected, nav to play" }
-                                    Gdx.app.postRunnable {
-                                        client.setScreen<PlayScreen>()
-                                    }
-                              }
-                            })
+                            client.startClientHostedServerAndJoin(null)
+                            client.setScreen<PlayScreen>()
+                            client.sendToAll(Network.Client.JoinRoomRequest())
+//                            client.startClientHostedServerAndJoin(object : MarshalObserver {
+//                                override fun disconnected(connectionId: Int) {
+//
+//                                }
+//
+//                                override fun received(connectionId: Int, `object`: Any?) {
+//
+//
+//                                }
+//
+//                                override fun connected(connectionId: Int) {
+//                                    log.debug { "Connected, nav to play" }
+//                                    Gdx.app.postRunnable {
+//                                        client.setScreen<PlayScreen>()
+//                                        client.sendToAll(Network.Client.JoinRoomRequest())
+//                                    }
+//                              }
+//                            })
 
 //                            client.setScreen<PlayScreen>()
 //                            client.startClientHostedServerAndJoin(object : ClientNetworkSystemOld.NetworkClientListener {
