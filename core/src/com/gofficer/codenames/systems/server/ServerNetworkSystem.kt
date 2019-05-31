@@ -13,7 +13,9 @@ import com.esotericsoftware.kryonet.Server
 import com.gofficer.codenames.*
 import com.gofficer.codenames.components.CardComponent
 import com.gofficer.codenames.components.PlayerComponent
+import com.gofficer.codenames.components.RevealedComponent
 import com.gofficer.codenames.components.TransformComponent
+import com.gofficer.codenames.utils.ifPresent
 import com.gofficer.codenames.utils.mapper
 import ktx.log.logger
 
@@ -33,7 +35,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
     private val mPlayer by mapper<PlayerComponent>()
     private val mCard by mapper<CardComponent>()
     private val mTransform by mapper<TransformComponent>()
-
+    private val mRevealed by mapper<RevealedComponent>()
 
     /**
      * keeps a tally of each packet type received and their frequency
@@ -85,6 +87,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
                 log.debug { "Received initial client data ${receivedObject.playerUUID} "}
                 receiveInitialClientData(job, receivedObject)
             }
+            is Network.Client.EntityTouch -> receiveEntityTouched(job, receivedObject)
 //            is Network.Client.PlayerMove -> receivePlayerMove(job, receivedObject)
 //            is Network.Client.ChatMessage -> receiveChatMessage(job, receivedObject)
 //            is Network.Client.MoveInventoryItem -> receiveMoveInventoryItem(job, receivedObject)
@@ -116,6 +119,7 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
             }
         }
     }
+
 
     internal class PlayerConnection : Connection() {
         /**
@@ -255,6 +259,17 @@ class ServerNetworkSystem(private val gameWorld: GameWorld, private val gameServ
             connectionListener.playerConnected(job.connection.playerEntityId)
         }
     }
+
+    private fun receiveEntityTouched(job: NetworkJob, entityTouch: Network.Client.EntityTouch) {
+        val entityId = entityTouch.entityId
+
+        val cardTouched = Network.Server.CardTouched(entityId = entityId)
+        mCard.ifPresent(entityId) {
+            mRevealed.set(entityId, true)
+            serverKryo.sendToAllTCP(cardTouched)
+        }
+    }
+
 
 
     override fun processSystem() {

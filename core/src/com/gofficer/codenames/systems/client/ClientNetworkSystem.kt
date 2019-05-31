@@ -11,6 +11,7 @@ import com.esotericsoftware.kryonet.FrameworkMessage
 import com.esotericsoftware.kryonet.Listener
 import com.gofficer.codenames.*
 import com.gofficer.codenames.components.CardComponent
+import com.gofficer.codenames.components.RevealedComponent
 import com.gofficer.codenames.components.TextureComponent
 import com.gofficer.codenames.components.TransformComponent
 import com.gofficer.codenames.utils.mapper
@@ -38,9 +39,34 @@ class ClientNetworkSystem(private val gameWorld: GameWorld) : BaseSystem() {
 
     var connected: Boolean = false
 
+    /**
+     * the network id is a special id that is used to refer to an entity across
+     * the network, for this client. Basically it is so the client knows what
+     * entity id the server is talking about..as the client and server ECS engines
+     * will have totally different sets of entitiy id's.
+     *
+     *
+     * So, server sends over what its internal entity id is for an entity to spawn,
+     * as well as for referring to future ones, and we make a map of ,
+     * since we normally receive a server entity id, and we must determine what *our* (clients) entity
+     * id is, so we can do things like move it around, perform actions etc on it.
+     *
+     *
+     *
+     *
+     * server remote entity ID(key), client local entity id(value)
+     */
+    private val entityForNetworkId = HashMap<Int, Int>(500)
+
+    /**
+     * client local entity id(key), server remote entity ID(value)
+     */
+    private val networkIdForEntityId = HashMap<Int, Int>(500)
+
     private val mTexture by mapper<TextureComponent>()
     private val mCard by mapper<CardComponent>()
     private val mTransform by mapper<TransformComponent>()
+    private val mRevealed by mapper<RevealedComponent>()
 
     /**
      * keeps a tally of each packet type received and their frequency
@@ -206,6 +232,7 @@ class ClientNetworkSystem(private val gameWorld: GameWorld) : BaseSystem() {
 //
 //            is Network.Server.ChatMessage -> receiveChatMessage(receivedObject)
 //            is Network.Server.PlayerAirChanged -> receiveAirChanged(receivedObject)
+            is Network.Server.CardTouched -> receiveCardTouched(receivedObject)
 //            is Network.Server.DoorOpen -> receiveDoorOpen(receivedObject)
 
             is FrameworkMessage.Ping -> {
@@ -221,6 +248,12 @@ class ClientNetworkSystem(private val gameWorld: GameWorld) : BaseSystem() {
                 log.debug { "Unmatched object $receivedObject"}
             }
         }
+    }
+
+    private fun receiveCardTouched(activated: Network.Server.CardTouched) {
+        val localId = entityForNetworkId[activated.entityId]!!
+        mCard.get(localId)
+        mRevealed.set(localId, true)
     }
 
     private fun receiveDisconnectReason(disconnectReason: Network.Shared.DisconnectReason) {
@@ -291,24 +324,32 @@ class ClientNetworkSystem(private val gameWorld: GameWorld) : BaseSystem() {
 //            //keep our networkid -> localid mappings up to date
 //            //since the client and server can never agree on which id to make an
 //            //entity as, so we must handshake after the fact
-//            val result1 = networkIdForEntityId.put(localEntityId, spawn.id)
-//            val result2 = entityForNetworkId.put(spawn.id, localEntityId)
-//
-//            if (result1 != null) {
-//                assert(false) {
-//                    """put failed for spawning, into entity bidirectional map, value already existed id: $localEntityId
-//                    networkid: ${spawn.id}"""
-//                }
-//            }
-//
-//            require(result2 == null) { "put failed for spawning, into entity bidirectional map, value already existed" }
-//
-//            require(entityForNetworkId.size == networkIdForEntityId.size) {
-//                "spawn, network id and entity id maps are out of sync(size mismatch)"
-//            }
+            val result1 = networkIdForEntityId.put(localEntityId, spawn.id)
+            val result2 = entityForNetworkId.put(spawn.id, localEntityId)
+
+            if (result1 != null) {
+                assert(false) {
+                    """put failed for spawning, into entity bidirectional map, value already existed id: $localEntityId
+                    networkid: ${spawn.id}"""
+                }
+            }
+
+            require(result2 == null) { "put failed for spawning, into entity bidirectional map, value already existed" }
+
+            require(entityForNetworkId.size == networkIdForEntityId.size) {
+                "spawn, network id and entity id maps are out of sync(size mismatch)"
+            }
         }
 
         //logger.debug {"networkclientsystem", debug)
+    }
+
+    fun sendCardTouched(entityId: Int) {
+        val networkId = networkIdForEntityId[entityId]!!
+        val cardPress = Network.Client.EntityTouch(networkId)
+
+
+        clientKryo.sendTCP(cardPress)
     }
 
 //    private fun receivePlayerSpawn(spawn: Network.Server.PlayerSpawned) {

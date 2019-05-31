@@ -153,7 +153,6 @@ class GameClient : KtxGame<KtxScreen>() {
      * immediately hops into hosting and joining its own local server
      */
     fun startClientHostedServerAndJoin(listener: ClientNetworkSystem.NetworkClientListener?) {
-
         gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
         cardTexture = gameplayAtlas!![RegionNames.CARD]
 
@@ -193,6 +192,31 @@ class GameClient : KtxGame<KtxScreen>() {
         //showFailToConnectDialog();
     }
 
+    fun joinExistingServer(listener: ClientNetworkSystem.NetworkClientListener) {
+        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
+        cardTexture = gameplayAtlas!![RegionNames.CARD]
+
+        world = GameWorld(this, null, GameWorld.WorldInstanceType.ClientHostingServer)
+        log.debug { "Initializing joining existing server client"}
+        world!!.init()
+        world!!.artemisWorld.inject(this)
+
+        if (listener != null) {
+            log.debug { "Adding client listener "}
+            clientNetworkSystem.addListener(listener)
+        }
+
+        try {
+            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
+        } catch (e: IOException) {
+            e.printStackTrace()
+            //fuck. gonna have to show the fail to connect dialog.
+            //could be a socket error..or anything, i guess
+            System.exit(1)
+        }
+    }
+
+
 //    private class NetworkConnectListener(private val client: GameClient) : ClientNetworkSystem.NetworkClientListener {
 //
 //        override fun connected() {
@@ -214,6 +238,7 @@ class GameClient : KtxGame<KtxScreen>() {
         params.color = Color.BLACK
         font24 = generator.generateFont(params)
     }
+
 
 
     companion object {

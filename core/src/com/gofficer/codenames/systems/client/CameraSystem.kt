@@ -18,7 +18,7 @@ class CameraSystem : BaseSystem() {
     init {
         camera.setToOrtho(false)
     }
-    
+
     override fun processSystem() {
     }
 

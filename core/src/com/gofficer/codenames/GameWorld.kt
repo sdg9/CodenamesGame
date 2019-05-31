@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
+import com.gofficer.codenames.systems.RemoveSystem
 import com.gofficer.codenames.systems.SpatialSystem
 import com.gofficer.codenames.systems.TestSystem
 import com.gofficer.codenames.systems.client.*
@@ -19,6 +20,7 @@ import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
 import com.gofficer.codenames.systems.server.ServerNetworkSystem
 import com.gofficer.codenames.utils.gameInject
 import ktx.log.logger
+import net.mostlyoriginal.api.event.common.EventSystem
 
 
 /**
@@ -98,18 +100,21 @@ class GameWorld
         // https://github.com/DaanVanYperen/artemis-odb-contrib/blob/f57d6b4cfd1520383a06e7cee38ccef8361ffd4e/contrib-jam/src/main/java/net/mostlyoriginal/api/system/graphics/RenderBatchingSystem.java
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
+                EventSystem(),
                 TagManager(),
                 TestSystem(),
                 CameraSystem(),
                 MouseCursorSystem(),
                 KeyboardInputSystem(),
                 TouchSystem(),
+                CardPressedSystem(),
 //                MouseClickSystem(),
                 ClearScreenSystem(),
                 TextureResolverSystem(this),
                 ClientNetworkSystem(this),
-                CardRenderSystem(gameWorld = this)
+                CardRenderSystem(gameWorld = this),
 //                TouchSystem(this)
+                RemoveSystem()
             ).build())
 
 //            WorldConfigurationBuilder().register(
@@ -164,22 +169,30 @@ class GameWorld
 
         log.debug { "Init server" }
         artemisWorld = World(WorldConfigurationBuilder()
-            .with(TagManager())
-            .with(SpatialSystem(this))
-            .with(PlayerManager())
+            .with(
+                TagManager(),
+                SpatialSystem(this),
+                PlayerManager(),
+                ServerNetworkEntitySystem(server!!),
+                ServerNetworkSystem(this, server!!),
+                RemoveSystem()
+            )
+//            .with(TagManager())
+//            .with(SpatialSystem(this))
+//            .with(PlayerManager())
 //            .with(AISystem(this))
 //            .with(MovementSystem(this))
 //            .with(ServerPowerSystem(this))
 //            .with(GameTickSystem(this))
 //            .with(DroppedItemPickupSystem(this))
-//            .with(GrassBlockSystem(this))
-            .with(ServerNetworkEntitySystem(server!!))
-//            .with(ServerBlockDiggingSystem(this))
-//            .with(PlayerSystem(this))
-//            .with(ExplosiveSystem(this))
-//            .with(AirSystem(this))
-            .with(ServerNetworkSystem(this, server!!))
-//            .with(TileLightingSystem(this))
+////            .with(GrassBlockSystem(this))
+//            .with(ServerNetworkEntitySystem(server!!))
+////            .with(ServerBlockDiggingSystem(this))
+////            .with(PlayerSystem(this))
+////            .with(ExplosiveSystem(this))
+////            .with(AirSystem(this))
+//            .with(ServerNetworkSystem(this, server!!))
+////            .with(TileLightingSystem(this))
 //            .with(LiquidSimulationSystem(this))
             .register(GameLoopSystemInvocationStrategy(msPerLogicTick = 25, isServer = true))
             .build())

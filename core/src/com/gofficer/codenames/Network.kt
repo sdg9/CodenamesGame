@@ -20,6 +20,7 @@ import kotlin.collections.ArrayList
  */
 object Network {
 
+    const val INVALID_ENTITY_ID = -1
     const val PORT = 54553
     const val bufferObjectSize = 255032
     const val bufferWriteSize = 250536
@@ -90,11 +91,13 @@ object Network {
 
         kryo.registerClass<Server.SpawnCards>()
         kryo.registerClass<Server.EntitySpawn>()
+        kryo.registerClass<Server.CardTouched>()
     }
 
     private fun registerClient(kryo: Kryo) {
         kryo.registerClass<Client.RequestCardSetup>()
         kryo.registerClass<Client.InitialClientData>()
+        kryo.registerClass<Client.EntityTouch>()
     }
 
     object Server {
@@ -118,6 +121,8 @@ object Network {
         class SpawnCards {
             var entitiesToSpawn = mutableListOf<EntitySpawn>()
         }
+
+        class CardTouched(var entityId: Int = INVALID_ENTITY_ID)
 
         class EntitySpawn {
             var size: Vector2 = Vector2()
@@ -166,6 +171,12 @@ object Network {
             var versionMinor: Int = 0
             var versionRevision: Int = 0
         }
+
+        /**
+         * request for the entity to be touched
+         * (Card flip)
+         */
+        class EntityTouch(var entityId: Int = 0)
     }
 
     object Shared {
