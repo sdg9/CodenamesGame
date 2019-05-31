@@ -1,6 +1,5 @@
 package com.gofficer.codenames.systems.client
 
-import com.artemis.BaseSystem
 import com.artemis.ComponentMapper
 import com.artemis.annotations.All
 import com.artemis.annotations.Exclude
@@ -10,7 +9,6 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.gofficer.codenames.components.*
 import com.gofficer.codenames.event.TouchEvent
-import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.mapper
 import ktx.log.logger
 import net.mostlyoriginal.api.event.common.Subscribe
@@ -24,7 +22,7 @@ class CardPressedSystem : IteratingSystem() {
     private lateinit var mPosition: ComponentMapper<PositionComponent>
     private val mRevealed by mapper<RevealedComponent>()
 
-    private lateinit var clientNetworkSystem: ClientNetworkSystem
+    private lateinit var clientNetworkSystem: ClientNetworkSystemOld
 
     private val touchEventQueue = ConcurrentLinkedQueue<Vector2>()
 

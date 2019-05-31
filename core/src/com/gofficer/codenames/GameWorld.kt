@@ -8,19 +8,18 @@ import ktx.log.debug
 import com.artemis.World
 import com.artemis.WorldConfigurationBuilder
 import com.artemis.managers.PlayerManager
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.utils.viewport.FitViewport
-import com.gofficer.codenames.config.GameConfig
+import com.gofficer.codenames.network.server.ServerNotificationProcessor
+import com.gofficer.codenames.network.server.ServerRequestProcessor
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
 import com.gofficer.codenames.systems.RemoveSystem
 import com.gofficer.codenames.systems.SpatialSystem
 import com.gofficer.codenames.systems.TestSystem
 import com.gofficer.codenames.systems.client.*
-import com.gofficer.codenames.systems.server.ServerNetworkEntitySystem
-import com.gofficer.codenames.systems.server.ServerNetworkSystem
+import com.gofficer.codenames.systems.server.*
 import com.gofficer.codenames.utils.gameInject
 import ktx.log.logger
 import net.mostlyoriginal.api.event.common.EventSystem
+import net.mostlyoriginal.api.network.marshal.kryonet.KryonetServerMarshalStrategy
 
 
 /**
@@ -49,8 +48,7 @@ class GameWorld
 
     var worldGenerator: WorldGenerator? = null
 
-
-    private lateinit var tagManager: TagManager
+//    private lateinit var tagManager: TagManager
 
     private lateinit var mCard: ComponentMapper<CardComponent>
 
@@ -100,6 +98,7 @@ class GameWorld
         // https://github.com/DaanVanYperen/artemis-odb-contrib/blob/f57d6b4cfd1520383a06e7cee38ccef8361ffd4e/contrib-jam/src/main/java/net/mostlyoriginal/api/system/graphics/RenderBatchingSystem.java
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
+                ClientNetworkSystem("127.0.0.1", Network.PORT),
                 EventSystem(),
                 TagManager(),
                 TestSystem(),
@@ -107,11 +106,12 @@ class GameWorld
                 MouseCursorSystem(),
                 KeyboardInputSystem(),
                 TouchSystem(),
-                CardPressedSystem(),
+                // TODO temp disable
+//                CardPressedSystem(),
 //                MouseClickSystem(),
                 ClearScreenSystem(),
                 TextureResolverSystem(this),
-                ClientNetworkSystem(this),
+//                ClientNetworkSystemOld(this),
                 CardRenderSystem(gameWorld = this),
 //                TouchSystem(this)
                 RemoveSystem()
@@ -126,7 +126,7 @@ class GameWorld
 ////            .with(MovementSystem(this))
 ////            .with(SoundSystem(this))
 //            .with(TestSystem())
-//            .with(ClientNetworkSystem(this))
+//            .with(ClientNetworkSystemOld(this))
 ////            .with(InputSystem(camera, this))
 ////            .with(EntityOverlaySystem(this))
 ////            .with(PlayerSystem(this))
@@ -168,14 +168,20 @@ class GameWorld
     fun initServer() {
 
         log.debug { "Init server" }
+        val strategy = KryonetServerMarshalStrategy("127.0.0.1", Network.PORT)
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
-                TagManager(),
-                SpatialSystem(this),
-                PlayerManager(),
-                ServerNetworkEntitySystem(server!!),
-                ServerNetworkSystem(this, server!!),
-                RemoveSystem()
+//                TagManager(),
+//                SpatialSystem(this),
+//                PlayerManager(),
+                ServerNetworkSystem(server!!, strategy, ServerRequestProcessor(server!!), ServerNotificationProcessor(server!!)),
+                NetworkManager(server!!, strategy),
+
+
+                WorldManager(server!!)
+//                ServerNetworkEntitySystemOld(server!!),
+//                ServerNetworkSystemOld(this, server!!),
+//                RemoveSystem()
             )
 //            .with(TagManager())
 //            .with(SpatialSystem(this))
@@ -186,12 +192,12 @@ class GameWorld
 //            .with(GameTickSystem(this))
 //            .with(DroppedItemPickupSystem(this))
 ////            .with(GrassBlockSystem(this))
-//            .with(ServerNetworkEntitySystem(server!!))
+//            .with(ServerNetworkEntitySystemOld(server!!))
 ////            .with(ServerBlockDiggingSystem(this))
 ////            .with(PlayerSystem(this))
 ////            .with(ExplosiveSystem(this))
 ////            .with(AirSystem(this))
-//            .with(ServerNetworkSystem(this, server!!))
+//            .with(ServerNetworkSystemOld(this, server!!))
 ////            .with(TileLightingSystem(this))
 //            .with(LiquidSimulationSystem(this))
             .register(GameLoopSystemInvocationStrategy(msPerLogicTick = 25, isServer = true))

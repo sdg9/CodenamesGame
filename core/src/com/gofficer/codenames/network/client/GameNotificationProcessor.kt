@@ -1,17 +1,15 @@
 package com.gofficer.codenames.network.client
 
-import com.artemis.Entity
-import com.badlogic.gdx.Gdx
 import com.esotericsoftware.minlog.Log
 import com.gofficer.codenames.network.interfaces.DefaultNotificationProcessor
 import com.gofficer.codenames.network.notification.EntityUpdate
 import com.gofficer.codenames.network.notification.RemoveEntity
-import com.gofficer.codenames.systems.client.ClientNetworkSystem
+import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import ktx.log.logger
 
 class GameNotificationProcessor : DefaultNotificationProcessor() {
     companion object {
-        val log = logger<ClientNetworkSystem>()
+        val log = logger<ClientNetworkSystemOld>()
     }
     override fun processNotification(entityUpdate: EntityUpdate) {
         log.debug { "Received an entity update $entityUpdate" }

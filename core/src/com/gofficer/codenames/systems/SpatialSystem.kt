@@ -7,7 +7,7 @@ import com.gofficer.codenames.GameWorld
 import com.gofficer.codenames.components.CardComponent
 import com.gofficer.codenames.components.TransformComponent
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.systems.server.ServerNetworkSystem
+import com.gofficer.codenames.systems.server.ServerNetworkSystemOld
 import com.gofficer.codenames.utils.mapper
 import com.gofficer.codenames.utils.require
 import com.gofficer.codenames.utils.system
@@ -30,7 +30,7 @@ class SpatialSystem(private val gameWorld: GameWorld) : IteratingSystem(Aspect.a
     // private val mVelocity by mapper<VelocityComponent>()
     // private val mJump by mapper<JumpComponent>()
 
-    private val serverNetworkSystem by system<ServerNetworkSystem>()
+    private val serverNetworkSystem by system<ServerNetworkSystemOld>()
 
     var quadTree: QuadTree
 

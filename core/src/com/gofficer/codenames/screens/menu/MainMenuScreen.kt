@@ -12,21 +12,19 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import com.esotericsoftware.kryonet.Client
-import com.esotericsoftware.kryonet.Server
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.AssetPaths
 import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.GameClient
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
-import com.gofficer.codenames.systems.client.ClientNetworkSystem
+import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.toInternalFile
 import ktx.app.KtxScreen
-import ktx.log.debug
 import ktx.log.logger
 import ktx.scene2d.*
+import net.mostlyoriginal.api.network.marshal.common.MarshalObserver
 
 
 class MainMenuScreen(private val client: GameClient) : KtxScreen {
@@ -108,14 +106,35 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
                 textButton("Host Game") {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            client.startClientHostedServerAndJoin(object : ClientNetworkSystem.NetworkClientListener {
-                                override fun connected() {
-                                    log.debug { "Connected" }
+                            // TODO respond to listener
+//                            client.startClientHostedServerAndJoin(null)
+//                            client.setScreen<PlayScreen>()
+                            client.startClientHostedServerAndJoin(object : MarshalObserver {
+                                override fun disconnected(connectionId: Int) {
+
+                                }
+
+                                override fun received(connectionId: Int, `object`: Any?) {
+
+                                }
+
+                                override fun connected(connectionId: Int) {
+                                    log.debug { "Connected, nav to play" }
                                     Gdx.app.postRunnable {
                                         client.setScreen<PlayScreen>()
                                     }
-                                }
+                              }
                             })
+
+//                            client.setScreen<PlayScreen>()
+//                            client.startClientHostedServerAndJoin(object : ClientNetworkSystemOld.NetworkClientListener {
+//                                override fun connected() {
+//                                    log.debug { "Connected" }
+//                                    Gdx.app.postRunnable {
+//                                        client.setScreen<PlayScreen>()
+//                                    }
+//                                }
+//                            })
                         }
                     })
                 }
@@ -123,7 +142,7 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
                 textButton("Connect to Server") {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            client.joinExistingServer(object : ClientNetworkSystem.NetworkClientListener {
+                            client.joinExistingServer(object : ClientNetworkSystemOld.NetworkClientListener {
                                 override fun connected() {
                                     log.debug { "Connected" }
                                     Gdx.app.postRunnable {

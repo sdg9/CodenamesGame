@@ -14,6 +14,8 @@ import com.gofficer.codenames.screens.menu.SomeRequest
 import com.gofficer.codenames.utils.registerClass
 import net.mostlyoriginal.api.network.marshal.common.MarshalDictionary
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.collections.ArrayList
 
 /**
@@ -37,13 +39,101 @@ object Network {
         registerComponents(kryo)
 
     }
+    class NetworkDictionary : MarshalDictionary() {
+        init {
+            registerAll(
+                // Game Requests
+                Array<Any>::class.java,
+                // Other
+                Array<BooleanArray>::class.java,
+                BooleanArray::class.java,
+                Array<IntArray>::class.java,
+                IntArray::class.java,
+                Array<Int>::class.java,
+                ConcurrentHashMap::class.java,
+                HashMap::class.java,
+                HashSet::class.java,
+                ConcurrentLinkedDeque::class.java,
+                Component::class.java,
+                Array<Component>::class.java,
+                Class::class.java,
+                Array<Any>::class.java,
+                Map::class.java,
+                Optional::class.java,
+                Any::class.java,
+                Network::class.java,
 
-    class NetworkDictionary : MarshalDictionary(
-        Color::class.java,
-        Shared.DisconnectReason::class.java
-    ) {
+                Color ::class.java,
+                ByteArray::class.java,
+                IntArray::class.java,
+                ArrayList::class.java,
 
+                Vector2::class.java,
+                IntArray::class.java,
+                Rectangle::class.java,
+
+
+                Shared.DisconnectReason::class.java,
+                Color::class.java,
+                Shared.DisconnectReason::class.java,
+                Shared.DisconnectReason.Reason::class.java,
+
+                EntityUpdate::class.java,
+                Shared.Player::class.java,
+
+                // Components
+                Component::class.java,
+                CardComponent::class.java,
+                TextureComponent::class.java,
+                PositionComponent::class.java,
+                TextureReferenceComponent::class.java,
+                RevealedComponent::class.java,
+                Server.EntitySpawnMultiple::class.java,
+                Server.CardPressed::class.java
+            )
+        }
+
+        private fun registerAll(vararg classes: Class<*>) {
+            topId = 40
+            for (clazz in classes) {
+                register(topId++, clazz)
+            }
+        }
     }
+//    class NetworkDictionary : MarshalDictionary(
+//        Color::class.java,
+//        ByteArray::class.java,
+//        IntArray::class.java,
+//        ArrayList::class.java,
+//
+//        Vector2::class.java,
+//        IntArray::class.java,
+//        Rectangle::class.java,
+//
+//
+//
+//        Shared.DisconnectReason::class.java,
+//        Color::class.java,
+//        Shared.DisconnectReason::class.java,
+//        Shared.DisconnectReason.Reason::class.java,
+//
+//        EntityUpdate::class.java,
+//        Shared.Player::class.java,
+//
+//        // Components
+//        Component::class.java,
+//        CardComponent::class.java,
+//        TextureComponent::class.java,
+//        PositionComponent::class.java,
+//        TextureReferenceComponent::class.java,
+//        RevealedComponent::class.java,
+//        Server.EntitySpawnMultiple::class.java,
+//        Server.CardPressed::class.java
+//
+//
+//    ) {
+//
+//    }
 
     private fun registerShared(kryo: Kryo) {
         kryo.registerClass<Color>()
@@ -68,6 +158,7 @@ object Network {
         kryo.register(EnumSet::class.java, DefaultSerializers.EnumSetSerializer())
 
         kryo.registerClass<EntityUpdate>()
+        kryo.registerClass<Shared.Player>()
     }
 
     private fun registerComponents(kryo: Kryo) {
@@ -200,6 +291,26 @@ object Network {
                 InvalidPlayerName
             }
         }
+
+        class Player {
+
+            var connectionId: Int = -1
+            var playerName: String = ""
+            var isReady: Boolean = false
+
+            constructor() {}
+
+            @JvmOverloads
+            constructor(connectionId: Int, playerName: String) {
+                this.connectionId = connectionId
+                this.playerName = playerName
+            }
+
+            override fun toString(): String {
+                return "$playerName Ready: $isReady"
+            }
+        }
+
     }
 }
 

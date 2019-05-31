@@ -3,7 +3,6 @@ package com.gofficer.codenames
 
 import com.badlogic.gdx.Application
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -17,12 +16,13 @@ import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
+import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import com.gofficer.codenames.utils.get
 import com.gofficer.sampler.utils.toInternalFile
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
-import ktx.log.debug
 import ktx.log.logger
+import net.mostlyoriginal.api.network.marshal.common.MarshalObserver
 import java.io.IOException
 import kotlin.concurrent.thread
 
@@ -35,7 +35,9 @@ class GameClient : KtxGame<KtxScreen>() {
 
 
     var world: GameWorld? = null
-
+//
+//    private lateinit var ClientNetworkSystemOld: ClientNetworkSystemOld
+//
     private lateinit var clientNetworkSystem: ClientNetworkSystem
 
     val assetManager = AssetManager()
@@ -44,7 +46,6 @@ class GameClient : KtxGame<KtxScreen>() {
 
     lateinit var font24: BitmapFont
 
-    lateinit private var multiplexer: InputMultiplexer
     var server: GameServer? = null
     private var serverThread: Thread? = null
 
@@ -152,9 +153,9 @@ class GameClient : KtxGame<KtxScreen>() {
     /**
      * immediately hops into hosting and joining its own local server
      */
-    fun startClientHostedServerAndJoin(listener: ClientNetworkSystem.NetworkClientListener?) {
-        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
-        cardTexture = gameplayAtlas!![RegionNames.CARD]
+    fun startClientHostedServerAndJoin(listener: MarshalObserver?) {
+//        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
+//        cardTexture = gameplayAtlas!![RegionNames.CARD]
 
 
         log.debug { "Initializing game server" }
@@ -170,54 +171,60 @@ class GameClient : KtxGame<KtxScreen>() {
             e.printStackTrace()
         }
 
+        log.debug { "Creating client world"}
         world = GameWorld(this, server, GameWorld.WorldInstanceType.ClientHostingServer)
         log.debug { "Initializing client hosted server client "}
         world!!.init()
         world!!.artemisWorld.inject(this)
 
+
         if (listener != null) {
             log.debug { "Adding client listener "}
-            clientNetworkSystem.addListener(listener)
+            clientNetworkSystem.kryonetClient.setListener(listener)
+//            clientNetworkSystem.addListener(listener)
         }
 
-        try {
-            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            //fuck. gonna have to show the fail to connect dialog.
-            //could be a socket error..or anything, i guess
-            System.exit(1)
-        }
+        clientNetworkSystem.kryonetClient.start()
+////
+//        try {
+//            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//            //fuck. gonna have to show the fail to connect dialog.
+//            //could be a socket error..or anything, i guess
+//            System.exit(1)
+//        }
 
         //showFailToConnectDialog();
     }
 
-    fun joinExistingServer(listener: ClientNetworkSystem.NetworkClientListener) {
+    fun joinExistingServer(listener: ClientNetworkSystemOld.NetworkClientListener) {
         gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
         cardTexture = gameplayAtlas!![RegionNames.CARD]
 
         world = GameWorld(this, null, GameWorld.WorldInstanceType.ClientHostingServer)
         log.debug { "Initializing joining existing server client"}
         world!!.init()
+        // Injects now instantiated clientNetworkSystem to this class
         world!!.artemisWorld.inject(this)
 
-        if (listener != null) {
-            log.debug { "Adding client listener "}
-            clientNetworkSystem.addListener(listener)
-        }
-
-        try {
-            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            //fuck. gonna have to show the fail to connect dialog.
-            //could be a socket error..or anything, i guess
-            System.exit(1)
-        }
+//        if (listener != null) {
+//            log.debug { "Adding client listener "}
+//            clientNetworkSystem.addListener(listener)
+//        }
+//
+//        try {
+//            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
+//        } catch (e: IOException) {
+//            e.printStackTrace()
+//            //fuck. gonna have to show the fail to connect dialog.
+//            //could be a socket error..or anything, i guess
+//            System.exit(1)
+//        }
     }
 
 
-//    private class NetworkConnectListener(private val client: GameClient) : ClientNetworkSystem.NetworkClientListener {
+//    private class NetworkConnectListener(private val client: GameClient) : ClientNetworkSystemOld.NetworkClientListener {
 //
 //        override fun connected() {
 //            //todo surely there's some first-time connection stuff we must do?

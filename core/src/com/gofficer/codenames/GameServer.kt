@@ -1,6 +1,7 @@
 package com.gofficer.codenames
 
 import ktx.log.logger
+import net.mostlyoriginal.api.network.marshal.kryonet.KryonetServerMarshalStrategy
 import java.util.concurrent.CountDownLatch
 
 /**
@@ -25,9 +26,13 @@ class GameServer() : Runnable {
 
     lateinit var gameWorld: GameWorld
 
+//    private var strategy: KryonetServerMarshalStrategy? = null
+//    private var players: Set<Network.Shared.Player>? = null
+
     override fun run() {
         Thread.currentThread().name = "server thread (main)"
 
+        log.debug { "Creating server game world"}
         gameWorld = GameWorld(client = null, server = this, worldInstanceType = GameWorld.WorldInstanceType.Server)
 
         gameWorld.init()

@@ -8,7 +8,6 @@ import com.gofficer.codenames.GameServer
 import com.gofficer.codenames.components.CardComponent
 import com.gofficer.codenames.components.PlayerComponent
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.systems.SpatialSystem
 import com.gofficer.codenames.utils.mapper
 import com.gofficer.codenames.utils.require
@@ -30,12 +29,12 @@ import ktx.log.logger
 
  */
 @Wire(failOnNull = false)
-class ServerNetworkEntitySystem(
+class ServerNetworkEntitySystemOld(
     val gameServer: GameServer
 ) : IteratingSystem(Aspect.all()) {
 
     companion object {
-        private val log = logger<ServerNetworkEntitySystem>()
+        private val log = logger<ServerNetworkEntitySystemOld>()
         val INVALID_ENTITY_ID = -1
     }
 
@@ -49,7 +48,7 @@ class ServerNetworkEntitySystem(
 //    private val mPlayer by mapper<PlayerComponent>()
 
 
-    private val serverNetworkSystem by system<ServerNetworkSystem>()
+    private val serverNetworkSystem by system<ServerNetworkSystemOld>()
 
     private inner class PlayerEntities(
         /**
@@ -72,7 +71,7 @@ class ServerNetworkEntitySystem(
     }
 
 
-    private inner class ConnectionListener : ServerNetworkSystem.NetworkServerConnectionListener {
+    private inner class ConnectionListener : ServerNetworkSystemOld.NetworkServerConnectionListener {
         override fun playerDisconnected(playerEntityId: Int) {
             playerEntities.removeAll { playerEntities ->
                 //remove all entity 'copies' for this player, since he's disconnecting
