@@ -37,7 +37,7 @@ It also is serving as my "Hello World" entry into game development. I'm a profes
 # TODO
 
 - [ ] Fix recent issue created breaking joining client sync
-  - Introduced in 8f3917ae27fa2469807ed5ec32e0c6294ffc2dbe
+  - Introduced in 8f3917ae27fa2469807ed5ec32e0c6294ffc2dbe, works one commit earlier 9194bef14b284683fafb9ec4cfed1369efe2afee
 
 ```java
   Exception in thread "server thread (main)" java.util.ConcurrentModificationException
