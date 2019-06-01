@@ -3,7 +3,7 @@ package com.gofficer.codenames.systems.client
 import com.badlogic.gdx.Gdx
 import com.esotericsoftware.minlog.Log
 import com.gofficer.codenames.GameWorld
-import com.gofficer.codenames.NetworkDictionary
+import com.gofficer.codenames.Network
 import com.gofficer.codenames.network.client.ClientResponseProcessor
 import com.gofficer.codenames.network.client.GameNotificationProcessor
 import com.gofficer.codenames.network.interfaces.INotification
@@ -14,9 +14,9 @@ import ktx.log.logger
 import net.mostlyoriginal.api.network.marshal.kryonet.KryonetClientMarshalStrategy
 import net.mostlyoriginal.api.network.system.MarshalSystem
 
-class clientNetworkSystem(gameWorld: GameWorld, host: String, port: Int) :
-    MarshalSystem(NetworkDictionary(), KryonetClientMarshalStrategy(host, port)) {
-//    MarshalSystem(NetworkDictionary(), KryonetClientMarshalStrategy(host, port)) {
+class ClientNetworkSystem(gameWorld: GameWorld, host: String, port: Int) :
+    MarshalSystem(Network.NetworkDictionary(), KryonetClientMarshalStrategy(host, port)) {
+//    MarshalSystem(NetworkDictionaryHelper(), KryonetClientMarshalStrategy(host, port)) {
 
     var responseProcessor: IResponseProcessor = ClientResponseProcessor(gameWorld)
     var notificationProcessor: INotificationProcessor = GameNotificationProcessor(gameWorld)
@@ -44,7 +44,7 @@ class clientNetworkSystem(gameWorld: GameWorld, host: String, port: Int) :
     }
 
     companion object {
-        val log = logger<clientNetworkSystem>()
+        val log = logger<ClientNetworkSystem>()
 
     }
 }

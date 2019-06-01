@@ -146,14 +146,17 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
                 textButton("Connect to Server") {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            client.joinExistingServer(object : ClientNetworkSystemOld.NetworkClientListener {
-                                override fun connected() {
-                                    log.debug { "Connected" }
-                                    Gdx.app.postRunnable {
-                                        client.setScreen<PlayScreen>()
-                                    }
-                                }
-                            })
+                            client.joinExistingServer(null)
+                            client.setScreen<PlayScreen>()
+                            client.sendToAll(Network.Client.JoinRoomRequest())
+//                            client.joinExistingServer(object : ClientNetworkSystemOld.NetworkClientListener {
+//                                override fun connected() {
+//                                    log.debug { "Connected" }
+//                                    Gdx.app.postRunnable {
+//                                        client.setScreen<PlayScreen>()
+//                                    }
+//                                }
+//                            })
 //                            val client = Client()
 //                            client.client = client
 //                            client.start()

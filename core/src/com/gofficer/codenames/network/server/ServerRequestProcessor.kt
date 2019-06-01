@@ -42,19 +42,19 @@ class ServerRequestProcessor(val world: GameWorld) : DefaultRequestProcessor() {
         world.artemisWorld.getSystem(NetworkManager::class.java).registerUserConnection(connectionId, connectionId)
 //        finisterra.getNetworkManager().registerUserConnection(player, connectionId)
 
-
-        val subscription = world.artemisWorld.aspectSubscriptionManager.get(Aspect.all(CardComponent::class.java))
-        val entityIds = subscription.entities
-
-
-        log.debug { "Found IDs $entityIds"}
-//        world.networkManager.sendTo(connectionId, En)
-        entityIds.forEach {
-            val update = EntityUpdate.EntityUpdateBuilder.of(it).build()
-            log.debug{"Sending entity update for $update"}
-            world.artemisWorld.getSystem(WorldManager::class.java).sendEntityUpdate(connectionId, update)
-//            world.worldManager.sendEntityUpdate(connectionId, update)
-        }
+//
+//        val subscription = world.artemisWorld.aspectSubscriptionManager.get(Aspect.all(CardComponent::class.java))
+//        val entityIds = subscription.entities
+//
+//
+//        log.debug { "Found IDs $entityIds"}
+////        world.networkManager.sendTo(connectionId, En)
+//        entityIds.forEach {
+//            val update = EntityUpdate.EntityUpdateBuilder.of(it).build()
+//            log.debug{"Sending entity update for $update"}
+//            world.artemisWorld.getSystem(WorldManager::class.java).sendEntityUpdate(connectionId, update)
+////            world.worldManager.sendEntityUpdate(connectionId, update)
+//        }
 //        world.getSystem(WorldManager::class.java).sendEntityUpdate(entityId, update)
 //        worldManager.world.artemisWorld.entityManager
 

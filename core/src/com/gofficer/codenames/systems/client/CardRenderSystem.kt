@@ -17,10 +17,14 @@ import com.gofficer.codenames.utils.RenderSystemMarker
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.mapper
 import com.gofficer.codenames.utils.use
+import ktx.log.logger
 
 @Wire
 @All(TextureRenderableComponent::class, PositionComponent::class)
 class CardRenderSystem(private val gameWorld: GameWorld) : IteratingSystem() , RenderSystemMarker {
+    companion object {
+        val log = logger<CardRenderSystem>()
+    }
 
 
     private val font = BitmapFont()
@@ -74,6 +78,8 @@ class CardRenderSystem(private val gameWorld: GameWorld) : IteratingSystem() , R
 //        clearScreen()
 //        batch.projectionMatrix = camera.combined
         val isRevealed = mRevealed.has(entityId)
+
+//        log.debug { "Texture: ${cTextureRenderable.textureRegion}" }
         batch.use {
 //            batch.color = cCard.cardColor
 //            batch.color = if (isRevealed == true && !suppressColor) cCard.cardColor else Color.WHITE

@@ -29,7 +29,7 @@ import net.mostlyoriginal.api.network.system.MarshalSystem
  * Handles the network side of things, for the client
  */
 @Wire
-class ClientNetworkSystemOld(private val gameWorld: GameWorld) : MarshalSystem(NetworkDictionary(), KryonetClientMarshalStrategy("127.0.0.1", Network.PORT)) {
+class ClientNetworkSystemOld(private val gameWorld: GameWorld) : MarshalSystem(Network.NetworkDictionary(), KryonetClientMarshalStrategy("127.0.0.1", Network.PORT)) {
 
     companion object {
         val log = logger<ClientNetworkSystemOld>()

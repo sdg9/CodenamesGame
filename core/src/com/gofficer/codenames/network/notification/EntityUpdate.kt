@@ -5,9 +5,10 @@ import com.gofficer.codenames.network.interfaces.INotification
 import com.gofficer.codenames.network.interfaces.INotificationProcessor
 import java.io.Serializable
 import java.util.*
+import com.badlogic.gdx.utils.Array
 
 
-class EntityUpdate(var entityId: Int = -1, var components: Array<Component> = arrayOf(), var toRemove: Array<Class<Component>>? = arrayOf()) : INotification, Serializable{
+class EntityUpdate(var entityId: Int = -1, var components: Array<Component>? = null, var toRemove: Array<Class<Component>>? = null) : INotification, Serializable{
 
 //    var entityId: Int = -1
 //    lateinit var components: Array<Component>
@@ -27,7 +28,7 @@ class EntityUpdate(var entityId: Int = -1, var components: Array<Component> = ar
 
     override fun toString(): String {
 //        return super.toString()
-        return "EntityUpdate[$entityId, ${components.size} components:  ${components.map {
+        return "EntityUpdate[$entityId, ${components?.size} components:  ${components?.map {
             it::class.java.simpleName
         }} toRemove: ${toRemove?.map{
             it::class.java.simpleName
@@ -54,8 +55,8 @@ class EntityUpdate(var entityId: Int = -1, var components: Array<Component> = ar
         }
 
         fun build(): EntityUpdate {
-            entityUpdate!!.components = components.toTypedArray()
-            entityUpdate!!.toRemove = toRemove.toTypedArray()
+//            entityUpdate!!.components = components?.toTypedArray()
+//            entityUpdate!!.toRemove = toRemove.toTypedArray()
             return entityUpdate!!
         }
 

@@ -2,8 +2,6 @@ package com.gofficer.codenames.systems.server
 
 import com.gofficer.codenames.GameServer
 import com.gofficer.codenames.GameWorld
-import com.gofficer.codenames.Network
-import com.gofficer.codenames.NetworkDictionary
 import com.gofficer.codenames.network.interfaces.INotification
 import com.gofficer.codenames.network.interfaces.INotificationProcessor
 import com.gofficer.codenames.network.interfaces.IRequest
@@ -13,9 +11,14 @@ import com.gofficer.codenames.network.server.ServerRequestProcessor
 import ktx.log.logger
 import net.mostlyoriginal.api.network.marshal.common.MarshalStrategy
 import net.mostlyoriginal.api.network.system.MarshalSystem
-import java.util.*
 import java.util.concurrent.ConcurrentLinkedDeque
+import com.badlogic.gdx.utils.Array
+import com.gofficer.codenames.Network
 
+/**
+ * An Artemis system class, this is responsible for managing the KryoNet Server and
+ * all inbound packet communication. It processes every loop.
+ */
 class ServerNetworkSystem @JvmOverloads constructor(
 
 
@@ -25,8 +28,10 @@ class ServerNetworkSystem @JvmOverloads constructor(
     private val requestProcessor: IRequestProcessor = ServerRequestProcessor(gameWorld),
     private val notificationProcessor: INotificationProcessor = ServerNotificationProcessor(gameWorld)
 ) :
-    MarshalSystem(NetworkDictionary(), strategy) {
+    MarshalSystem(Network.NetworkDictionary(), strategy) {
     private val netQueue = ConcurrentLinkedDeque<NetworkJob>()
+
+    private val connectionListeners = Array<NetworkServerConnectionListener>()
 
     companion object {
         val log = logger<ServerNetworkSystem>()
@@ -60,6 +65,10 @@ class ServerNetworkSystem @JvmOverloads constructor(
     override fun connected(connectionId: Int) {
         super.connected(connectionId)
         log.debug { "Player $connectionId connected"}
+
+        for (connectionListener in connectionListeners) {
+            connectionListener.playerConnected(connectionId)
+        }
     }
 
     override fun disconnected(connectionId: Int) {
@@ -76,6 +85,9 @@ class ServerNetworkSystem @JvmOverloads constructor(
 //            }
 //
 //        }
+        for (connectionListener in connectionListeners) {
+            connectionListener.playerDisconnected(connectionId)
+        }
     }
 //
 //    fun getServer(): Optional<Server> {
@@ -83,4 +95,25 @@ class ServerNetworkSystem @JvmOverloads constructor(
 //    }
 
     class NetworkJob internal constructor(val connectionId: Int, val receivedObject: Any)
+
+    fun addConnectionListener(listener: NetworkServerConnectionListener) = connectionListeners.add(listener)
+
+    /**
+     * Listener for notifying when a player has joined/disconnected,
+     * systems and such interested can subscribe.
+     */
+    interface NetworkServerConnectionListener {
+        /**
+         * note this does not indicate when a connection *actually*
+         * first happened, since we wouldn't have a player object,
+         * and it wouldn't be valid yet.
+         * @param playerEntityId
+         */
+        fun playerConnected(playerEntityId: Int) {
+
+        }
+
+        fun playerDisconnected(playerEntityId: Int) {
+        }
+    }
 }

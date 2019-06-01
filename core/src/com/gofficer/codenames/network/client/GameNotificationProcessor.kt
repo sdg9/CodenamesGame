@@ -30,7 +30,7 @@ class GameNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificationP
             addComponentsToEntity(newEntity, entityUpdate)
 
             val stuff = newEntity.getComponent(PositionComponent::class.java)
-            log.debug { "Created entity: $newEntity with $stuff"}
+            log.debug { "Created entity: $newEntity with $stuff" }
 //            if (E(newEntity).hasFocused()) {
 //                Log.info("New focused player: " + newEntity.getId())
 //                GameScreen.setPlayer(newEntity.getId())
@@ -48,9 +48,12 @@ class GameNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificationP
 
     private fun addComponentsToEntity(newEntity: Entity, entityUpdate: EntityUpdate) {
         val edit = newEntity.edit()
-        for (component in entityUpdate.components) {
-            Log.info("Adding component: $component")
-            edit.add(component)
+        val components = entityUpdate.components
+        if (components != null) {
+            for (component in components) {
+                Log.info("Adding component: $component")
+                edit.add(component)
+            }
         }
     }
 
@@ -65,10 +68,14 @@ class GameNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificationP
         if (entityId != null) {
             val entity = gameWorld.artemisWorld.getEntity(entityId)
             val edit = entity.edit()
-            for (component in entityUpdate.components) {
-                // this should replace if already exists
-                edit.add(component)
-                Log.info("Adding component: $component")
+
+            val components = entityUpdate.components
+            if (components != null) {
+                for (component in components) {
+                    // this should replace if already exists
+                    edit.add(component)
+                    Log.info("Adding component: $component")
+                }
             }
             val toRemove = entityUpdate.toRemove
             if (toRemove != null) {

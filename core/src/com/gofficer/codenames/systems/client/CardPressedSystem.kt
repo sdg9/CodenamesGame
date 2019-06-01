@@ -21,8 +21,9 @@ class CardPressedSystem : IteratingSystem() {
 
     private lateinit var mPosition: ComponentMapper<PositionComponent>
     private val mRevealed by mapper<RevealedComponent>()
+    private val mDirty by mapper<DirtyComponent>()
 
-    private lateinit var clientNetworkSystem: ClientNetworkSystemOld
+//    private lateinit var clientNetworkSystem: ClientNetworkSystemOld
 
     private val touchEventQueue = ConcurrentLinkedQueue<Vector2>()
 
@@ -39,7 +40,9 @@ class CardPressedSystem : IteratingSystem() {
 //                mRevealed.set(entityId, true)
                 // TODO add flip animation
                 // TODO add network component?
-                clientNetworkSystem.sendCardTouched(entityId)
+//                clientNetworkSystem.sendCardTouched(entityId)
+                mRevealed.set(entityId, true)
+                mDirty.set(entityId, true)
             }
         }
     }

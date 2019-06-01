@@ -4,7 +4,6 @@ import com.artemis.Component
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.utils.SnapshotArray
 import com.esotericsoftware.kryo.Kryo
 import com.esotericsoftware.kryo.serializers.DefaultSerializers
 import com.esotericsoftware.kryonet.EndPoint
@@ -40,8 +39,10 @@ object Network {
         registerComponents(kryo)
 
     }
-    class NetworkDictionaryOld : MarshalDictionary() {
+    class NetworkDictionary : MarshalDictionary() {
+
         init {
+
             registerAll(
                 // Game Requests
                 Array<Any>::class.java,
@@ -80,6 +81,8 @@ object Network {
                 IntArray::class.java,
                 Rectangle::class.java,
 
+                com.badlogic.gdx.utils.Array::class.java,
+
 
                 Shared.DisconnectReason::class.java,
                 Color::class.java,
@@ -97,6 +100,10 @@ object Network {
                 PositionComponent::class.java,
                 TextureReferenceComponent::class.java,
                 RevealedComponent::class.java,
+                NetworkComponent::class.java,
+                TransformComponent::class.java,
+
+
                 Server.EntitySpawnMultiple::class.java,
                 Server.CardPressed::class.java,
 
@@ -109,9 +116,11 @@ object Network {
             for (clazz in classes) {
                 register(topId++, clazz)
             }
+//            register(topId++, Array<Class<*>>::class.java)
+            register(topId++, NetworkDictionaryHelper.getClazz())
         }
     }
-//    class NetworkDictionary : MarshalDictionary(
+//    class NetworkDictionaryHelper : MarshalDictionary(
 //        Color::class.java,
 //        ByteArray::class.java,
 //        IntArray::class.java,

@@ -15,7 +15,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.screens.loading.LoadingScreen
-import com.gofficer.codenames.systems.client.clientNetworkSystem
+import com.gofficer.codenames.systems.client.ClientNetworkSystem
 import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import com.gofficer.codenames.utils.get
 import com.gofficer.sampler.utils.toInternalFile
@@ -37,7 +37,7 @@ class GameClient : KtxGame<KtxScreen>() {
 //
 //    private lateinit var ClientNetworkSystemOld: ClientNetworkSystemOld
 //
-    private lateinit var clientNetworkSystem: clientNetworkSystem
+    private lateinit var clientNetworkSystem: ClientNetworkSystem
 
     fun sendToAll(obj: Any) {
         clientNetworkSystem.kryonetClient.sendToAll(obj)
@@ -160,28 +160,17 @@ class GameClient : KtxGame<KtxScreen>() {
      * immediately hops into hosting and joining its own local server
      */
     fun startClientHostedServerAndJoin(listener: MarshalObserver?) {
+        // TODO move texture to a better place for client
 //        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
 //        cardTexture = gameplayAtlas!![RegionNames.CARD]
 
-
-        log.debug { "Initializing game server" }
-        server = GameServer()
-        log.debug { "Running game server in new thread" }
-        serverThread = thread(name = "main server thread") { server!!.run() }
-
-        try {
-            //wait for the local server thread to report that it is live and running, before we attempt
-            // a connection to it
-            server!!.connectHostLatch.await()
-        } catch (e: InterruptedException) {
-            e.printStackTrace()
-        }
-
-        log.debug { "Creating client world"}
-        world = GameWorld(this, server, GameWorld.WorldInstanceType.ClientHostingServer)
-        log.debug { "Initializing client hosted server client "}
-        world!!.init()
-        world!!.artemisWorld.inject(this)
+        startLocalServer()
+        startLocalClient(GameWorld.WorldInstanceType.ClientHostingServer)
+//        log.debug { "Creating client world"}
+//        world = GameWorld(this, server, GameWorld.WorldInstanceType.ClientHostingServer)
+//        log.debug { "Initializing client hosted server client "}
+//        world!!.init()
+//        world!!.artemisWorld.inject(this)
 
 
 //        if (listener != null) {
@@ -191,7 +180,7 @@ class GameClient : KtxGame<KtxScreen>() {
 ////            clientNetworkSystem.addListener(listener)
 //        }
 
-        clientNetworkSystem.kryonetClient.start()
+
 ////
 //        try {
 //            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
@@ -205,15 +194,43 @@ class GameClient : KtxGame<KtxScreen>() {
         //showFailToConnectDialog();
     }
 
-    fun joinExistingServer(listener: ClientNetworkSystemOld.NetworkClientListener) {
+    private fun startLocalServer() {
+        log.debug { "Initializing game server" }
+        server = GameServer()
+        log.debug { "Running game server in new thread" }
+        serverThread = thread(name = "main server thread") { server!!.run() }
+
+        try {
+            //wait for the local server thread to report that it is live and running, before we attempt
+            // a connection to it
+            server!!.connectHostLatch.await()
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
+
+    }
+
+    private fun startLocalClient(type: GameWorld.WorldInstanceType) {
         gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
         cardTexture = gameplayAtlas!![RegionNames.CARD]
-
-        world = GameWorld(this, null, GameWorld.WorldInstanceType.ClientHostingServer)
-        log.debug { "Initializing joining existing server client"}
+        log.debug { "Creating client world"}
+        world = GameWorld(this, server, type)
+        log.debug { "Initializing client hosted server client "}
         world!!.init()
-        // Injects now instantiated clientNetworkSystem to this class
         world!!.artemisWorld.inject(this)
+        clientNetworkSystem.kryonetClient.start()
+    }
+
+    fun joinExistingServer(listener: ClientNetworkSystemOld.NetworkClientListener?) {
+//        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
+//        cardTexture = gameplayAtlas!![RegionNames.CARD]
+
+        startLocalClient(GameWorld.WorldInstanceType.Client)
+//        world = GameWorld(this, null, GameWorld.WorldInstanceType.Client)
+//        log.debug { "Initializing joining existing server client"}
+//        world!!.init()
+//        // Injects now instantiated clientNetworkSystem to this class
+//        world!!.artemisWorld.inject(this)
 
 //        if (listener != null) {
 //            log.debug { "Adding client listener "}

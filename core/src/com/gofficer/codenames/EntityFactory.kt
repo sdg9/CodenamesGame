@@ -19,6 +19,7 @@ class EntityFactory(val gameWorld: GameWorld) {
     private lateinit var mCard: ComponentMapper<CardComponent>
     private lateinit var mPlayer: ComponentMapper<PlayerComponent>
     private lateinit var mPosition: ComponentMapper<PositionComponent>
+    private lateinit var mNetworkComponent: ComponentMapper<NetworkComponent>
 
     val artemisWorld = gameWorld.artemisWorld
 
@@ -49,6 +50,8 @@ class EntityFactory(val gameWorld: GameWorld) {
         mTextureReference.create(entity).apply {
             path = "TODO"
         }
+
+        mNetworkComponent.create(entity)
 
 
         return entity

@@ -7,6 +7,7 @@ import com.gofficer.codenames.components.CardComponent
 import ktx.log.debug
 import com.artemis.World
 import com.artemis.WorldConfigurationBuilder
+import com.artemis.managers.PlayerManager
 import com.gofficer.codenames.network.server.ServerNotificationProcessor
 import com.gofficer.codenames.network.server.ServerRequestProcessor
 import com.gofficer.codenames.systems.*
@@ -96,9 +97,11 @@ class GameWorld
         // https://github.com/DaanVanYperen/artemis-odb-contrib/blob/f57d6b4cfd1520383a06e7cee38ccef8361ffd4e/contrib-jam/src/main/java/net/mostlyoriginal/api/system/graphics/RenderBatchingSystem.java
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
-                clientNetworkSystem(this, "127.0.0.1", Network.PORT),
+                ClientNetworkSystem(this, "127.0.0.1", Network.PORT),
+                ClientNetworkEntitySystem(),
                 EventSystem(),
                 TagManager(),
+                TextureManager(client!!.assetManager),
                 TestSystem(),
                 CameraSystem(),
                 MouseCursorSystem(),
@@ -106,7 +109,7 @@ class GameWorld
                 TouchSystem(),
                 SharedWorldManager(this),
                 // TODO temp disable
-//                CardPressedSystem(),
+                CardPressedSystem(),
 //                MouseClickSystem(),
                 ClearScreenSystem(),
                 TextureResolverSystem(this),
@@ -170,10 +173,11 @@ class GameWorld
         val strategy = KryonetServerMarshalStrategy("127.0.0.1", Network.PORT)
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
-//                TagManager(),
+                TagManager(),
 //                SpatialSystem(this),
-//                PlayerManager(),
+                PlayerManager(),
                 ServerNetworkSystem(this, server!!, strategy, ServerRequestProcessor(this), ServerNotificationProcessor(this)),
+                ServerNetworkEntitySystem(),
                 NetworkManager(server!!, strategy),
                 SharedWorldManager(this),
 
