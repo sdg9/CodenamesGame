@@ -43,13 +43,13 @@ It also is serving as my "Hello World" entry into game development. I'm a profes
   - [ ] Display IP for client running server
 - [ ] Confirm behavior on Android
 - [ ] Confirm behavior on iOS
-- Items previously working in Round 1 now need to be addressed again
+- [ ] Items previously working in Round 1 now need to be addressed again
   - [ ] Restore ability to toggle over to list of words and what team they belong to (for the two cluegivers)
   - [ ] Ability to leave game
   - [ ] Ability to reset game (make a new one)
   - [ ] Animate card on press
 
-# Screenshot
+# Screenshots
 
 ![Main Menu](/screenshots/mainMenu.png?raw=true "Main Menu")
 ![New Game](/screenshots/newGame.png?raw=true "New Game")s
