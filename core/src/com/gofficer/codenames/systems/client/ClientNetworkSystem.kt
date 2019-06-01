@@ -5,7 +5,7 @@ import com.esotericsoftware.minlog.Log
 import com.gofficer.codenames.GameWorld
 import com.gofficer.codenames.Network
 import com.gofficer.codenames.network.client.ClientResponseProcessor
-import com.gofficer.codenames.network.client.GameNotificationProcessor
+import com.gofficer.codenames.network.client.ClientNotificationProcessor
 import com.gofficer.codenames.network.interfaces.INotification
 import com.gofficer.codenames.network.interfaces.INotificationProcessor
 import com.gofficer.codenames.network.interfaces.IResponse
@@ -19,7 +19,7 @@ class ClientNetworkSystem(gameWorld: GameWorld, host: String, port: Int) :
 //    MarshalSystem(NetworkDictionaryHelper(), KryonetClientMarshalStrategy(host, port)) {
 
     var responseProcessor: IResponseProcessor = ClientResponseProcessor(gameWorld)
-    var notificationProcessor: INotificationProcessor = GameNotificationProcessor(gameWorld)
+    var notificationProcessor: INotificationProcessor = ClientNotificationProcessor(gameWorld)
 
     val kryonetClient: KryonetClientMarshalStrategy
         get() = marshal as KryonetClientMarshalStrategy

@@ -42,21 +42,9 @@ class GameWorld
     }
 
     lateinit var artemisWorld: World
-//    lateinit var networkManager: NetworkManager
-//    lateinit var worldManager: WorldManager
-
-    var worldGenerator: WorldGenerator? = null
-
-//    private lateinit var tagManager: TagManager
-
-    private lateinit var mCard: ComponentMapper<CardComponent>
-
     lateinit var entityFactory: EntityFactory
 
-//    lateinit var camera: OrthographicCamera
-//    lateinit var viewport: FitViewport
-//    lateinit var uiCamera: OrthographicCamera
-//    lateinit var uiViewport: FitViewport
+    var worldGenerator: WorldGenerator? = null
 
     fun init() {
         if (worldInstanceType == WorldInstanceType.Client || worldInstanceType == WorldInstanceType.ClientHostingServer) {
@@ -86,15 +74,8 @@ class GameWorld
 
 
     fun initClient() {
-//        initCamera()
-
         log.debug { "Init client" }
-//        atlas = TextureAtlas(file("packed/entities.atlas"))
 
-        //note although it may look like it.. order between render and logic ones..actually doesn't matter, their base
-        // class dictates this. order between ones of the same type, does though.
-        // TODO look up alternative systems that may be helpful
-        // https://github.com/DaanVanYperen/artemis-odb-contrib/blob/f57d6b4cfd1520383a06e7cee38ccef8361ffd4e/contrib-jam/src/main/java/net/mostlyoriginal/api/system/graphics/RenderBatchingSystem.java
         artemisWorld = World(WorldConfigurationBuilder()
             .with(
                 ClientNetworkSystem(this, "127.0.0.1", Network.PORT),
@@ -114,58 +95,20 @@ class GameWorld
                 ClearScreenSystem(),
                 TextureResolverSystem(this),
 //                ClientNetworkSystemOld(this),
+                FlipAnimationSystem(),
                 CardRenderSystem(gameWorld = this),
 //                TouchSystem(this)
                 RemoveSystem()
             ).build())
-
-//            WorldConfigurationBuilder().register(
-//                GameLoopSystemInvocationStrategy(msPerLogicTick = 25,
-//            isServer = false)
-//            )
-//            .with(TagManager())
-//            .with(PlayerManager())
-////            .with(MovementSystem(this))
-////            .with(SoundSystem(this))
-//            .with(TestSystem())
-//            .with(ClientNetworkSystemOld(this))
-////            .with(InputSystem(camera, this))
-////            .with(EntityOverlaySystem(this))
-////            .with(PlayerSystem(this))
-////            .with(GameTickSystem(this))
-////            .with(ClientBlockDiggingSystem(this, client!!))
-////            .with(BackgroundRenderSystem(oreWorld = this, camera = client!!.viewport.camera))
-////            .with(TileRenderSystem(camera = camera,
-////                fullscreenCamera = client!!.viewport.camera,
-////                oreWorld = this))
-////            .with(SpriteRenderSystem(camera = camera,
-////                oreWorld = this))
-////            .with(LiquidRenderSystem(camera = camera, oreWorld = this))
-////            .with(DebugTextRenderSystem(camera, this))
-////            .with(PowerOverlayRenderSystem(oreWorld = this,
-////                fullscreenCamera = client!!.viewport.camera,
-////                stage = client!!.stage))
-////            .with(TileTransitionSystem(camera, this))
-////            .register(GameLoopSystemInvocationStrategy(msPerLogicTick = 25, isServer = false))
-//            .build())
-        //b.dependsOn(WorldConfigurationBuilder.Priority.LOWEST + 1000,ProfilerSystem.class);
 
         //inject the mappers into the world, before we start doing things
         artemisWorld.inject(this, true)
 
         entityFactory = EntityFactory(this)
 
-        val e = artemisWorld.createEntity()
-        artemisWorld.getSystem(TagManager::class.java).register("cursor", e)
+//        val e = artemisWorld.createEntity()
+//        artemisWorld.getSystem(TagManager::class.java).register("cursor", e)
     }
-
-//    private fun initCamera() {
-//        camera = OrthographicCamera()
-//        viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
-//        uiCamera = OrthographicCamera()
-//        uiViewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, uiCamera)
-//
-//    }
 
     fun initServer() {
 
@@ -209,18 +152,11 @@ class GameWorld
         //inject the mappers into the world, before we start doing things
         artemisWorld.gameInject(this)
 
-        // TODO initial card generations
-
         entityFactory = EntityFactory(this)
 
         worldGenerator = WorldGenerator(this)
 
         worldGenerator!!.generateGame()
-        // TODO make starting works
-        //severe: obviously...we don't want to do this right after..we can't save the world while we're still generating it
-//        if (OreSettings.saveLoadWorld) {
-//            worldIO.saveWorld()
-//        }
     }
 
     /**

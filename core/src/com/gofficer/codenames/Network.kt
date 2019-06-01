@@ -102,6 +102,8 @@ object Network {
                 RevealedComponent::class.java,
                 NetworkComponent::class.java,
                 TransformComponent::class.java,
+                RectangleComponent::class.java,
+                FlipAnimationComponent::class.java,
 
 
                 Server.EntitySpawnMultiple::class.java,

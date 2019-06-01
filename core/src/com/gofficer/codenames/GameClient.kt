@@ -34,9 +34,7 @@ class GameClient : KtxGame<KtxScreen>() {
 
 
     var world: GameWorld? = null
-//
-//    private lateinit var ClientNetworkSystemOld: ClientNetworkSystemOld
-//
+
     private lateinit var clientNetworkSystem: ClientNetworkSystem
 
     fun sendToAll(obj: Any) {
@@ -52,18 +50,9 @@ class GameClient : KtxGame<KtxScreen>() {
     var server: GameServer? = null
     private var serverThread: Thread? = null
 
-    lateinit var stage: Stage
-
     lateinit var viewport: FitViewport
 
-
-
-
     override fun create() {
-        // for debugging kryonet
-        if (GameSettings.networkLog) {
-//            Log.set(Log.LEVEL_DEBUG)
-        }
         Gdx.app.logLevel = Application.LOG_DEBUG
         assetManager.logger.level = Logger.DEBUG
 
@@ -71,65 +60,8 @@ class GameClient : KtxGame<KtxScreen>() {
 
         Thread.currentThread().name = "client render thread (GL)"
 
-//        dragAndDrop = DragAndDrop()
-//        viewport = FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera)
-
-        //load before stage
-//        VisUI.load(oreSkin)
-//        TooltipManager.getInstance().apply {
-//            initialTime = 0f
-//            hideAll()
-//        }
-
-//        stage = Stage(viewport)
-//        rootTable = VisTable()
-//        rootTable.setFillParent(true)
-//        stage.addActor(rootTable)
-
-//        multiplexer = InputMultiplexer(stage, this)
-//        Gdx.input.inputProcessor = multiplexer
-
         addScreen(LoadingScreen(this))
         setScreen<LoadingScreen>()
-
-//        //fixme: this really needs to be stripped out of the client, put in a proper
-//        //system or something
-//        fontGenerator = FreeTypeFontGenerator(file("fonts/Ubuntu-L.ttf"))
-//        val parameter = FreeTypeFontGenerator.FreeTypeFontParameter()
-//        parameter.size = 13
-//        bitmapFont_8pt = fontGenerator.generateFont(parameter)
-//
-//        fontGenerator.dispose()
-//
-//        chatDialog = ChatDialog(this, stage, rootTable)
-//        multiplexer.addProcessor(chatDialog.inputListener)
-//
-//        chat = Chat()
-//        chat.addListener(chatDialog)
-//
-//        hud = Hud(this, stage, rootTable)
-//        loadingScreen = LoadingScreen(this, stage, rootTable)
-//
-//        sidebar = Sidebar(stage, this)
-//
-//        inGameState = State(type = GuiState.LoadingScreen,
-//            enter = {
-//                rootTable.add(chatDialog.container)
-//                    .expand().bottom().left()
-//                    .padBottom(5f).size(400f, 200f)
-//            },
-//            exit = { rootTable.clear() })
-//
-//        loadingScreenState = State(type = GuiState.LoadingScreen,
-//            enter = {
-//                /*severe hack*/
-//                rootTable.clear()
-//                rootTable.add(loadingScreen).fill().expand()
-//            },
-//            exit = { rootTable.clear() })
-//        guiStates.push(loadingScreenState)
-
-//        startClientHostedServerAndJoin()
     }
 
     override fun render() {
@@ -151,47 +83,12 @@ class GameClient : KtxGame<KtxScreen>() {
     }
 
 
-
-
-
-
-
     /**
      * immediately hops into hosting and joining its own local server
      */
     fun startClientHostedServerAndJoin(listener: MarshalObserver?) {
-        // TODO move texture to a better place for client
-//        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
-//        cardTexture = gameplayAtlas!![RegionNames.CARD]
-
         startLocalServer()
         startLocalClient(GameWorld.WorldInstanceType.ClientHostingServer)
-//        log.debug { "Creating client world"}
-//        world = GameWorld(this, server, GameWorld.WorldInstanceType.ClientHostingServer)
-//        log.debug { "Initializing client hosted server client "}
-//        world!!.init()
-//        world!!.artemisWorld.inject(this)
-
-
-//        if (listener != null) {
-//            log.debug { "Adding client listener "}
-//            clientNetworkSystem.kryonetClient.add
-//            clientNetworkSystem.kryonetClient.setListener(listener)
-////            clientNetworkSystem.addListener(listener)
-//        }
-
-
-////
-//        try {
-//            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//            //fuck. gonna have to show the fail to connect dialog.
-//            //could be a socket error..or anything, i guess
-//            System.exit(1)
-//        }
-
-        //showFailToConnectDialog();
     }
 
     private fun startLocalServer() {
@@ -211,6 +108,7 @@ class GameClient : KtxGame<KtxScreen>() {
     }
 
     private fun startLocalClient(type: GameWorld.WorldInstanceType) {
+        // TODO: Determine optimal texture approach
         gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
         cardTexture = gameplayAtlas!![RegionNames.CARD]
         log.debug { "Creating client world"}
@@ -222,44 +120,8 @@ class GameClient : KtxGame<KtxScreen>() {
     }
 
     fun joinExistingServer(listener: ClientNetworkSystemOld.NetworkClientListener?) {
-//        gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
-//        cardTexture = gameplayAtlas!![RegionNames.CARD]
-
         startLocalClient(GameWorld.WorldInstanceType.Client)
-//        world = GameWorld(this, null, GameWorld.WorldInstanceType.Client)
-//        log.debug { "Initializing joining existing server client"}
-//        world!!.init()
-//        // Injects now instantiated clientNetworkSystem to this class
-//        world!!.artemisWorld.inject(this)
-
-//        if (listener != null) {
-//            log.debug { "Adding client listener "}
-//            clientNetworkSystem.addListener(listener)
-//        }
-//
-//        try {
-//            clientNetworkSystem.connect("127.0.0.1", Network.PORT)
-//        } catch (e: IOException) {
-//            e.printStackTrace()
-//            //fuck. gonna have to show the fail to connect dialog.
-//            //could be a socket error..or anything, i guess
-//            System.exit(1)
-//        }
     }
-
-
-//    private class NetworkConnectListener(private val client: GameClient) : ClientNetworkSystemOld.NetworkClientListener {
-//
-//        override fun connected() {
-//            //todo surely there's some first-time connection stuff we must do?
-//        }
-//
-//        override fun disconnected(disconnectReason: Network.Shared.DisconnectReason) {
-//            //todo show gui, say we've disconnected
-//        }
-//
-//    }
-
 
     private fun initFonts() {
         val generator = FreeTypeFontGenerator("fonts/Arcon.ttf".toInternalFile())
@@ -273,8 +135,6 @@ class GameClient : KtxGame<KtxScreen>() {
 
 
     companion object {
-
-
         val log = logger<GameClient>()
 
         val VERSION_MAJOR = 0

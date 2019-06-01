@@ -20,6 +20,7 @@ class EntityFactory(val gameWorld: GameWorld) {
     private lateinit var mPlayer: ComponentMapper<PlayerComponent>
     private lateinit var mPosition: ComponentMapper<PositionComponent>
     private lateinit var mNetworkComponent: ComponentMapper<NetworkComponent>
+    private lateinit var mRectangle: ComponentMapper<RectangleComponent>
 
     val artemisWorld = gameWorld.artemisWorld
 
@@ -28,7 +29,7 @@ class EntityFactory(val gameWorld: GameWorld) {
     }
 
 
-    fun createCard(name: String, color: Color, x: Float, y: Float): Int {
+    fun createCard(name: String, color: Color, x: Float, y: Float, width: Float, height: Float): Int {
 
         log.debug { "Generating Card $name" }
         val entity = artemisWorld.create()
@@ -49,6 +50,11 @@ class EntityFactory(val gameWorld: GameWorld) {
 
         mTextureReference.create(entity).apply {
             path = "TODO"
+        }
+
+        mRectangle.create(entity).apply {
+            this.width = width
+            this.height = height
         }
 
         mNetworkComponent.create(entity)

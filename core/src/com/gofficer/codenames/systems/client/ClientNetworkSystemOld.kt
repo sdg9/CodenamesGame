@@ -12,7 +12,7 @@ import com.gofficer.codenames.components.RevealedComponent
 import com.gofficer.codenames.components.TextureComponent
 import com.gofficer.codenames.components.TransformComponent
 import com.gofficer.codenames.network.client.ClientResponseProcessor
-import com.gofficer.codenames.network.client.GameNotificationProcessor
+import com.gofficer.codenames.network.client.ClientNotificationProcessor
 import com.gofficer.codenames.network.interfaces.INotificationProcessor
 import com.gofficer.codenames.network.interfaces.IResponseProcessor
 import com.gofficer.codenames.utils.mapper
@@ -37,7 +37,7 @@ class ClientNetworkSystemOld(private val gameWorld: GameWorld) : MarshalSystem(N
 
 
     var responseProcessor: IResponseProcessor = ClientResponseProcessor(gameWorld)
-    var notificationProcessor: INotificationProcessor = GameNotificationProcessor(gameWorld)
+    var notificationProcessor: INotificationProcessor = ClientNotificationProcessor(gameWorld)
 
     lateinit var clientKryo: Client
     private val networkStatusListeners = Array<NetworkClientListener>(5)

@@ -20,10 +20,10 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class CardPressedSystem : IteratingSystem() {
 
     private lateinit var mPosition: ComponentMapper<PositionComponent>
+    private lateinit var mRectangle: ComponentMapper<RectangleComponent>
+    private lateinit var mFlipAnimation: ComponentMapper<FlipAnimationComponent>
     private val mRevealed by mapper<RevealedComponent>()
     private val mDirty by mapper<DirtyComponent>()
-
-//    private lateinit var clientNetworkSystem: ClientNetworkSystemOld
 
     private val touchEventQueue = ConcurrentLinkedQueue<Vector2>()
 
@@ -31,18 +31,21 @@ class CardPressedSystem : IteratingSystem() {
         if (touchEventQueue.peek() != null) {
 //            log.debug { "Processing $entityId"}
             val position = mPosition.get(entityId)
-            // TODO update bounds to be dynamic
-            val bounds = Rectangle(position.x, position.y, 150f, 100f)
+            val rectangle = mRectangle.get(entityId)
+
+            val bounds = Rectangle(position.x, position.y, rectangle.width, rectangle.height)
             val touchEvent = touchEventQueue.peek()
 //            val touchEvent = touchEventQueue.poll()
             if (bounds.contains(touchEvent.x, touchEvent.y)) {
                 log.debug { "Touched entity $entityId"}
-//                mRevealed.set(entityId, true)
-                // TODO add flip animation
-                // TODO add network component?
-//                clientNetworkSystem.sendCardTouched(entityId)
+                // TODO optimized approach would be to auto set dirty when I change revealed (or any other component)
+                // as well as only pass in the changed components
+                // Currently I must also say component is dirty (not synced w/ network) and it passes the component in its entirety
                 mRevealed.set(entityId, true)
+                // Dirty is processed by client's network sync system
                 mDirty.set(entityId, true)
+                // TODO WIP on animation
+                mFlipAnimation.create(entityId)
             }
         }
     }

@@ -1,24 +1,25 @@
-package com.gofficer.codenames.network.client
+package com.gofficer.codenames.network.shared
 
 import com.artemis.Entity
 import com.esotericsoftware.minlog.Log
 import com.gofficer.codenames.GameWorld
 import com.gofficer.codenames.components.PositionComponent
+import com.gofficer.codenames.network.client.ClientNotificationProcessor
 import com.gofficer.codenames.network.interfaces.DefaultNotificationProcessor
 import com.gofficer.codenames.network.notification.EntityUpdate
 import com.gofficer.codenames.network.notification.RemoveEntity
 import com.gofficer.codenames.systems.SharedWorldManager
-import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import ktx.log.logger
 
-class GameNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificationProcessor() {
+
+class SharedNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificationProcessor() {
     companion object {
-        val log = logger<ClientNetworkSystemOld>()
+        val log = logger<SharedNotificationProcessor>()
     }
 
 
     override fun processNotification(entityUpdate: EntityUpdate) {
-        log.debug { "Received an entity update $entityUpdate" }
+        ClientNotificationProcessor.log.debug { "Received an entity update $entityUpdate" }
 
 //        val worldManager = gameWorld.artemisWorld.getSystem(SharedWorldManager::class.java)
         val worldManager = gameWorld.artemisWorld.getSystem(SharedWorldManager::class.java)
@@ -30,7 +31,7 @@ class GameNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificationP
             addComponentsToEntity(newEntity, entityUpdate)
 
             val stuff = newEntity.getComponent(PositionComponent::class.java)
-            log.debug { "Created entity: $newEntity with $stuff" }
+            ClientNotificationProcessor.log.debug { "Created entity: $newEntity with $stuff" }
 //            if (E(newEntity).hasFocused()) {
 //                Log.info("New focused player: " + newEntity.getId())
 //                GameScreen.setPlayer(newEntity.getId())

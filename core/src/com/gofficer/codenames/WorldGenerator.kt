@@ -69,7 +69,8 @@ class WorldGenerator(private val world: GameWorld) {
             }
         }
 
-        // TODO fix to use dynamic width
+        // TODO fix to use dynamic width/height?
+        // If not, this should be the only 1 spot that has it hardcoded
         val width = 150f
         val height = 100f
         for (row in 0..4) {
@@ -77,14 +78,10 @@ class WorldGenerator(private val world: GameWorld) {
                 val id = row + column * 5
                 val card = cards[id]
                 val color = types[id]
-//            engine.addEntity(createCardAtCoordinate(engine, card.text, card.type, i, j, id, cardTexture))
-//                    val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
-//                val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
                 val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
                 val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
 
-
-                world.entityFactory.createCard(card, color, x, y)
+                world.entityFactory.createCard(card, color, x, y, width, height)
             }
         }
     }
