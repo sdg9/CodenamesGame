@@ -4,26 +4,26 @@ This project intends to reimplement the board game "Codenames" using [libgdx](ht
 
 The intent is to be able to play on the couch via devices rather than a physical game.
 
-It also is serving as my "Hello World" entry into game development. I'm a professional web and mobile app developer but all of these technologies are brand new to me.
+It also is serving as my "Hello World" entry into game development. I'm a professional web and mobile app developer but all of these technologies are brand new to me. I want to make an original game and multiplayer CodeNames seemed like a nice place to start learning the basics before I take on something larger.
 
 ## Journey thus far
 
 - Udemy course on libgdx + kotlin
-- Round 1: Libgdx + [Colysues](https://github.com/colyseus/colyseus)
+- First implementation attempt: Libgdx + [Colysues](https://github.com/colyseus/colyseus)
   - Used Colysues node server as authoritative server
   - Implemented a redux like state management system (what I know from web/mobile world) for syncing (Found some kotlin redux implementations)
   - Didn't like that client logic was in kotlin and server logic was in node (duplicate dev effort) so re-implemented Colyseus in java
   - Initially used JSON for serialization, then moved over to message pack
   - Didn't love the idea for an autoritative server for my use case and how I'd need to host it on something like heroku (which I had working w/ Colyseus)
   - Found out Kryonet existed and moved on to a game hosted locally
-- Round 2: Libgdx + ECS
+- Second attempt: Libgdx + ECS
   - Found out that ECS was a thing. Coming from a react-redux background liked how I could break things into components and systems feel like middleware. Very much at home.
   - Implemented project with Ashley for ECS.
   - Implemented basic KryoNet server.
   - Didn't like how I did serialization, all syncing between client & server was very manual and tedious based on my implementation.
   - Found [Ore Infinium](https://github.com/sreich/ore-infinium) Using libgdx, artemis-odb, and kryonet
   - Switched over to Artemis-ODB over Ashley, still didn't love serialization
-- Round 3: Libgdx + ECS + automatic serializing
+- Third (and current) attempt: Libgdx + ECS + automatic serializing
   - Found [DaanVanYperen's artemis-odb extensions](https://github.com/DaanVanYperen/artemis-odb-contrib)
   - Found [Argentum Online](https://github.com/ao-libre/ao-java) based game using libgdx, artemis-odb, and kryonet using above extensions
   - With two libgdx + artemis-odb + kryonet examples learned more from existing approaches
