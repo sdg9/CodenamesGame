@@ -11,7 +11,6 @@ class WorldManager(val world: GameWorld, server: GameServer) : DefaultManager(se
     companion object {
         val log = logger<WorldManager>()
     }
-//    private val networkManager by system<NetworkManager>()
     private lateinit var networkManager: NetworkManager
 
     fun sendEntityRemove(user: Int, entity: Int) {

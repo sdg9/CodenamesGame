@@ -18,14 +18,11 @@ import com.gofficer.codenames.config.GameConfig
 import com.gofficer.codenames.GameClient
 import com.gofficer.codenames.Network
 import com.gofficer.codenames.screens.play.PlayScreen
-import com.gofficer.codenames.systems.GameLoopSystemInvocationStrategy
-import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import com.gofficer.codenames.utils.clearScreen
 import com.gofficer.codenames.utils.toInternalFile
 import ktx.app.KtxScreen
 import ktx.log.logger
 import ktx.scene2d.*
-import net.mostlyoriginal.api.network.marshal.common.MarshalObserver
 
 
 class MainMenuScreen(private val client: GameClient) : KtxScreen {
@@ -33,7 +30,7 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
     companion object {
         @JvmStatic
 //        private val log = logger<MainMenuScreen>()
-        val log = logger<GameLoopSystemInvocationStrategy>()
+        val log = logger<MainMenuScreen>()
     }
 
     private var skin: Skin = Skin()
@@ -146,7 +143,7 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
                 textButton("Connect to Server") {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                            client.joinExistingServer(null)
+                            client.joinExistingServer()
                             client.setScreen<PlayScreen>()
                             client.sendToAll(Network.Client.JoinRoomRequest())
 //                            client.joinExistingServer(object : ClientNetworkSystemOld.NetworkClientListener {

@@ -7,14 +7,18 @@ import com.badlogic.gdx.math.Vector2
 import com.gofficer.codenames.components.*
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import ktx.log.logger
+import javax.swing.text.Position
 
+/**
+ * Builds entities for the game world.
+ * Entities should be made using this, not from scratch.
+ */
 class EntityFactory(val gameWorld: GameWorld) {
 
     companion object {
         private val log = logger<LoadingScreen>()
     }
 
-    private lateinit var mTransform: ComponentMapper<TransformComponent>
     private lateinit var mTextureReference: ComponentMapper<TextureReferenceComponent>
     private lateinit var mCard: ComponentMapper<CardComponent>
     private lateinit var mPlayer: ComponentMapper<PlayerComponent>
@@ -33,10 +37,6 @@ class EntityFactory(val gameWorld: GameWorld) {
 
         log.debug { "Generating Card $name" }
         val entity = artemisWorld.create()
-
-        mTransform.create(entity).apply {
-            velocity = Vector2(x, y)
-        }
 
         mCard.create(entity).apply {
             cardName = name
@@ -61,29 +61,6 @@ class EntityFactory(val gameWorld: GameWorld) {
 
 
         return entity
-//
-//        val scaleFactor = 0.7f
-//        return engine.createEntity().apply {
-//            add(TextureComponent(cardTexture))
-//            add(TransformComponent(Vector2(x, y)))
-//            add(RevealableComponent())
-//            add(StateComponent())
-//            add(TeamComponent(color))
-//            add(NameComponent(name))
-//            add(IDComponent(id))
-//            add(
-//                RectangleComponent(
-//                    cardTexture!!.regionWidth.toFloat() * scaleFactor,
-//                    cardTexture!!.regionHeight.toFloat() * scaleFactor
-//                )
-//            )
-//            add(
-//                ClickableComponent(
-//                    cardTexture!!.regionWidth.toFloat() * scaleFactor,
-//                    cardTexture!!.regionHeight.toFloat() * scaleFactor
-//                )
-//            )
-//        }
     }
 
     fun createPlayer(playerName: String, connectionId: Int): Int {

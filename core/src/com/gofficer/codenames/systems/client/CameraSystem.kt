@@ -1,10 +1,8 @@
 package com.gofficer.codenames.systems.client
 
 import com.artemis.BaseSystem
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.utils.viewport.FitViewport
-import com.gofficer.codenames.MyInputProcessor
 import com.gofficer.codenames.config.GameConfig
 
 

@@ -9,14 +9,12 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.Logger
 import com.badlogic.gdx.utils.viewport.FitViewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
-import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import com.gofficer.codenames.utils.get
 import com.gofficer.sampler.utils.toInternalFile
 import ktx.app.KtxGame
@@ -119,7 +117,7 @@ class GameClient : KtxGame<KtxScreen>() {
         clientNetworkSystem.kryonetClient.start()
     }
 
-    fun joinExistingServer(listener: ClientNetworkSystemOld.NetworkClientListener?) {
+    fun joinExistingServer() {
         startLocalClient(GameWorld.WorldInstanceType.Client)
     }
 

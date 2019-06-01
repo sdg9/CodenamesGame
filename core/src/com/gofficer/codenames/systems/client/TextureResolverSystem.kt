@@ -32,15 +32,11 @@ class TextureResolverSystem(private val gameWorld: GameWorld) : BaseEntitySystem
     }
 
     private fun assignTexture(id: Int) {
-//        val cTextureRenderable = mTextureRenderable.create(id)
 
         // TODO for now always give same texture, in future drive off value of texture reference
-//        log.debug { "Applying texture ${textureManager.cardTexture}"}
         mTextureRenderable.create(id).apply {
             textureRegion = textureManager.cardTexture
         }
-//        cTextureRenderable.textureRegion = gameWorld?.client?.cardTexture
-
     }
 
 }

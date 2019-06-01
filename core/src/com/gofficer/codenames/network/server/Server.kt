@@ -1,22 +1,5 @@
 package com.gofficer.codenames.network.server
 
-import com.artemis.BaseSystem
-import com.artemis.World
-import com.artemis.WorldConfigurationBuilder
-import com.artemis.managers.PlayerManager
-import com.artemis.managers.TagManager
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.math.MathUtils
-import com.gofficer.codenames.Network
-import com.gofficer.codenames.systems.RemoveSystem
-import com.gofficer.codenames.systems.SpatialSystem
-import com.gofficer.codenames.systems.server.NetworkManager
-import com.gofficer.codenames.systems.server.ServerNetworkEntitySystemOld
-import com.gofficer.codenames.systems.server.ServerNetworkSystem
-import com.gofficer.codenames.systems.server.ServerNetworkSystemOld
-import net.mostlyoriginal.api.network.marshal.kryonet.KryonetServerMarshalStrategy
-import java.util.HashMap
-
 //
 //class Server(
 ////    private val objectManager: ObjectManager,

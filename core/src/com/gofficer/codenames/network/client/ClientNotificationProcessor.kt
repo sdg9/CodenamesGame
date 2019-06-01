@@ -6,12 +6,11 @@ import com.gofficer.codenames.network.interfaces.DefaultNotificationProcessor
 import com.gofficer.codenames.network.notification.EntityUpdate
 import com.gofficer.codenames.network.notification.RemoveEntity
 import com.gofficer.codenames.network.shared.SharedNotificationProcessor
-import com.gofficer.codenames.systems.client.ClientNetworkSystemOld
 import ktx.log.logger
 
 class ClientNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificationProcessor() {
     companion object {
-        val log = logger<ClientNetworkSystemOld>()
+        val log = logger<ClientNotificationProcessor>()
     }
 
     private val sharedNotificationProcessor = SharedNotificationProcessor(gameWorld)

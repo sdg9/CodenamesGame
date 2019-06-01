@@ -16,7 +16,6 @@ import net.mostlyoriginal.api.network.system.MarshalSystem
 
 class ClientNetworkSystem(gameWorld: GameWorld, host: String, port: Int) :
     MarshalSystem(Network.NetworkDictionary(), KryonetClientMarshalStrategy(host, port)) {
-//    MarshalSystem(NetworkDictionaryHelper(), KryonetClientMarshalStrategy(host, port)) {
 
     var responseProcessor: IResponseProcessor = ClientResponseProcessor(gameWorld)
     var notificationProcessor: INotificationProcessor = ClientNotificationProcessor(gameWorld)

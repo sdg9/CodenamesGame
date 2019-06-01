@@ -1,4 +1,4 @@
-package com.gofficer.codenames.systems
+package com.gofficer.codenames.systems.client
 
 import com.artemis.annotations.All
 import com.artemis.systems.IteratingSystem
@@ -6,19 +6,6 @@ import com.gofficer.codenames.components.*
 import com.gofficer.codenames.utils.require
 import ktx.log.logger
 
-//
-//import com.badlogic.ashley.core.Entity
-//import com.badlogic.ashley.core.Family
-//import com.badlogic.ashley.systems.IteratingSystem
-//import com.badlogic.gdx.math.Vector2
-//import com.gofficer.codenames.components.*
-//import ktx.ashley.allOf
-//import ktx.ashley.mapperFor
-//import ktx.ashley.remove
-//import ktx.log.info
-//
-//val flippableFamily: Family = allOf(FlipAnimationComponent::class, RectangleComponent::class).get()
-//
 @All(FlipAnimationComponent::class)
 class FlipAnimationSystem: IteratingSystem() {
 
@@ -26,8 +13,6 @@ class FlipAnimationSystem: IteratingSystem() {
         val log = logger<FlipAnimationSystem>()
     }
 
-    private val mCard by require<CardComponent>()
-    private val mTransform by require<TransformComponent>()
     private val mPosition by require<PositionComponent>()
     private val mFlipAnimation by require<FlipAnimationComponent>()
     private val mRectangle by require<RectangleComponent>()

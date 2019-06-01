@@ -1,9 +1,7 @@
 package com.gofficer.codenames
 
 
-import com.artemis.ComponentMapper
 import com.artemis.managers.TagManager
-import com.gofficer.codenames.components.CardComponent
 import ktx.log.debug
 import com.artemis.World
 import com.artemis.WorldConfigurationBuilder
@@ -12,6 +10,7 @@ import com.gofficer.codenames.network.server.ServerNotificationProcessor
 import com.gofficer.codenames.network.server.ServerRequestProcessor
 import com.gofficer.codenames.systems.*
 import com.gofficer.codenames.systems.client.*
+import com.gofficer.codenames.systems.client.FlipAnimationSystem
 import com.gofficer.codenames.systems.server.*
 import com.gofficer.codenames.utils.gameInject
 import ktx.log.logger
@@ -83,10 +82,7 @@ class GameWorld
                 EventSystem(),
                 TagManager(),
                 TextureManager(client!!.assetManager),
-                TestSystem(),
                 CameraSystem(),
-                MouseCursorSystem(),
-                KeyboardInputSystem(),
                 TouchSystem(),
                 SharedWorldManager(this),
                 // TODO temp disable
@@ -123,31 +119,8 @@ class GameWorld
                 ServerNetworkEntitySystem(),
                 NetworkManager(server!!, strategy),
                 SharedWorldManager(this),
-
-
                 WorldManager(this, server!!)
-//                ServerNetworkEntitySystemOld(server!!),
-//                ServerNetworkSystemOld(this, server!!),
-//                RemoveSystem()
             )
-//            .with(TagManager())
-//            .with(SpatialSystem(this))
-//            .with(PlayerManager())
-//            .with(AISystem(this))
-//            .with(MovementSystem(this))
-//            .with(ServerPowerSystem(this))
-//            .with(GameTickSystem(this))
-//            .with(DroppedItemPickupSystem(this))
-////            .with(GrassBlockSystem(this))
-//            .with(ServerNetworkEntitySystemOld(server!!))
-////            .with(ServerBlockDiggingSystem(this))
-////            .with(PlayerSystem(this))
-////            .with(ExplosiveSystem(this))
-////            .with(AirSystem(this))
-//            .with(ServerNetworkSystemOld(this, server!!))
-////            .with(TileLightingSystem(this))
-//            .with(LiquidSimulationSystem(this))
-            .register(GameLoopSystemInvocationStrategy(msPerLogicTick = 25, isServer = true))
             .build())
         //inject the mappers into the world, before we start doing things
         artemisWorld.gameInject(this)

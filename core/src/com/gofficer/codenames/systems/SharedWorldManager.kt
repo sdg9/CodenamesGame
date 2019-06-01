@@ -9,10 +9,11 @@ import com.gofficer.codenames.GameWorld
 import com.gofficer.codenames.components.NetworkComponent
 import com.gofficer.codenames.components.PositionComponent
 
-
+/**
+ * TODO Confirm what this does
+ * Without it entities do not sync well between client & server
+ */
 class SharedWorldManager(val gameWorld: GameWorld) : BaseSystem() {
-
-//    private lateinit var mPosition: ComponentMapper<PositionComponent>
 
     private lateinit var mNetwork: ComponentMapper<NetworkComponent>
 

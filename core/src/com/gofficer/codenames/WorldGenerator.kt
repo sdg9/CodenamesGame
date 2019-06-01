@@ -9,6 +9,10 @@ import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.get
 import com.gofficer.codenames.utils.vanillaWordList
 
+/**
+ * Helps generate initial world entities
+ * In this case 25 cards for codenames
+ */
 class WorldGenerator(private val world: GameWorld) {
 
     init {
@@ -32,7 +36,6 @@ class WorldGenerator(private val world: GameWorld) {
         val isBlueFirst = Math.random() > 0.5
         val totalBlue = if (isBlueFirst) 9 else 8
         val totalRed = if (!isBlueFirst) 9 else 8
-//        val types = mutableListOf<String>()
         val types = mutableListOf<Color>()
 
         for (i in 1..totalBlue) {
@@ -48,20 +51,10 @@ class WorldGenerator(private val world: GameWorld) {
         val shuffledTypes = types.shuffled()
 
         while (cards.size < count) {
-//        println("Adding more: ${cards.size}")
             val random = getRandomArbitrary(0, vanillaWordList.size)
-//        println("Random: $random")
             val exists = cards.any { it == vanillaWordList[random] }
             if (!exists) {
                 cards.add(vanillaWordList[random])
-//                cards.add(
-//                    PlayScreen.ECSCard(
-//                        cards.size + 1,
-//                        vanillaWordList.get(random),
-//                        shuffledTypes.get(cards.size),
-//                        false
-//                    )
-//                )
             }
             attempts += 1
             if (attempts > 200) {
@@ -77,7 +70,7 @@ class WorldGenerator(private val world: GameWorld) {
             for (column in 0..4) {
                 val id = row + column * 5
                 val card = cards[id]
-                val color = types[id]
+                val color = shuffledTypes[id]
                 val x = 0f + row * GameConfig.WORLD_WIDTH / 6 + width / 2
                 val y = GameConfig.WORLD_HEIGHT - height - ((column + 1) * GameConfig.WORLD_HEIGHT / 6)
 

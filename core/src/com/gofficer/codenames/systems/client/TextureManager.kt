@@ -9,7 +9,7 @@ import com.gofficer.codenames.utils.get
 
 class TextureManager(assetManager: AssetManager) : BaseSystem() {
 
-    val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
+    private val gameplayAtlas = assetManager[AssetDescriptors.GAMEPLAY]
     val cardTexture = gameplayAtlas!![RegionNames.CARD]
 
     override fun processSystem() {

@@ -29,16 +29,6 @@ object Network {
     const val bufferObjectSize = 255032
     const val bufferWriteSize = 250536
 
-    fun register(endPoint: EndPoint) {
-        val kryo = endPoint.kryo
-
-        registerClient(kryo)
-        registerServer(kryo)
-        registerShared(kryo)
-
-        registerComponents(kryo)
-
-    }
     class NetworkDictionary : MarshalDictionary() {
 
         init {
@@ -96,12 +86,10 @@ object Network {
                 // Components
                 Component::class.java,
                 CardComponent::class.java,
-                TextureComponent::class.java,
                 PositionComponent::class.java,
                 TextureReferenceComponent::class.java,
                 RevealedComponent::class.java,
                 NetworkComponent::class.java,
-                TransformComponent::class.java,
                 RectangleComponent::class.java,
                 FlipAnimationComponent::class.java,
 
@@ -121,107 +109,6 @@ object Network {
 //            register(topId++, Array<Class<*>>::class.java)
             register(topId++, NetworkDictionaryHelper.getClazz())
         }
-    }
-//    class NetworkDictionaryHelper : MarshalDictionary(
-//        Color::class.java,
-//        ByteArray::class.java,
-//        IntArray::class.java,
-//        ArrayList::class.java,
-//
-//        Vector2::class.java,
-//        IntArray::class.java,
-//        Rectangle::class.java,
-//
-//
-//
-//        Shared.DisconnectReason::class.java,
-//        Color::class.java,
-//        Shared.DisconnectReason::class.java,
-//        Shared.DisconnectReason.Reason::class.java,
-//
-//        EntityUpdate::class.java,
-//        Shared.Player::class.java,
-//
-//        // Components
-//        Component::class.java,
-//        CardComponent::class.java,
-//        TextureComponent::class.java,
-//        PositionComponent::class.java,
-//        TextureReferenceComponent::class.java,
-//        RevealedComponent::class.java,
-//        Server.EntitySpawnMultiple::class.java,
-//        Server.CardPressed::class.java
-//
-//
-//    ) {
-//
-//    }
-
-    private fun registerShared(kryo: Kryo) {
-        kryo.registerClass<Color>()
-
-        kryo.registerClass<Shared.DisconnectReason>()
-        kryo.registerClass<Shared.DisconnectReason.Reason>()
-        //modular components. some components are too fucking huge and stupid to serialize automatically (like Sprite),
-        //so we split up only what we need.
-
-        // primitives/builtin
-        kryo.registerClass<ByteArray>()
-        kryo.registerClass<IntArray>()
-
-//        kryo.register(ArrayList::class.java)
-        kryo.registerClass<ArrayList<Any>>()
-
-        kryo.registerClass<kotlin.Array<Any>>()
-        kryo.registerClass<kotlin.Array<Any>>()
-        kryo.registerClass<Vector2>()
-        kryo.registerClass<IntArray>()
-        kryo.registerClass<Rectangle>()
-        kryo.register(EnumSet::class.java, DefaultSerializers.EnumSetSerializer())
-
-        kryo.registerClass<EntityUpdate>()
-        kryo.registerClass<Shared.Player>()
-    }
-
-    private fun registerComponents(kryo: Kryo) {
-//        kryo.registerClass<Object>()
-//        kryo.registerClass<SnapshotArray<*>>()
-//        kryo.registerClass<Signal<*>>()
-//        kryo.registerClass<Entity>()
-        kryo.registerClass<Component>()
-//        kryo.registerClass<ClickableComponent>()
-//        kryo.registerClass<FlipAnimationComponent>()
-//        kryo.registerClass<NameComponent>()
-//        kryo.registerClass<RectangleComponent>()
-//        kryo.registerClass<RevealableComponent>()
-//        kryo.registerClass<StateComponent>()
-//        kryo.registerClass<TeamComponent>()
-        kryo.registerClass<CardComponent>()
-        kryo.registerClass<TextureComponent>()
-        kryo.registerClass<TransformComponent>()
-        kryo.registerClass<PositionComponent>()
-        kryo.registerClass<TextureReferenceComponent>()
-        kryo.registerClass<RevealedComponent>()
-//        kryo.registerClass<NetworkComponent>()
-    }
-
-    private fun registerServer(kryo: Kryo) {
-        kryo.registerClass<Server.EntityDestroyMultiple>()
-        kryo.registerClass<Server.EntitySpawnMultiple>()
-        kryo.registerClass<Server.CardPressed>()
-        kryo.registerClass<Server.Card>()
-        kryo.registerClass<Server.Cards>()
-        kryo.registerClass<Server.PlayerSpawned>()
-
-        kryo.registerClass<Server.SpawnCards>()
-        kryo.registerClass<Server.EntitySpawn>()
-        kryo.registerClass<Server.CardTouched>()
-    }
-
-    private fun registerClient(kryo: Kryo) {
-        kryo.registerClass<Client.RequestCardSetup>()
-        kryo.registerClass<Client.InitialClientData>()
-        kryo.registerClass<Client.EntityTouch>()
     }
 
     object Server {
