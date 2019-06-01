@@ -51,6 +51,7 @@ class ServerNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificatio
         }
     }
 
+    // TODO consider making in sync w/ client?  Currently the same
     private fun addComponentsToEntity(newEntity: Entity, entityUpdate: EntityUpdate) {
         val edit = newEntity.edit()
         val components = entityUpdate.components
@@ -62,6 +63,7 @@ class ServerNotificationProcessor(val gameWorld: GameWorld) : DefaultNotificatio
         }
     }
 
+    // TODO consider making in sync w/ client?  Currently the same
     private fun updateEntity(entityUpdate: EntityUpdate) {
         val worldManager = gameWorld.artemisWorld.getSystem(SharedWorldManager::class.java)
 
