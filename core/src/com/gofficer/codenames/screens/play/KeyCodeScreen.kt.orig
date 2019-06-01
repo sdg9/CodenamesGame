@@ -2,29 +2,49 @@ package com.gofficer.codenames.screens.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
-//import com.badlogic.gdx.ScreenAdapter
-//import com.gofficer.codenames.CodenamesGame
+<<<<<<< HEAD
+import com.badlogic.gdx.ScreenAdapter
+import com.gofficer.codenames.CodenamesGame
+=======
+import com.gofficer.codenames.GameClient
+>>>>>>> artemis
 import com.gofficer.codenames.utils.logger
 import ktx.app.KtxScreen
 
-class KeyCodeScreen() : KtxScreen {
+class KeyCodeScreen(val game: GameClient) : KtxScreen {
 
     companion object {
         @JvmStatic
         private val log = logger<KeyCodeScreen>()
     }
 
-//    private val assetManager = game.assetManager
+    private val assetManager = game.assetManager
 //    private var renderer: KeyCodeRenderer = KeyCodeRenderer(game.font24, assetManager, game.store)
 
     override fun show() {
         log.debug("show")
-//        renderer = KeyCodeRenderer(game.font24, assetManager, game.store)
+<<<<<<< HEAD
+        renderer = KeyCodeRenderer(game.font24, assetManager, game.store)
+        renderer.show()
+    }
+
+    override fun render(delta: Float) {
+        renderer.render(delta)
+=======
+//
+//        if (game.client == null) {
+//            setupGame()
+//        }
+//        game.store.subscribe {
+//            log.debug("Update to store")
+//        }
 //        renderer.show()
     }
 
     override fun render(delta: Float) {
+//        controller.update(delta)
 //        renderer.render(delta)
+>>>>>>> artemis
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
             hide()
@@ -47,4 +67,10 @@ class KeyCodeScreen() : KtxScreen {
 //        renderer.dispose()
     }
 
+<<<<<<< HEAD
+=======
+    private fun setupGame() {
+//        game.store.dispatch(SetupGame())
+    }
+>>>>>>> artemis
 }

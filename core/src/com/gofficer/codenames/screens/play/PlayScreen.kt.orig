@@ -53,8 +53,16 @@ class PlayScreen(val client: GameClient) : KtxScreen {
 //    private var animationSystem: FlipAnimationSystem? = null
 
     override fun show() {
-//        log.debug("show")
-//        renderer = PlayRenderer(game.font24, assetManager, game.store, game.client)
+<<<<<<< HEAD
+        log.debug("show")
+        renderer = PlayRenderer(game.font24, assetManager, game.store, game.client)
+=======
+//        renderingSystem = RenderingSystem(batch, font)
+//        touchSystem = TouchSystem(camera)
+//        animationSystem = FlipAnimationSystem()
+//        client.engine.addSystem(renderingSystem)
+//        client.engine.addSystem(touchSystem)
+//        client.engine.addSystem(animationSystem)
 
 //        log.debug { "show" }
 //        if (game.client == null) {
@@ -123,6 +131,7 @@ class PlayScreen(val client: GameClient) : KtxScreen {
                     })
                 }
             }
+>>>>>>> artemis
 
         }
 

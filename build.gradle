@@ -108,150 +108,11 @@ project(":ios") {
     }
 }
 
-project(":redux") {
-    apply plugin: "kotlin"
-
-    dependencies {
-        compile project(":network")
-        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
-//        implementation("com.squareup.moshi:moshi:$moshi_version")
-//        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
-//        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
-//        implementation "com.squareup.okio:okio:1.16.0"
-        testCompile "io.ktor:ktor-server-tests:$ktor_version"
-    }
-
-}
-
-///**
-// * Game server core logic (not customized to codenames)
-// */
-//
-//project(":server") {
-//    apply plugin: "kotlin"
-//
-//    dependencies {
-//        compile project(":redux")
-//        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-//        compile "io.ktor:ktor-server-netty:$ktor_version"
-//        compile "ch.qos.logback:logback-classic:$logback_version"
-//        compile "io.ktor:ktor-server-core:$ktor_version"
-//        compile "io.ktor:ktor-server-sessions:$ktor_version"
-//        compile "io.ktor:ktor-websockets:$ktor_version"
-//        compile "io.ktor:ktor-gson:$ktor_version"
-//        implementation("com.squareup.moshi:moshi:$moshi_version")
-//        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
-//        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-//        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
-//        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
-//        compile 'org.redisson:redisson:3.10.7'
-//        // https://mvnrepository.com/artifact/commons-codec/commons-codec
-//        compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
-//        testCompile "io.ktor:ktor-server-tests:$ktor_version"
-//    }
-//
-//}
-
-
-/**
- * Game server client
- */
-project(":client") {
-    apply plugin: "kotlin"
-
-    dependencies {
-
-        compile project(":network")
-        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-        implementation 'com.fasterxml.jackson.core:jackson-databind:2.9.8'
-        implementation 'org.java-websocket:Java-WebSocket:1.3.9'
-        implementation 'org.msgpack:jackson-dataformat-msgpack:0.8.16'
-
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-    }
-
-}
-
-/**
- * Across the wire logic, deserializing/serializing message pack to POJOs
- */
-project(":network") {
-    apply plugin: "kotlin"
-
-    dependencies {
-        implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
-        // To print out byte array as hex
-        compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
-
-        implementation 'org.msgpack:jackson-dataformat-msgpack:0.8.16'
-        testCompile group: 'junit', name: 'junit', version: '4.12'
-    }
-
-}
-
-project(":my-server") {
-    apply plugin: "kotlin"
-    apply plugin: "application"
-    repositories {
-        maven { url 'https://kotlin.bintray.com/ktor' }
-    }
-
-    dependencies {
-        compile project(":redux")
-        compile project(":server")
-        compile project(":network")
-        implementation("com.squareup.moshi:moshi:$moshi_version")
-        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
-        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
-        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
-        testCompile "io.ktor:ktor-server-tests:$ktor_version"
-    }
-}
-
-project(":server") {
-    apply plugin: "kotlin"
-    apply plugin: "application"
-    repositories {
-        maven { url 'https://kotlin.bintray.com/ktor' }
-    }
-
-    dependencies {
-        compile project(":redux")
-        compile project(":network")
-        compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-        compile "io.ktor:ktor-server-netty:$ktor_version"
-        compile "ch.qos.logback:logback-classic:$logback_version"
-        compile "io.ktor:ktor-server-core:$ktor_version"
-        compile "io.ktor:ktor-server-sessions:$ktor_version"
-        compile "io.ktor:ktor-websockets:$ktor_version"
-        compile "io.ktor:ktor-gson:$ktor_version"
-        implementation("com.squareup.moshi:moshi:$moshi_version")
-        implementation "com.squareup.moshi:moshi-adapters:$moshi_version"
-        implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
-        implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
-        implementation "com.github.pardom:redux-kotlin:$reduxKotlinVersion"
-        compile 'org.redisson:redisson:3.10.7'
-        compile 'org.msgpack:msgpack-core:0.8.16'
-//        // https://mvnrepository.com/artifact/commons-codec/commons-codec
-        compile group: 'commons-codec', name: 'commons-codec', version: '1.9'
-//        // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-//        compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-//        // https://mvnrepository.com/artifact/commons-codec/commons-codec
-//        compile group: 'commons-codec', name: 'commons-codec', version: '1.12'
-        testCompile "io.ktor:ktor-server-tests:$ktor_version"
-    }
-}
-
 project(":core") {
     apply plugin: "kotlin"
 
     dependencies {
-        compile project(":redux")
-        compile project(":client")
+//        implementation "com.badlogicgames.ashley:ashley:1.7.3"
         implementation "com.badlogicgames.gdx:gdx:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         implementation "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
@@ -264,6 +125,49 @@ project(":core") {
         implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
         implementation "com.daveanthonythomas.moshipack:moshipack:1.0.0-beta"
 
+//        implementation "io.github.libktx:ktx-ashley:$ktxVersion"
+//        implementation "io.github.libktx:ktx-graphics:$ktxVersion"
+//        implementation "io.github.libktx:ktx-scene2d:$ktxVersion"
+
+//        compile "com.kotcrab.vis:vis-ui:$visuiVersion"
+//        implementation "io.github.libktx:ktx-vis:$ktxVersion"
+
+        api "io.github.libktx:ktx-actors:$ktxVersion"
+        api "io.github.libktx:ktx-scene2d:$ktxVersion"
+
+        api "io.github.libktx:ktx-app:$ktxVersion"
+//        api "io.github.libktx:ktx-ashley:$ktxVersion"
+        api "io.github.libktx:ktx-assets:$ktxVersion"
+        api "io.github.libktx:ktx-collections:$ktxVersion"
+        api "io.github.libktx:ktx-graphics:$ktxVersion"
+        api "io.github.libktx:ktx-inject:$ktxVersion"
+        api "io.github.libktx:ktx-log:$ktxVersion"
+
+        api "net.onedaybeard.artemis:artemis-odb:$artemisVersion"
+
+
+        api "com.esotericsoftware:kryonet:2.22.0-RC1"
+
+        // jcommander for command line parsing
+        api "com.beust:jcommander:$jcommanderVersion"
+        // Artemis-odb bonus functionality (systems, events, components).
+        api "net.mostlyoriginal.artemis-odb:contrib-core:$artemisContribVersion"
+        api "net.mostlyoriginal.artemis-odb:contrib-eventbus:$artemisContribVersion"
+        api "net.mostlyoriginal.artemis-odb:contrib-jam:$artemisContribVersion"
+        api "net.mostlyoriginal.artemis-odb:contrib-network:$artemisContribVersion"
+
+
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile "org.mockito:mockito-all:1.9.+"
+        testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+        testCompile "com.badlogicgames.gdx:gdx:$gdxVersion"
+        testCompile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+
+
+//
+//        compile "junit:junit:4.12"
+//        compile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+//        compile "org.mockito:mockito-all:1.9.+"
 //        implementation "com.freeletics.coredux:core:1.1.0"
 //        implementation "com.freeletics.coredux:log-common:1.1.0"
 
@@ -279,12 +183,6 @@ tasks.eclipse.doLast {
 }
 
 clean.doFirst {
-//    delete "${rootDir}/build"
-    delete "${rootDir}/client/out"
     delete "${rootDir}/core/out"
     delete "${rootDir}/desktop/out"
-    delete "${rootDir}/my-server/out"
-    delete "${rootDir}/network/out"
-    delete "${rootDir}/redux/out"
-    delete "${rootDir}/server/out"
 }

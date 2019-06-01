@@ -8,14 +8,16 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.Viewport
 import com.gofficer.codenames.assets.AssetDescriptors
 import com.gofficer.codenames.config.GameConfig
-import com.gofficer.codenames.CodenamesGame
+import com.gofficer.codenames.GameClient
 import com.gofficer.codenames.screens.menu.MainMenuScreen
 import com.gofficer.codenames.screens.play.PlayScreen
 import com.gofficer.codenames.utils.clearScreen
-import com.gofficer.codenames.utils.logger
+import ktx.app.KtxScreen
+import ktx.assets.disposeSafely
+import ktx.log.logger
 
 
-class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
+class LoadingScreen(private val client: GameClient) : KtxScreen {
 
     companion object {
         @JvmStatic
@@ -27,21 +29,21 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
         private const val PROGRESS_BAR_HEIGHT = 10f // world units
 
     }
-
-    private val assetManager = game.assetManager
-    private lateinit var camera: OrthographicCamera
-    private lateinit var viewport: Viewport
-    private lateinit var renderer: ShapeRenderer
+//
+//    private val assetManager = client.assetManager
+    private var camera: OrthographicCamera = OrthographicCamera()
+    private var viewport: Viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
+    private var renderer: ShapeRenderer = ShapeRenderer()
     private var progress: Float = 0f
 
     override fun show() {
-        log.debug("show")
-        camera = OrthographicCamera()
-        viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
-        renderer = ShapeRenderer()
-//        viewport.apply()
-
-//        renderer.projectionMatrix = camera.combined
+        log.debug { "show" }
+//        camera = OrthographicCamera()
+//        viewport = FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera)
+//        renderer = ShapeRenderer()
+////        viewport.apply()
+//
+////        renderer.projectionMatrix = camera.combined
 
         progress = 0f
 
@@ -77,17 +79,26 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
     }
 
     override fun dispose() {
-        log.debug("dispose")
-        renderer.dispose()
+        log.debug { "dispose" }
+        renderer.disposeSafely()
     }
 
     // == private functions ==
     private fun update(delta: Float) {
-        progress = MathUtils.lerp(progress, assetManager.progress, .1f)
-        if (assetManager.update() && progress >= assetManager.progress - .001f) {
+        progress = MathUtils.lerp(progress, client.assetManager.progress, .1f)
+        if (client.assetManager.update() && progress >= client.assetManager.progress - .001f) {
 
-            @Suppress("ConstantConditionIf")
-            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
+            // Add all screens once assets loaded
+            client.addScreen(PlayScreen(client))
+            client.addScreen(MainMenuScreen(client))
+
+//            client.world.assetManager = client.assetManager
+//            client.addScreen(SplashScreen(client))
+//            client.addScreen(KeyCodeScreen(client))
+
+//            @Suppress("ConstantConditionIf")
+//            game.screen = if (GameConfig.USE_SPLASH) SplashScreen(game) else MainMenuScreen(game)
+            client.setScreen<MainMenuScreen>()
 //            game.screen = PlayScreen(game)
         }
     }
@@ -106,9 +117,9 @@ class LoadingScreen(private val game: CodenamesGame) : ScreenAdapter() {
     }
 
     private fun queueAssets() {
-        assetManager.load(AssetDescriptors.FONT)
-        assetManager.load(AssetDescriptors.GAMEPLAY)
-        assetManager.load(AssetDescriptors.SPLASH)
-        assetManager.load(AssetDescriptors.UI_SKIN)
+        client.assetManager.load(AssetDescriptors.FONT)
+        client.assetManager.load(AssetDescriptors.GAMEPLAY)
+        client.assetManager.load(AssetDescriptors.SPLASH)
+        client.assetManager.load(AssetDescriptors.UI_SKIN)
     }
 }
