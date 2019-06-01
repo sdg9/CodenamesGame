@@ -16,7 +16,7 @@ import com.gofficer.codenames.assets.RegionNames
 import com.gofficer.codenames.screens.loading.LoadingScreen
 import com.gofficer.codenames.systems.client.ClientNetworkSystem
 import com.gofficer.codenames.utils.get
-import com.gofficer.sampler.utils.toInternalFile
+import com.gofficer.codenames.utils.toInternalFile
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.log.logger
@@ -84,7 +84,7 @@ class GameClient : KtxGame<KtxScreen>() {
     /**
      * immediately hops into hosting and joining its own local server
      */
-    fun startClientHostedServerAndJoin(listener: MarshalObserver?) {
+    fun startClientHostedServerAndJoin() {
         startLocalServer()
         startLocalClient(GameWorld.WorldInstanceType.ClientHostingServer)
     }

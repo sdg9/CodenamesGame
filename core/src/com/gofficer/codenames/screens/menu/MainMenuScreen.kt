@@ -105,7 +105,7 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
                     addListener(object : ClickListener() {
                         override fun clicked(event: InputEvent?, x: Float, y: Float) {
                             // TODO respond to listener
-                            client.startClientHostedServerAndJoin(null)
+                            client.startClientHostedServerAndJoin()
                             client.setScreen<PlayScreen>()
                             client.sendToAll(Network.Client.JoinRoomRequest())
 //                            client.startClientHostedServerAndJoin(object : MarshalObserver {
@@ -217,7 +217,7 @@ class MainMenuScreen(private val client: GameClient) : KtxScreen {
         }
 
         stage.addActor(root)
-        stage.isDebugAll = true
+//        stage.isDebugAll = true
         Gdx.input.inputProcessor = stage
     }
 

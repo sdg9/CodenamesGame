@@ -85,15 +85,11 @@ class GameWorld
                 CameraSystem(),
                 TouchSystem(),
                 SharedWorldManager(this),
-                // TODO temp disable
                 CardPressedSystem(),
-//                MouseClickSystem(),
                 ClearScreenSystem(),
                 TextureResolverSystem(this),
-//                ClientNetworkSystemOld(this),
-                FlipAnimationSystem(),
+//                FlipAnimationSystem(),
                 CardRenderSystem(gameWorld = this),
-//                TouchSystem(this)
                 RemoveSystem()
             ).build())
 
@@ -102,8 +98,6 @@ class GameWorld
 
         entityFactory = EntityFactory(this)
 
-//        val e = artemisWorld.createEntity()
-//        artemisWorld.getSystem(TagManager::class.java).register("cursor", e)
     }
 
     fun initServer() {
