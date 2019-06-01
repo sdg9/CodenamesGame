@@ -49,4 +49,8 @@ It also is serving as my "Hello World" entry into game development. I'm a profes
   - [ ] Ability to reset game (make a new one)
   - [ ] Animate card on press
 
-# Screenshots
+# Screenshot
+
+![Main Menu](/screenshots/mainMenu.png?raw=true "Main Menu")
+![New Game](/screenshots/newGame.png?raw=true "New Game")s
+![Game In Progress](/screenshots/gameInProgress.png?raw=true "Game In Progress")
