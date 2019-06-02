@@ -29,10 +29,16 @@ It also is serving as my "Hello World" entry into game development. I'm a profes
   - With two libgdx + artemis-odb + kryonet examples learned more from existing approaches
   - Implemented serializing in such a way where simply creating an entity with the appropriate component would cause it to appear in all worlds (server & clients)
     - Now I can "almost" develop without thinking about network connectivity for a good chunk of the game
-- Future
-  - Better understanding of how I should deal with libgdx scenes when using ECS
-    - What should ECS systems render vs libgdx scenes
-    - How do I deal with Scene2d?
+
+## Next Steps
+
+- Screens
+  - How to deal with multiple screens & artemis-odb world?
+    - Menu (no world/internet connectivity)
+    - Game Board (world/network connectivity exists)
+    - Game Word List (world/network connectivity exits)
+  - Specifically, how do I deal with toggling between Board & Word list (100% different UI). Should world change on client? Server only has one world running how do I deal with that?
+- Scene 2d (tables) and ECS intermingling?
 
 # TODO
 
