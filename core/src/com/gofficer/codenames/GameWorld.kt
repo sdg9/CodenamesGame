@@ -10,9 +10,9 @@ import com.gofficer.codenames.network.server.ServerNotificationProcessor
 import com.gofficer.codenames.network.server.ServerRequestProcessor
 import com.gofficer.codenames.systems.*
 import com.gofficer.codenames.systems.client.*
-import com.gofficer.codenames.systems.client.FlipAnimationSystem
 import com.gofficer.codenames.systems.server.*
 import com.gofficer.codenames.utils.gameInject
+import com.gofficer.codenames.systems.server.GameLoopSystemInvocationStrategy
 import ktx.log.logger
 import net.mostlyoriginal.api.event.common.EventSystem
 import net.mostlyoriginal.api.network.marshal.kryonet.KryonetServerMarshalStrategy
@@ -115,6 +115,7 @@ class GameWorld
                 SharedWorldManager(this),
                 WorldManager(this, server!!)
             )
+            .register(GameLoopSystemInvocationStrategy(msPerLogicTick = 25, isServer = true))
             .build())
         //inject the mappers into the world, before we start doing things
         artemisWorld.gameInject(this)

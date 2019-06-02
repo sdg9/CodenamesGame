@@ -36,16 +36,6 @@ It also is serving as my "Hello World" entry into game development. I'm a profes
 
 # TODO
 
-- [ ] Fix recent issue created breaking joining client sync
-  - Introduced in 8f3917ae27fa2469807ed5ec32e0c6294ffc2dbe, works one commit earlier 9194bef14b284683fafb9ec4cfed1369efe2afee
-
-```java
-  Exception in thread "server thread (main)" java.util.ConcurrentModificationException
-	at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:909)
-	at java.util.ArrayList$Itr.next(ArrayList.java:859)
-	at com.gofficer.codenames.systems.server.ServerNetworkEntitySystem.process(ServerNetworkEntitySystem.kt:63)
-```
-
 - [ ] When joining a game, the menu is not rendered but buttons are still clickable. So if you click in the same region as the "Host game" button you'll try and host again, causing game world to crash.
 - [ ] Determine optimal approach for navigating across various game screens
 - [ ] Support more than hardcoded localhost newtork play
