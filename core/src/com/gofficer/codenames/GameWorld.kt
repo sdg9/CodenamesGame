@@ -72,7 +72,7 @@ class GameWorld
             worldInstanceType == WorldInstanceType.ClientHostingServer
 
 
-    fun initClient() {
+    private fun initClient() {
         log.debug { "Init client" }
 
         artemisWorld = World(WorldConfigurationBuilder()
@@ -100,7 +100,7 @@ class GameWorld
 
     }
 
-    fun initServer() {
+     private fun initServer() {
 
         log.debug { "Init server" }
         val strategy = KryonetServerMarshalStrategy("127.0.0.1", Network.PORT)
